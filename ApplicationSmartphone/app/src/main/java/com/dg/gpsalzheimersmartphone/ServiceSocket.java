@@ -21,11 +21,15 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import static com.dg.gpsalzheimersmartphone.MainActivity.android_id;
+
 public class ServiceSocket extends Service implements LocationListener
 {
     private CommunicationServer comm;
     final static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
+    final static String ACTION_RECEIVE_FROM_SERVER = "RECEIVE_FROM_SERVER";
     private MyReceiver myReceiver;
+    private OkReceiver okReceiver;
     private boolean gpsOn;
 
     public ServiceSocket()
@@ -45,10 +49,15 @@ public class ServiceSocket extends Service implements LocationListener
         comm.setService(this);
         comm.start();
         myReceiver = new MyReceiver();
+        okReceiver = new OkReceiver();
+
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MainActivity.ACTION_SEND_TO_SERVICE);
         registerReceiver(myReceiver, intentFilter);
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_RECEIVE_FROM_SERVER);
+        registerReceiver(okReceiver, intentFilter);
         super.onStartCommand(intent,flags,startId);
         return START_STICKY;
     }
@@ -65,6 +74,7 @@ public class ServiceSocket extends Service implements LocationListener
 
         }
         unregisterReceiver(myReceiver);
+        unregisterReceiver(okReceiver);
         comm.interrupt();
         super.onDestroy();
     }
@@ -105,19 +115,37 @@ public class ServiceSocket extends Service implements LocationListener
         @Override
         public void onReceive(Context arg0, Intent arg1) {
             // TODO Auto-generated method stub
-            String message = arg1.getStringExtra("DATAPASSED");
-            String messageContinue = arg1.getStringExtra("CONTINUE");
-            if (message != null)
-            {
-                ServiceSocket.this.comm.sendMessage(message);
+
+            boolean startSuivi = arg1.getBooleanExtra("STARTSUIVI*" + android_id, false);
+            boolean messageContinue = arg1.getBooleanExtra("CONTINUE*" + android_id, false);
+            if(startSuivi){
+                ServiceSocket.this.comm.sendMessage("STARTSUIVI*" + android_id);
             }
-            if (messageContinue != null)
+            if (messageContinue)
             {
-                ServiceSocket.this.comm.sendMessage(messageContinue);
+                ServiceSocket.this.comm.sendMessage("CONTINUE*" + android_id);
             }
 
+
+
+
+            boolean killApp = arg1.getBooleanExtra("KILL",false);
+            if (killApp)
+            {
+                ServiceSocket.this.stopSelf();
+            }
+        }
+
+    }
+
+    private class OkReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            // TODO Auto-generated method stub
 
             boolean startGps = arg1.getBooleanExtra("OKPROMENADE",false);
+
             if (startGps)
             {
                 gpsOn = true;
@@ -131,13 +159,8 @@ public class ServiceSocket extends Service implements LocationListener
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 lm.removeUpdates(ServiceSocket.this);
             }
-
-            boolean killApp = arg1.getBooleanExtra("KILL",false);
-            if (killApp)
-            {
-                ServiceSocket.this.stopSelf();
-            }
         }
 
     }
+
 }
