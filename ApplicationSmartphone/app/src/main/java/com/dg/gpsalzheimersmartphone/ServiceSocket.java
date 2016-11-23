@@ -1,17 +1,23 @@
 package com.dg.gpsalzheimersmartphone;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,7 +26,6 @@ public class ServiceSocket extends Service implements LocationListener
     private CommunicationServer comm;
     final static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
     private MyReceiver myReceiver;
-    private String username;
     private boolean gpsOn;
 
     public ServiceSocket()
@@ -30,7 +35,6 @@ public class ServiceSocket extends Service implements LocationListener
     @Override
     public int onStartCommand(Intent intent,int flags,int startId)
     {
-        this.username = intent.getStringExtra("username");
 
         if (comm == null)
         {
@@ -74,10 +78,9 @@ public class ServiceSocket extends Service implements LocationListener
     @Override
     public void onLocationChanged(Location location)
     {
-        comm.sendMessage("POSITION*3*"+
-                this.username+"*"+
-                String.valueOf(location.getLatitude())+"*"+
-                String.valueOf(location.getLongitude()));
+        comm.sendMessage("POSITION*" + String.valueOf(location.getLongitude()) +
+                "*" +
+                String.valueOf(location.getLatitude()));
     }
 
     @Override
@@ -103,20 +106,26 @@ public class ServiceSocket extends Service implements LocationListener
         public void onReceive(Context arg0, Intent arg1) {
             // TODO Auto-generated method stub
             String message = arg1.getStringExtra("DATAPASSED");
+            String messageContinue = arg1.getStringExtra("CONTINUE");
             if (message != null)
             {
                 ServiceSocket.this.comm.sendMessage(message);
             }
+            if (messageContinue != null)
+            {
+                ServiceSocket.this.comm.sendMessage(messageContinue);
+            }
 
-            boolean startGps = arg1.getBooleanExtra("STARTGPS",false);
+
+            boolean startGps = arg1.getBooleanExtra("OKPROMENADE",false);
             if (startGps)
             {
                 gpsOn = true;
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
-                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0,ServiceSocket.this);
+                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,0,ServiceSocket.this);
             }
-            else if (startGps == false)
+            else if (!startGps)
             {
                 gpsOn = false;
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

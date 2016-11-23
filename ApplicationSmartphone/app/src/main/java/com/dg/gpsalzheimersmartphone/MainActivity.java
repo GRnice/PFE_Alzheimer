@@ -1,10 +1,16 @@
 package com.dg.gpsalzheimersmartphone;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,12 +23,17 @@ public class MainActivity extends AppCompatActivity {
 
     private int etat = 0;
     private MyReceiver myReceiver;
-    final static String ACTION_SEND_TO_SERVICE = "DATA_TO_SERVICE";
+    public final static String ACTION_SEND_TO_SERVICE = "DATA_TO_SERVICE";
+    public static String android_id;
+    private NetworkChangeReceiver networkChangeReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         if (! isMyServiceRunning(ServiceSocket.class))
         {
@@ -56,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
                 {
                     Intent intent = new Intent();
                     intent.setAction(ACTION_SEND_TO_SERVICE);
-                    intent.putExtra("DATAPASSED","STARTSUIVI*1*Rémy");
-                    intent.putExtra("STARTGPS",true);
+                    intent.putExtra("DATAPASSED","STARTSUIVI*" + android_id);
+                    intent.putExtra("OKPROMENADE",true);
                     sendBroadcast(intent);
 
                     buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
@@ -68,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
                     etat = 0;
                     Intent intent = new Intent();
                     intent.setAction(ACTION_SEND_TO_SERVICE);
-                    intent.putExtra("DATAPASSED","STOPSUIVI*1*Rémy");
-                    intent.putExtra("STARTGPS",false);
+                    intent.putExtra("DATAPASSED","STOPSUIVI");
+                    intent.putExtra("OKPROMENADE",false);
                     sendBroadcast(intent);
                     buttonSwitchConnexion.setText("ACTIVER LE SUIVI");
                 }
@@ -102,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ServiceSocket.ACTION_SEND_TO_ACTIVITY);
         registerReceiver(myReceiver, intentFilter);
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter intentFilter1 = new IntentFilter();
+        intentFilter1.addAction(NetworkChangeReceiver.CONNECTIVITY_CHANGED);
+        registerReceiver(networkChangeReceiver, intentFilter1);
     }
 
     @Override
@@ -116,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onStop();
         unregisterReceiver(myReceiver);
+        unregisterReceiver(networkChangeReceiver);
     }
 
 
@@ -129,10 +145,34 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(MainActivity.this,
                     "Triggered by Service!\n"
-                            + "Data passed: " + datapassed,
+                            + "Data passed: " + datapassed + ", device id: " + android_id,
                     Toast.LENGTH_LONG).show();
 
         }
 
     }
+
+    private class NetworkChangeReceiver extends BroadcastReceiver {
+
+        public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
+        private boolean connected;
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            int status = NetworkUtil.getConnectivityStatusString(context);
+            if (CONNECTIVITY_CHANGED.equals(intent.getAction())) {
+                if(status==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    connected = false;
+//                Toast.makeText(context, "Lost connection!", Toast.LENGTH_SHORT).show();
+                }
+                if(!connected && status==NetworkUtil.NETWORK_STATUS_MOBILE){
+                    Intent intent1 = new Intent();
+                    intent1.setAction(MainActivity.ACTION_SEND_TO_SERVICE);
+                    intent1.putExtra("CONTINUE", "CONTINUE*" + android_id);
+                    sendBroadcast(intent1);
+                }
+            }
+        }
+    }
+
 }

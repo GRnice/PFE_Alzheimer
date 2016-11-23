@@ -24,7 +24,7 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "192.168.43.5";
+    public static final String SOCKET_ADDR = "192.168.42.164";
     public static final int PORT = 3000;
     private Socket m_sock;
     private BufferedReader input;
@@ -59,6 +59,7 @@ public class CommunicationServer extends Thread implements Runnable
         }
         catch (IOException e)
         {
+
             e.printStackTrace();
             return;
         }
