@@ -10,14 +10,15 @@ import eventlet
 import eventlet.wsgi
 from flask import Flask, render_template
 
-poolRequest = queue.Queue(500) # MAX 100 requetes à traiter
-mlock = RLock()
+poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
+lockPool = RLock()
+lockMap = RLock()
 
 
 class Tracker: ## Classe representant un tracker
     def __init__(self):
         self.id = None
-        self.position = tuple() # (latitude longitude)
+        self.position = tuple() # (longitude latitude)
         self.etat = 0 # 0 -> connecté mais aucune information de l'utilisateur; 1 -> connecté avec information;
         
 
@@ -32,7 +33,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         self.dict[socket] = Tracker()
 
     def delTracker(self,socket):
-        del self.dict[socket]
+        if socket in self.dict.keys():
+            del self.dict[socket]
 
     def getTracker(self,socket):
         if socket in self.dict.keys():
@@ -42,7 +44,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         return self.dict.keys()
             
 
-    def apply(self,commande): ## parse la commande et applique la commande
+    def apply(self,commande):
+        ## parse la commande et applique la commande
         # commande contient un tuple (socket , commande)
         ## les commandes:
             ## entete*parametre*parametre*...
@@ -76,6 +79,25 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             print("Nouvelle position connue pour : (",longitude,",",latitude,")")
             tracker.position = (longitude,latitude)
             self.dict[socket] = tracker
+
+        elif (entete == "CONTINUE"):
+            idTel = requeteArray[1]
+            nwTracker = self.dict[socket]
+            allkeys = list(self.dict.keys())
+            for key in allkeys:
+                if self.dict[key].id == idTel:
+                    old = self.dict[key]
+                    nwTracker.id = idTel
+                    nwTracker.position = old.position
+                    nwTracker.etat = old.etat
+                    self.dict[socket] = nwTracker
+                    key.close()
+                    del self.dict[key]
+                    socket.send("OKPROMENADE\r\n".encode('utf-8'))
+                    break
+            
+                    
+                    
             
 
 class Pool(Thread):
@@ -88,7 +110,7 @@ class Pool(Thread):
         commande = None
         while True:
             
-            with mlock:
+            with lockPool:
                 if (not poolRequest.empty()):
                     commande = poolRequest.get() # (socket , requete)
 
@@ -119,15 +141,26 @@ def assistantServeur(port):
     eventlet.wsgi.server(eventlet.listen(('', port)), app)
 
 
+
+
+###############################################
+###############################################
+###############################################
+##
+## SERVEUR_PATIENT <---------------> Smartphone
+##
+###############################################
+###############################################
+###############################################
 class PatientServer(Thread):
     def __init__(self,port,sizeBuffer,maxClientSocket):
         Thread.__init__(self)
         self.PORT = port
         self.RECV_BUFFER = sizeBuffer
         self.maxClientSocket = maxClientSocket
-        self.CONNECTION_LIST = [] # list of socket clients
-        self.mapper = None
+        self.CONNECTION_LIST = [] # liste des patients connectés (socket)
         self.serverOnline = True
+        self.mapper = Mapper() # HashMap<socket,Profil>
 
     def getMapper(self):
         return self.mapper
@@ -141,7 +174,7 @@ class PatientServer(Thread):
         server_socket.listen(self.maxClientSocket)
         # Add server socket to the list of readable connections
         self.CONNECTION_LIST.append(server_socket)
-        self.mapper = Mapper()
+        
         pool = Pool(self.mapper)
         pool.start()
         print("Chat server started on port " + str(self.PORT) + " [ok]")
@@ -156,13 +189,10 @@ class PatientServer(Thread):
                  
                 #New connection
                 if sock == server_socket:
-                    # Handle the case in which there is a new connection recieved through server_socket
                     sockfd, addr = server_socket.accept()
                     self.mapper.addTracker(sockfd)
-                    #sockfd.send("CONNECTED\r\n".encode('utf-8'))
                     print("Client (%s, %s) connected" % addr)
                      
-                #Some incoming message from a client
                 else:
                     # Data recieved from client, process it
                     try:
@@ -171,7 +201,7 @@ class PatientServer(Thread):
                         data = sock.recv(self.RECV_BUFFER)
 
                         if len(data) > 0:
-                            with mlock:
+                            with lockPool:
                                 poolRequest.put((sock,data.decode('utf-8')))
 
                         else:
@@ -187,7 +217,6 @@ class PatientServer(Thread):
                         print("Client (%s, %s) is offline" % addr)
                         sock.close()
                         self.mapper.delTracker(sock)
-                        continue
 
              
         server_socket.close()
