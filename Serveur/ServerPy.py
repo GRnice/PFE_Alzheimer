@@ -107,7 +107,6 @@ class Pool(Thread):
     def __init__(self,mapper):
         Thread.__init__(self)
         self.mapper = mapper
-        self.minuteur = testStopAfterNCommand
 
     def run(self):
         print("Poll ready [ok]")
