@@ -19,7 +19,7 @@ def startSockerIOassistantServeur(port):
     def connect(sid, environ):
         print("connect ", sid)
         lookUpAssistantPatient.addAssistant(sio)
-        sio.emit("PROFILES","Dominique;Dib$Eslam;Hossam",room=sid)
+        sio.emit("PROFILES","Dominique,Dib$Eslam,Hossam",room=sid)
 
     @sio.on('chat', namespace='/')
     def message(sid, data):
