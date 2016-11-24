@@ -8,8 +8,37 @@ import queue
 #from ServerServiceTablet import *
 from ServerServiceTablet import *
 
-lookUpAssistantPatient = LookupAssistantPatient.LookupAssistantPatient()
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
+
+class Profile:
+    def __init__(self, nom, prenom):
+        self.firstName = prenom
+        self.lastName = nom
+        
+class ManagerProfile:
+    def __init__(self):
+        self.listProfile = []
+
+    
+    def read(self, nomFichier):
+        with open(nomFichier, 'r') as f:
+            for line in f:
+                myLine = line.strip()
+                listLine = myLine.split(",")
+                p = Profile(listLine[0], listLine[1])
+                self.listProfile.append(p)
+        f.close()
+
+        for elt in self.listProfile:
+            print(elt.firstName + " " + elt.lastName)
+        
+
+    def write(self, nomFichier, profile):
+        with open(nomFichier, 'a') as out:
+            out.write(profile.firstName + "," + 
+                      profile.lastName + "\n")
+        out.close()
+        
 
 class Tracker: ## Classe representant un tracker
     def __init__(self):

@@ -8,9 +8,8 @@ import LookupAssistantPatient
 
 lockPool = RLock()
 lockMap = RLock()
-lockLookup = RLock()
 
-
+lookUpAssistantPatient = LookupAssistantPatient.LookupAssistantPatient()
 
 def startSockerIOassistantServeur(port):
     sio = socketio.Server()
