@@ -34,8 +34,9 @@
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
       
-<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
- 
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+  <!--   <script src="http://172.20.10.3/socket.io/socket.io.js">   -->
+    
 
       
   </head>
@@ -49,16 +50,26 @@
     </ion-nav-bar>
       
     
-<script>
-  var socket = io('http://172.20.10.3:2000');
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-</script>
-      
+    
 
- 
+   
+<script>
+    
+    var socket = io('http://172.20.10.3:2000');
+    socket.on('connect', function (data) {
+        console.log('AAA');
+        console.log(data);
+        socket.emit('chat', { data: 'BLABLA' });
+  });
+    
+    socket.on('message', function(data) {
+        console.log(data);
+    });
+    
+    
+</script>
+
+
           
 
     <!--
