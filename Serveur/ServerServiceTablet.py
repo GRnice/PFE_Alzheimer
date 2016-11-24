@@ -13,11 +13,12 @@ def startSockerIOassistantServeur(port):
     @sio.on('connect', namespace='/')
     def connect(sid, environ):
         print("connect ", sid)
+        sio.emit("coucou",room=sid)
 
-    @sio.on('chat message', namespace='/')
+    @sio.on('chat', namespace='/')
     def message(sid, data):
         print("message ", data)
-        sio.emit('reply', room=sid)
+        sio.emit('message','COUCOU', room=sid)
 
     @sio.on('disconnect', namespace='/')
     def disconnect(sid):
@@ -42,10 +43,3 @@ class ServerAssistant(Thread):
     def run(self):
         ## while
         pass
-
-
-
-
-s = ServerAssistant(2000)
-s.start()
-s.join()
