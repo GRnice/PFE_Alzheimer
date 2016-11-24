@@ -204,7 +204,7 @@ if __name__ == "__main__":
     
     serveAssistant.start()
     servePatient.start()
-    threadServAssistants.join()
+    serveAssistant.join()
     servePatient.join()
 
 ## TEST POOL
