@@ -42,10 +42,3 @@ class ServerAssistant(Thread):
     def run(self):
         ## while
         pass
-
-
-
-
-s = ServerAssistant(2000)
-s.start()
-s.join()
