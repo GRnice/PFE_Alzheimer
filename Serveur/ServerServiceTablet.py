@@ -3,7 +3,13 @@ import eventlet
 import eventlet.wsgi
 from flask import Flask, render_template
 
-from threading import Thread
+from threading import Thread,RLock
+import LookupAssistantPatient
+
+lockPool = RLock()
+lockMap = RLock()
+lockLookup = RLock()
+
 
 
 def startSockerIOassistantServeur(port):
@@ -13,6 +19,7 @@ def startSockerIOassistantServeur(port):
     @sio.on('connect', namespace='/')
     def connect(sid, environ):
         print("connect ", sid)
+        lookUpAssistantPatient.addAssistant(sio)
         sio.emit("coucou",room=sid)
 
     @sio.on('chat', namespace='/')
@@ -23,11 +30,13 @@ def startSockerIOassistantServeur(port):
     @sio.on('disconnect', namespace='/')
     def disconnect(sid):
         print('disconnect ', sid)
+        lookUpAssistantPatient.removeAssistant(sio)
 
     app = socketio.Middleware(sio, app)
     eventlet.wsgi.server(eventlet.listen(('', port)), app)
+      
+            
 
-    
 class ServerAssistant(Thread):
     def __init__(self,port):
         Thread.__init__(self)

@@ -5,19 +5,19 @@ from threading import Thread,RLock
 
 import socket, select
 import queue
+#from ServerServiceTablet import *
 from ServerServiceTablet import *
 
+lookUpAssistantPatient = LookupAssistantPatient.LookupAssistantPatient()
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
-lockPool = RLock()
-lockMap = RLock()
-
 
 class Tracker: ## Classe representant un tracker
     def __init__(self):
         self.id = None
-        self.position = tuple() # (longitude latitude)
-        self.etat = 0 # 0 -> connecté mais aucune information de l'utilisateur; 1 -> connecté avec information;
-        
+        self.position = tuple() # (longitude, latitude)
+        self.etat = 0
+        # 0 -> connecté mais aucune information de l'utilisateur;
+        # 1 -> connecté avec information;
 
 
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
@@ -50,54 +50,56 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             ## POSITION*longitude(float)*latitude(float) -> rafraichir la position du tracker sur le serveur
             ## STARTSUIVI*IDSMARTPHONE -> associer le socket à l'id smartphone
             ## STOPSUIVI -> indiquer au smartphone d'arreter le suivi
-        socket = commande[0]
-        requete = commande[1].rstrip()
-        requeteArray = requete.split("*")
-        entete = requeteArray[0]
+        with lockMap:
+            socket = commande[0]
+            requete = commande[1].rstrip()
+            requeteArray = requete.split("*")
+            entete = requeteArray[0]
 
-        if (entete == "STARTSUIVI"):
-            idTel = requeteArray[1]
-            tracker = self.getTracker(socket)
-            tracker.etat = 1
-            tracker.id = idTel
-            self.dict[socket] = tracker
-            print("Demarrage du suivi pour le tel à l'id : ",idTel)
-            socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
+            if (entete == "STARTSUIVI"):
+                idTel = requeteArray[1]
+                tracker = self.getTracker(socket)
+                tracker.etat = 1
+                tracker.id = idTel
+                self.dict[socket] = tracker
+                print("Demarrage du suivi pour le tel à l'id : ",idTel)
+                socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
 
 
-        elif (entete == "POSITION"):
-            longitude = float(requeteArray[1])
-            latitude = float(requeteArray[2])
-            tracker = self.getTracker(socket)
-            if (tracker == None):
-                print("Erreur, tracker inconnu")
-                return
+            elif (entete == "POSITION"):
+                longitude = float(requeteArray[1])
+                latitude = float(requeteArray[2])
+                tracker = self.getTracker(socket)
+                if (tracker == None):
+                    print("Erreur, tracker inconnu")
+                    return
 
-            print("Nouvelle position connue pour : (",longitude,",",latitude,")")
-            tracker.position = (longitude,latitude)
-            self.dict[socket] = tracker
+                print("Nouvelle position connue pour : (",longitude,",",latitude,")")
+                tracker.position = (longitude,latitude)
+                self.dict[socket] = tracker
 
-        elif (entete == "STOPSUIVI"):
-            tracker = self.getTracker(socket)
-            tracker.etat = 0
-            print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
-            socket.send("STOPSUIVI\r\n".encode('utf-8'))
+            elif (entete == "STOPSUIVI"):
+                tracker = self.getTracker(socket)
+                tracker.etat = 0
+                print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
+                socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
-        elif (entete == "CONTINUE"):
-            idTel = requeteArray[1]
-            nwTracker = self.dict[socket]
-            allkeys = list(self.dict.keys())
-            for key in allkeys:
-                if self.dict[key].id == idTel:
-                    old = self.dict[key]
-                    nwTracker.id = idTel
-                    nwTracker.position = old.position
-                    nwTracker.etat = old.etat
-                    self.dict[socket] = nwTracker
-                    key.close()
-                    del self.dict[key]
-                    socket.send("OKPROMENADE\r\n".encode('utf-8'))
-                    break
+            elif (entete == "CONTINUE"):
+                idTel = requeteArray[1]
+                nwTracker = self.dict[socket]
+                
+                allkeys = list(self.dict.keys())
+                for key in allkeys:
+                    if self.dict[key].id == idTel:
+                        old = self.dict[key]
+                        nwTracker.id = idTel
+                        nwTracker.position = old.position
+                        nwTracker.etat = old.etat
+                        self.dict[socket] = nwTracker
+                        key.close()
+                        del self.dict[key]
+                        socket.send("OKPROMENADE\r\n".encode('utf-8'))
+                        break
             
                     
                     
@@ -163,7 +165,9 @@ class PatientServer(Thread):
         print("=============SERVEUR ONLINE=============")
         while self.serverOnline:
         # Get the list sockets which are ready to be read through select
-            liste = list(self.mapper.getSockets()) # les sockets
+            liste = []
+            with lockMap:
+                liste = list(self.mapper.getSockets()) # les sockets
             liste.extend(self.CONNECTION_LIST)
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
      
@@ -172,7 +176,8 @@ class PatientServer(Thread):
                 #New connection
                 if sock == server_socket:
                     sockfd, addr = server_socket.accept()
-                    self.mapper.addTracker(sockfd)
+                    with lockMap:
+                        self.mapper.addTracker(sockfd)
                     print("Client (%s, %s) connected" % addr)
                      
                 else:
@@ -189,7 +194,8 @@ class PatientServer(Thread):
                         else:
                             print("Client (%s, %s) is offline" % addr)
                             sock.close()
-                            self.mapper.delTracker(sock)
+                            with lockMap:
+                                self.mapper.delTracker(sock)
 
          
                      
@@ -198,7 +204,8 @@ class PatientServer(Thread):
                         #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                         print("Client (%s, %s) is offline" % addr)
                         sock.close()
-                        self.mapper.delTracker(sock)
+                        with lockMap:
+                            self.mapper.delTracker(sock)
 
              
         server_socket.close()
