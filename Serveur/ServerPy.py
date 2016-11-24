@@ -77,6 +77,12 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker.position = (longitude,latitude)
             self.dict[socket] = tracker
 
+        elif (entete == "STOPSUIVI"):
+            tracker = self.getTracker(socket)
+            tracker.etat = 0
+            print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
+            socket.send("STOPSUIVI\r\n".encode('utf-8'))
+
         elif (entete == "CONTINUE"):
             idTel = requeteArray[1]
             nwTracker = self.dict[socket]
@@ -101,6 +107,7 @@ class Pool(Thread):
     def __init__(self,mapper):
         Thread.__init__(self)
         self.mapper = mapper
+        self.minuteur = testStopAfterNCommand
 
     def run(self):
         print("Poll ready [ok]")
@@ -204,6 +211,16 @@ if __name__ == "__main__":
     
     serveAssistant.start()
     servePatient.start()
+##    message = " "
+##    print("ALT-F4 pour tuer le serveur")
+##    while True:
+##        message = input("entrez une commande: ")
+##        ## STOP -> envoyer STOP au premier socket trouvé dans la hashmap<socket,Tracker>
+##        if message == "STOP" and len(list(servePatient.mapper.dict.keys())) > 0:
+##            with lockPool:
+##                poolRequest.put((list(servePatient.mapper.dict.keys())[0],"STOPSUIVI")) # fonctionne uniquement
+##            
+
     serveAssistant.join()
     servePatient.join()
 
