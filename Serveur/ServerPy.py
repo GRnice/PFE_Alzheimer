@@ -5,10 +5,8 @@ from threading import Thread,RLock
 
 import socket, select
 import queue
-#from ServerServiceTablet import *
 from ServerServiceTablet import *
 
-lookUpAssistantPatient = LookupAssistantPatient.LookupAssistantPatient()
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
 
 class Tracker: ## Classe representant un tracker
@@ -101,8 +99,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                         socket.send("OKPROMENADE\r\n".encode('utf-8'))
                         break
             
-                    
-                    
+                
             
 
 class Pool(Thread):
@@ -192,7 +189,7 @@ class PatientServer(Thread):
                                 poolRequest.put((sock,data.decode('utf-8')))
 
                         else:
-                            print("Client (%s, %s) is offline" % addr)
+                            print("Client (%s) is offline" % sock)
                             sock.close()
                             with lockMap:
                                 self.mapper.delTracker(sock)
@@ -202,7 +199,7 @@ class PatientServer(Thread):
                     # client disconnected, so remove from socket list
                     except:
                         #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
-                        print("Client (%s, %s) is offline" % addr)
+                        print("Client (%s) is offline" % sock)
                         sock.close()
                         with lockMap:
                             self.mapper.delTracker(sock)

@@ -1,3 +1,7 @@
+from threading import RLock
+
+lockLookup = RLock()
+
 class LookupAssistantPatient:
     def __init__(self):
         self.dict = dict() ## HashMap<socketAssistant,[socketPatient]>

@@ -8,9 +8,8 @@ import LookupAssistantPatient
 
 lockPool = RLock()
 lockMap = RLock()
-lockLookup = RLock()
 
-
+lookUpAssistantPatient = LookupAssistantPatient.LookupAssistantPatient()
 
 def startSockerIOassistantServeur(port):
     sio = socketio.Server()
@@ -20,7 +19,7 @@ def startSockerIOassistantServeur(port):
     def connect(sid, environ):
         print("connect ", sid)
         lookUpAssistantPatient.addAssistant(sio)
-        sio.emit("coucou",room=sid)
+        sio.emit("PROFILES","Dominique;Dib$Eslam;Hossam",room=sid)
 
     @sio.on('chat', namespace='/')
     def message(sid, data):
