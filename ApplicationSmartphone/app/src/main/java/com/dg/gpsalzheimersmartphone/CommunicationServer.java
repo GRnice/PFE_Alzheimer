@@ -24,8 +24,10 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "192.168.1.43";
+    public static final String SOCKET_ADDR = "10.212.119.255";
     public static final int PORT = 3000;
+    public static final String OKPROMENADE = "OKPROMENADE";
+    public static final String STOPSUIVI = "STOPSUIVI";
     private Socket m_sock;
     private BufferedReader input;
     private PrintWriter output;
@@ -53,6 +55,8 @@ public class CommunicationServer extends Thread implements Runnable
     {
         String line;
 
+
+
         try
         {
             m_sock = new Socket(SOCKET_ADDR, PORT);
@@ -79,16 +83,13 @@ public class CommunicationServer extends Thread implements Runnable
             intent = new Intent();
             intent.setAction(ServiceSocket.ACTION_RECEIVE_FROM_SERVER);
             try {
-                synchronized (input)
-                {
                     line = input.readLine();
-                }
                 if (line != null)
                 {
-                    if(line.equals("OKPROMENADE")){
-                        intent.putExtra("OKPROMENADE", true);
-                    } else if(line.equals("STOPSUIVI")){
-                        intent.putExtra("OKPROMENADE", false);
+                    if(line.equals(OKPROMENADE)){
+                        intent.putExtra(OKPROMENADE, true);
+                    } else if(line.equals(STOPSUIVI)){
+                        intent.putExtra(OKPROMENADE, false);
                     }
                     synchronized (this.service)
                     {
