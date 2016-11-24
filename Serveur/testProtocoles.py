@@ -38,6 +38,7 @@ class TestProtocoleServeurPatient(unittest.TestCase):
         newSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         newSocket.connect((hote, port))
         newSocket.send("CONTINUE*123456789\r\n".encode("utf-8"))
+        time.sleep(1)
         messageServeur = newSocket.recv(4096)
         messageServeur = messageServeur.rstrip()
         self.assertEqual(messageServeur.decode("utf-8"),"OKPROMENADE")

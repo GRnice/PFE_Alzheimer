@@ -5,10 +5,7 @@ from threading import Thread,RLock
 
 import socket, select
 import queue
-import socketio
-import eventlet
-import eventlet.wsgi
-from flask import Flask, render_template
+from ServerServiceTablet import *
 
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
 lockPool = RLock()
@@ -118,28 +115,7 @@ class Pool(Thread):
                 self.mapper.apply(commande)
 
             commande = None
-        
-        
-def assistantServeur(port):
-    sio = socketio.Server()
-    app = Flask(__name__)
-
-    @sio.on('connect', namespace='/')
-    def connect(sid, environ):
-        print("connect ", sid)
-
-    @sio.on('chat message', namespace='/')
-    def message(sid, data):
-        print("message ", data)
-        sio.emit('reply', room=sid)
-
-    @sio.on('disconnect', namespace='/')
-    def disconnect(sid):
-        print('disconnect ', sid)
-
-    app = socketio.Middleware(sio, app)
-    eventlet.wsgi.server(eventlet.listen(('', port)), app)
-
+    
 
 
 
@@ -178,7 +154,7 @@ class PatientServer(Thread):
         pool = Pool(self.mapper)
         pool.start()
         print("Chat server started on port " + str(self.PORT) + " [ok]")
-        
+        print("=============SERVEUR ONLINE=============")
         while self.serverOnline:
         # Get the list sockets which are ready to be read through select
             liste = list(self.mapper.getSockets()) # les sockets
@@ -220,15 +196,16 @@ class PatientServer(Thread):
 
              
         server_socket.close()
+        print("=============SERVEUR OFFLINE=============")
 
 if __name__ == "__main__":
-    threadServAssistants = Thread(target=assistantServeur,args=(2000,))
-    sock = PatientServer(3000,4096,200) # sur le port 3000
+    serveAssistant = ServerAssistant(2000)
+    servePatient = PatientServer(3000,4096,200) # sur le port 3000
     
-    threadServAssistants.start()
-    sock.start()
+    serveAssistant.start()
+    servePatient.start()
     threadServAssistants.join()
-    sock.join()
+    servePatient.join()
 
 ## TEST POOL
 ##mapper = Mapper()
