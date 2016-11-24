@@ -52,6 +52,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
   .state('tab.chats', {
       url: '/chats',
+	  params: {'id' : null},
       views: {
         'tab-chats': {
           templateUrl: 'templates/tab-chats.html',

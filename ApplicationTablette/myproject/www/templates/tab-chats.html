@@ -1,7 +1,7 @@
 <ion-view view-title="Chats">
   <ion-content>
     <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="profil in profils" type="item-text-wrap" href="#/tab/chats/{{profil.id}}">
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="profil in profils" ng-click="profilSelected({{profil.id}})" type="item-text-wrap" href="#/tab/chats/{{profil.id}}">
         <img ng-src="{{profil.face}}">
         <h2>{{profil.prenom}}</h2>
         <p>{{profil.nom}}</p>

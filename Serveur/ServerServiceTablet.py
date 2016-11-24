@@ -1,6 +1,7 @@
 import socketio
 import eventlet
 import eventlet.wsgi
+import time
 from flask import Flask, render_template
 
 from threading import Thread,RLock
@@ -20,7 +21,13 @@ def startSockerIOassistantServeur(port):
         print("connect ", sid)
         lookUpAssistantPatient.addAssistant(sio)
         sio.emit("PROFILES","Dominique,Dib$Eslam,Hossam",room=sid)
+        time.sleep(1)
+        sio.emit("NEWSESSION","12fa90c",room=sid)
 
+    @sio.on('FOLLOW',namespace="/")
+    def follow(sid,data):
+        print("ok follow",data)
+        
     @sio.on('chat', namespace='/')
     def message(sid, data):
         print("message ", data)
