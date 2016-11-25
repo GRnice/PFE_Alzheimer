@@ -11,9 +11,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
+
 public class MainActivity extends AppCompatActivity {
 
-    public static final String KILL = "KILL";
     public static final String STARTSUIVI = "STARTSUIVI";
     private int etat = 0;
 //    private MyReceiver myReceiver;
@@ -38,16 +39,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final Button buttonSwitchConnexion = (Button) findViewById(R.id.button);
-        final Button buttonKillService = (Button) findViewById(R.id.button2);
+        final Button buttonStopSuivi = (Button) findViewById(R.id.button2);
 
-        buttonKillService.setOnClickListener(new View.OnClickListener()
+        buttonStopSuivi.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 Intent intent = new Intent();
                 intent.setAction(ACTION_SEND_TO_SERVER);
-                intent.putExtra(KILL,true);
+                intent.putExtra(STOPSUIVI,true);
                 sendBroadcast(intent);
                 MainActivity.this.finish();
             }

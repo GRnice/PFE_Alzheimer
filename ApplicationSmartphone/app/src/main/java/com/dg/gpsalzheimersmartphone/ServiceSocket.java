@@ -13,13 +13,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 import static com.dg.gpsalzheimersmartphone.MainActivity.android_id;
 
 public class ServiceSocket extends Service implements LocationListener
 {
     public static final String STARTSUIVI = "STARTSUIVI";
     public static final String CONTINUE = "CONTINUE";
-    public static final String KILL = "KILL";
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String POSITION = "POSITION";
     public static final String SEPARATOR = "*";
@@ -125,6 +125,11 @@ public class ServiceSocket extends Service implements LocationListener
 
             boolean startSuivi = arg1.getBooleanExtra(STARTSUIVI + SEPARATOR + android_id, false);
             boolean messageContinue = arg1.getBooleanExtra(CONTINUE + SEPARATOR + android_id, false);
+            boolean stopSuivi = arg1.getBooleanExtra(STOPSUIVI, false);
+
+            if(stopSuivi){
+                ServiceSocket.this.comm.sendMessage(STOPSUIVI);
+            }
             if(startSuivi){
                 ServiceSocket.this.comm.sendMessage(STARTSUIVI + SEPARATOR + android_id);
             }
@@ -145,11 +150,6 @@ public class ServiceSocket extends Service implements LocationListener
 
 
 
-            boolean killApp = arg1.getBooleanExtra(KILL,false);
-            if (killApp)
-            {
-                ServiceSocket.this.stopSelf();
-            }
         }
 
     }
@@ -160,6 +160,11 @@ public class ServiceSocket extends Service implements LocationListener
         public void onReceive(Context arg0, Intent arg1) {
 
             boolean startGps = arg1.getBooleanExtra(OKPROMENADE,false);
+            boolean stop = arg1.getBooleanExtra(STOPSUIVI, false);
+
+            if(stop){
+                ServiceSocket.this.stopSelf();
+            }
 
             if (startGps)
             {

@@ -86,10 +86,10 @@ public class CommunicationServer extends Thread implements Runnable
                     line = input.readLine();
                 if (line != null)
                 {
-                    if(line.equals(OKPROMENADE)){
+                    if(line.equals(STOPSUIVI)){
+                        intent.putExtra(STOPSUIVI, true);
+                    } else if(line.equals(OKPROMENADE)){
                         intent.putExtra(OKPROMENADE, true);
-                    } else if(line.equals(STOPSUIVI)){
-                        intent.putExtra(OKPROMENADE, false);
                     }
                     synchronized (this.service)
                     {
