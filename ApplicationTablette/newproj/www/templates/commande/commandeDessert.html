@@ -1,0 +1,32 @@
+<ion-pane>
+	<ion-header-bar class="bar bar-header" style="background-color:#1E90FF;" on-swipe-up="onSwipeUp()" on-swipe-down="onSwipeDown()" ng-show="showHeader">
+		<button class="button icon-left ion-chevron-left button-clear button-light" ng-click="back('cmdBurger')"></button>
+		<h1 class="title" style="text-align:center;">Dessert</h1>
+		<button class="button icon-right ion-bag button-light button-clear">Panier</button>
+	</ion-header-bar>
+	<ion-content class="has-header has-footer">
+		<ion-list on-swipe-right="back('cmdBurger')" on-swipe-left="goPaiement()">
+			<ion-checkbox ng-model="filter.red" class="item-avatar item-icon-right" ng-repeat="dessert in desserts" type="item-text-wrap" style="background-color: rgba(255,255,255,.70)" ng-click="dessertSelected({{dessert.id}})">
+				<h2>{{dessert.name}}</h2>
+				<p>{{dessert.lastText}}</p> <h3>{{dessert.prix}}</h3>
+				<img style="max-width: 100px;max-height : 100px;" ng-src="{{dessert.face}}">
+			</ion-checkbox>
+		</ion-list>
+	</ion-content>
+	<ion-footer-bar class="bar-assertive" style="bottom:0px;" ng-show="!cookieCheck && !milkShakeCheck" ng-click="goPaiement()">
+		<h1 class="title" style="text-align:center;">Sans dessert pour moi</h1>
+	</ion-footer-bar>
+	<ion-footer-bar class="bar-balanced" ng-show="cookieCheck || milkShakeCheck" ng-click="goPaiement()">
+		<h1 class="title" style="text-align:center;">Valider</h1>
+	</ion-footer-bar>
+</ion-pane>
+
+<style type="text/css">
+.pane
+{
+background:url('http://i1.wp.com/lasalecom.com/wp-content/uploads/2013/12/cronut.jpg') no-repeat center center fixed; 
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        background-size: cover;
+}
+</style>

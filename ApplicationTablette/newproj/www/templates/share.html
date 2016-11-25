@@ -1,0 +1,8 @@
+<ion-content on-swipe-right="onSwipeRight()">
+    <img ng-show="imgURI !== undefined" style="position:center;" ng-src="{{imgURI}}">
+	<button class="button button-block button-balanced"  style="height:3cm;" ng-show="imgURI === undefined" ng-click="takePicture()">Prendre une photo</button>
+	
+	<button class="button button-block button-balanced" style="height:3cm;" ng-show="imgURI !== undefined" ng-click="back()">Partager</button>
+	
+	<button style="position:relative;"  style="height:3cm;" class="button button-block button-assertive" ng-click="back()">Retour</button>
+</ion-content>

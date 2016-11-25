@@ -1,0 +1,46 @@
+<ion-pane>
+	<ion-header-bar class="bar bar-header" style="background-color:#1E90FF;">
+		<button class="button icon-left ion-chevron-left button-clear button-light" ng-click="back('cmdLivraison')"></button>
+		<h1 class="title" style="text-align:center;">Mode de paiement</h1>
+		<button class="button icon-right ion-bag button-light button-clear">Panier</button>
+    </ion-header-bar>
+	<ion-content class="has-header has-footer" on-swipe-right="back('commandModesLivraison')">	
+	<div class="list">
+  <label class="item item-input">
+    <input type="text" placeholder="First Name">
+  </label>
+  <label class="item item-input">
+    <input type="text" placeholder="Last Name">
+  </label>
+  <label class="item item-input">
+    <textarea placeholder="Comments"></textarea>
+  </label>
+  
+  
+  <div class="list" ng-show="modePaiementLivraison()" >
+
+  <label class="item item-input item-select">
+    <div class="input-label">
+      Mode de paiement
+    </div>
+    <select>
+      <option ng-click="carte = false;">Espece</option>
+      <option selected ng-click="carte = true">Carte</option>
+    </select>
+  </label>
+
+</div>
+</div>
+
+	  <label class="item item-input" ng-show="carte">
+    <input type="text" placeholder="Numéro de carte">
+  </label>
+  <label class="item item-input" ng-show="carte">
+    <input type="text" placeholder="Cryptogramme">
+  </label>
+  
+	</ion-content>
+	<ion-footer-bar class="bar-balanced" style="bottom:0px;">
+		<h1 class="title" style="text-align:center;">Envoyer la commande</h1>
+	</ion-footer-bar>
+</ion-pane>
