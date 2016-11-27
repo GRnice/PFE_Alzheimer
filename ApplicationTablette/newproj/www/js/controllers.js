@@ -20,6 +20,7 @@ angular.module('starter.controllers', ['ionic'])
         document.getElementById("settingsTab").classList.toggle("active");
     };
     
+    $scope.profils = Profils.all();
     
 	var latLng = new google.maps.LatLng(43.612, 7.08);
 	var mapOptions = {
