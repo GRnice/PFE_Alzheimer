@@ -3,6 +3,21 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ctrlMap',function($scope,$state,$ionicPopup,Socket,Profils)
 {
+    $scope.visibleMapMenu = true;
+    $scope.visibleConfig = false;
+    
+    // Visibility 
+    $scope.showMap = function(){
+      $scope.visibleMapMenu = true;
+      $scope.visibleConfig = false;
+    }
+    
+    $scope.showConfig = function(){
+      $scope.visibleMapMenu = false;
+      $scope.visibleConfig = true;
+    }
+    
+    
 	var latLng = new google.maps.LatLng(43.612, 7.08);
 	var mapOptions = {
 					  center: latLng,

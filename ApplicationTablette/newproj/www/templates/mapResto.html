@@ -1,1 +1,98 @@
-<div id="map" style="height:80%;" data-tap-disabled="true"></div>
+<html>
+ 
+
+<!-- <div class="bar bar-header">
+    <div class="tabs-striped tabs-top tabs-background-positive tabs-color-light">
+   
+    <div class="tabs">
+        
+        <a class="tab-item active" ng-click="show(mapView)">
+                 
+            <i class="icon ion-map"></i>
+            Test
+          </a>
+        
+          <a class="tab-item" ng-click="show(configurationView)">
+            <i class="icon ion-gear-a"></i>
+            Settings
+          </a>
+    </div>
+
+    </div>   
+</div>  -->
+    
+    <div class="bar bar-header">
+    <ion-tabs class="tabs-positive tabs-icon-top">
+
+  <ion-tab title="About" icon-on="ion ion-map" icon-off="ion-ios-clock-outline" ng-click="showMap()">
+    <!-- Tab 1 content -->
+  </ion-tab>
+
+  <ion-tab title="Settings" icon-on="ion ion-gear" icon-off="ion-ios-gear-outline" ng-click="showConfig()">
+    <!-- Tab 2 content -->
+  </ion-tab>
+
+</ion-tabs>
+    </div>
+
+ 
+
+
+<div class="row">
+      <div class="col col-25" id="leftSideBar" style="height:100%; background-color: lightblue;">
+         
+          <div ng-show="visibleMapMenu">
+              <br>
+              <br>
+              <br>
+              <button class="button button-dark">
+                  button-dark
+             </button>
+              <br>
+              <br>
+              <br>
+              <button class="button button-dark">
+                  button-dark
+             </button>
+              <br>
+
+              <label class="toggle">
+               <input type="checkbox">
+               <div class="track">
+                 <div class="handle"></div>
+               </div>
+            </label>
+          </div>
+          
+          <div ng-show="visibleConfig">
+                        <br>
+              <br>
+              <br>
+                       <br>
+              <br>
+              <br>
+                       <br>
+              <br>
+              <br>
+              <button class="button button-dark">
+                  button-dark
+             </button>
+              <br>
+              <br>
+              <br>
+              <button class="button button-dark">
+                  button-dark
+             </button>
+              <br>
+          </div>
+          
+    </div>
+          
+    
+        <div class="col col-75" id="map" style="height:97%; padding-top:3%;" data-tap-disabled="true" > </div>
+</div>
+
+<!-- <div id="map" style="height:100%; padding-left: 30%;" data-tap-disabled="true"></div>
+<div id="leftSideBar" style="height:100%; color:darkblue;"></div> -->
+    
+</html>
