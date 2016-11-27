@@ -14,9 +14,12 @@ angular.module('starter.controllers', ['ionic'])
         document.getElementById("settingsTab").classList.toggle("active");
     };
     
+
     var positions = [];
     positions[0] = new google.maps.LatLng(43.612, 7.08);
 	positions[1] = new google.maps.LatLng(43.610, 7.09);
+
+
 	var mapOptions = {
 					  center: positions[0],
 					  zoom: 15,
