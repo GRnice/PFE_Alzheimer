@@ -5,17 +5,20 @@ angular.module('starter.controllers', ['ionic'])
 {
     $scope.visibleMapMenu = true;
     $scope.visibleConfig = false;
-    
-    // Visibility 
+    // Visibility
     $scope.showMap = function(){
       $scope.visibleMapMenu = true;
       $scope.visibleConfig = false;
-    }
+      document.getElementById("mapTab").classList.toggle("active");
+      document.getElementById("settingsTab").classList.toggle("active");
+    };
     
     $scope.showConfig = function(){
       $scope.visibleMapMenu = false;
       $scope.visibleConfig = true;
-    }
+        document.getElementById("mapTab").classList.toggle("active");
+        document.getElementById("settingsTab").classList.toggle("active");
+    };
     
     
 	var latLng = new google.maps.LatLng(43.612, 7.08);
@@ -42,7 +45,7 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ctrlSelectProfil',function($scope,$state,$stateParams,Socket,Profils,ProfilSelected)
 {
-	console.log("COUCOU")
+	console.log("COUCOU");
 	console.log($stateParams.id);
 	$scope.profils = Profils.all();
 	
