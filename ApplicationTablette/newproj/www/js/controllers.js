@@ -3,13 +3,19 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils)
 {
+    $scope.visibleMapMenu = true;
+    $scope.visibleConfig = false;
     // Visibility
     $scope.showMap = function(){
+        $scope.visibleMapMenu = true;
+        $scope.visibleConfig = false;
       document.getElementById("mapTab").classList.toggle("active");
       document.getElementById("settingsTab").classList.toggle("active");
     };
     
     $scope.showConfig = function(){
+        $scope.visibleMapMenu = false;
+        $scope.visibleConfig = true;
         document.getElementById("mapTab").classList.toggle("active");
         document.getElementById("settingsTab").classList.toggle("active");
     };
