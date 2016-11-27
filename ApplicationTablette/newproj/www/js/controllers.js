@@ -36,11 +36,16 @@ angular.module('starter.controllers', ['ionic'])
 
     $scope.$on('$createPositions',
     function(event, markers){
-    	for(var i = 0; i < markers.length; i++){
-			console.log(markers);
+        console.log(markers);
+        for(var i = 0; i < markers.length; i++){
 			markers[i].setMap($scope.map);
+            google.maps.event.addListener(markers[i], 'click', function () {
+                var marker = this;
+                $scope.$apply(function () {
+                    $scope.nom = Profils.all()[marker.id].nom;
+                });
+            });
 		}
-
 
     });
 
@@ -67,7 +72,8 @@ angular.module('starter.controllers', ['ionic'])
             var marker = new google.maps.Marker({
                 position: positions[i],
                 animation: google.maps.Animation.DROP,
-				icon: 'img/test.png'
+				icon: 'img/test.png',
+                id: i
             });
             markers[i] = marker;
             // marker.setMap($scope.map);
