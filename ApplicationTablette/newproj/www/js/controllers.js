@@ -1,49 +1,43 @@
 angular.module('starter.controllers', ['ionic'])
 
 
-.controller('ctrlMap',function($scope,$state,$ionicPopup,Socket,Profils)
+.controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils)
 {
-    $scope.visibleMapMenu = true;
-    $scope.visibleConfig = false;
     // Visibility
     $scope.showMap = function(){
-      $scope.visibleMapMenu = true;
-      $scope.visibleConfig = false;
       document.getElementById("mapTab").classList.toggle("active");
       document.getElementById("settingsTab").classList.toggle("active");
     };
     
     $scope.showConfig = function(){
-      $scope.visibleMapMenu = false;
-      $scope.visibleConfig = true;
         document.getElementById("mapTab").classList.toggle("active");
         document.getElementById("settingsTab").classList.toggle("active");
     };
     
-    
-	var latLng = new google.maps.LatLng(43.612, 7.08);
+    var positions = [];
+    positions[0] = new google.maps.LatLng(43.612, 7.08);
+	positions[1] = new google.maps.LatLng(43.610, 7.09);
 	var mapOptions = {
-					  center: latLng,
+					  center: positions[0],
 					  zoom: 15,
 					  mapTypeId: google.maps.MapTypeId.ROADMAP
 					};
 				
 	$scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-	
-	
-	var marker = new google.maps.Marker({
-		position: latLng,
-		nom: "BurgerExpress d'Australie",
-		adresse: "45 avenue du kangourou",
-		map: $scope.map,
-		animation: google.maps.Animation.DROP
-	});
-	
-	marker.setMap($scope.map);
-	
+
+    $scope.$on('$createPositions',
+    function(event, markers){
+    	for(var i = 0; i < markers.length; i++){
+			console.log(markers);
+			markers[i].setMap($scope.map);
+		}
+
+
+    });
+
 })
 
-.controller('ctrlSelectProfil',function($scope,$state,$stateParams,Socket,Profils,ProfilSelected)
+.controller('ctrlSelectProfil',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
 {
 	console.log("COUCOU");
 	console.log($stateParams.id);
@@ -55,6 +49,22 @@ angular.module('starter.controllers', ['ionic'])
 		var leProfil = Profils.get(id);
 		ProfilSelected.set(leProfil);
 		Socket.sendMessage("FOLLOW",$stateParams.id);
+        var positions = [];
+        var markers = [];
+        positions[0] = new google.maps.LatLng(43.612, 7.08);
+        positions[1] = new google.maps.LatLng(43.610, 7.09);
+        for(var i = 0; i < Profils.all().length; i++){
+            console.log("here1");
+            var marker = new google.maps.Marker({
+                position: positions[i],
+                animation: google.maps.Animation.DROP,
+				icon: 'img/test.png'
+            });
+            markers[i] = marker;
+            // marker.setMap($scope.map);
+        }
+        $rootScope.$broadcast('$createPositions', markers);
 		$state.go("Map");
+
 	}
 });
