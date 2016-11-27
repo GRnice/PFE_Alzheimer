@@ -19,6 +19,8 @@ angular.module('starter.controllers', ['ionic'])
         document.getElementById("mapTab").classList.toggle("active");
         document.getElementById("settingsTab").classList.toggle("active");
     };
+
+    $scope.profils = Profils.all();
     
 
     var positions = [];
@@ -43,6 +45,10 @@ angular.module('starter.controllers', ['ionic'])
                 var marker = this;
                 $scope.$apply(function () {
                     $scope.nom = Profils.all()[marker.id].nom;
+                    $scope.avatar = "img/test.png";
+                    document.getElementById($scope.nom).style.visibility = "visible";
+                    document.getElementById($scope.nom).style.height = "50%";
+                    document.getElementById($scope.nom).style.width = "100%";
                 });
             });
 		}
