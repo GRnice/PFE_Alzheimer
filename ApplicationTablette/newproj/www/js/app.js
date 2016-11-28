@@ -43,6 +43,9 @@ angular.module('starter', ['ionic','starter.controllers','starter.services','ngC
 	.state('SelectProfil', {
 		url: '/selectProfil',
 		templateUrl: 'templates/selectProfil.html',
+        params: {
+            id: null
+        },
 		controller : 'ctrlListeProfils'
 	});
 	

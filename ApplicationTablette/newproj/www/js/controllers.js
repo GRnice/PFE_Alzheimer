@@ -4,6 +4,34 @@ angular.module('starter.controllers', ['ionic'])
 .controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils, ProfilSelected)
 {
 
+    $scope.$on('$notifSession',
+        function(event, notifBool){
+            // A confirm dialog
+            $scope.showConfirm = function() {
+                var confirmPopup = $ionicPopup.confirm({
+                title: 'Appairage',
+                template: 'Voulez-vous ajouter le smartphone ...'
+            });
+
+            confirmPopup.then(function(res) {
+                if(res) {
+                    console.log('OK');
+                    $state.go("SelectProfil", { id: Socket.data() });
+                } else {
+                    console.log('Cancel');
+                    }
+                });   
+        
+        };
+        if(notifBool) {
+            $scope.showConfirm();
+        }
+
+    });
+            
+    
+       
+            
 	$scope.up = function()
     {
         Socket.sendMessage("UP","up1");	
@@ -86,13 +114,16 @@ angular.module('starter.controllers', ['ionic'])
                     console.log(ProfilSelected.get());
                 });
             });
-		}
-
+		}        
+   
 		console.log($scope.profilsSelected);
         $scope.showMap();
     });
 
 })
+
+
+
 //
 // .controller('ctrlSelectProfil',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
 // {
@@ -132,7 +163,7 @@ angular.module('starter.controllers', ['ionic'])
 
 	console.log($stateParams.id);
 	$scope.profils = Profils.all();
-	
+    
 	$scope.profilSelected = function(id)
 	{
 		var id = parseInt(id);

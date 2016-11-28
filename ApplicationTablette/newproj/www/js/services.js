@@ -29,9 +29,9 @@ angular.module('starter.services', [])
   };
 })
 
-.factory('Socket', function($state,Profils)
+.factory('Socket', function($state,$rootScope,Profils)
 {
-	var socket = io("http://127.0.0.1:2000");
+	var socket = io("http://172.20.10.2:2000");
 	var id;
 	
 	socket.on('connect', function(data)
@@ -60,7 +60,9 @@ angular.module('starter.services', [])
 		console.log("NOUVELLE SESSION")
 		console.log(data);
 		id = data;
-		// $state.go('SelectProfil',{id : data});
+        console.log($rootScope);
+        $rootScope.$broadcast('$notifSession', true);
+     //   $state.go('SelectProfil',{id : data});
 	});
     
     socket.on('message', function(data) {
