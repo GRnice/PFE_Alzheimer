@@ -85,7 +85,7 @@ angular.module('starter.controllers', ['ionic'])
 		var id = parseInt(id);
 		var leProfil = Profils.get(id);
 		ProfilSelected.set(leProfil);
-		Socket.sendMessage("FOLLOW",$stateParams.id);
+		Socket.sendMessage("FOLLOW",$stateParams.id+"*"+leProfil.prenom+"*"+leProfil.nom);
         var positions = [];
         var markers = [];
         positions[0] = new google.maps.LatLng(43.612, 7.08);

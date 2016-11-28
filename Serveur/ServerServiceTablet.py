@@ -31,12 +31,23 @@ def startSockerIOassistantServeur(port,serverAssistant):
 
     @sio.on('FOLLOW',namespace="/")
     def follow(sid,data):
+        # message attendu "idTel*prenom*nom"
         print(sid)
-        print("ok follow",data)
+        data = data.split("*")
+        idTel = data[0]
+        prenom = data[1]
+        nom = data[2]
+        sockPatient = serverAssistant.mapper.getSocketById(idTel)
+        tracker = serverAssistant.mapper.getTracker(sockPatient)
+        tracker.nom = nom
+        tracker.prenom = prenom
+
+        serverAssistant.lookup.attach(sockPatient,sid)
+        sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+        
 
     @sio.on("UP",namespace="/")
     def up(sid,data):
-        print(data)
         event = serverAssistant.poolerEvent.nextEventFor(sid)
         if event != None:
             header = event[0]
@@ -72,6 +83,9 @@ class ServerAssistant(Thread):
         self.managerProfils.read("./profils.txt")
         self.socketIoThread = Thread(target=startSockerIOassistantServeur,args=(port,self))
         self.socketIoThread.start()
+
+    def setMapper(self,mapper):
+        self.mapper = mapper
 
     def addAssistant(self,sid):
         self.lookup.addAssistant(sid)
