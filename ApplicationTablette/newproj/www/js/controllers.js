@@ -129,15 +129,16 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ctrlListeProfils',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
 {
-    // console.log($stateParams.id);
-    $scope.profils = Profils.all();
 
-    $scope.profilSelected = function(id)
-    {
-        var id = parseInt(id);
-        var leProfil = Profils.get(id);
-        ProfilSelected.set(leProfil);
-        Socket.sendMessage("FOLLOW",$stateParams.id);
+	console.log($stateParams.id);
+	$scope.profils = Profils.all();
+	
+	$scope.profilSelected = function(id)
+	{
+		var id = parseInt(id);
+		var leProfil = Profils.get(id);
+		ProfilSelected.set(leProfil);
+		Socket.sendMessage("FOLLOW",$stateParams.id+"*"+leProfil.prenom+"*"+leProfil.nom);
         var positions = [];
         var markers = [];
         positions[0] = new google.maps.LatLng(43.612, 7.08);

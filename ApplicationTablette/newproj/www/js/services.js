@@ -52,6 +52,7 @@ angular.module('starter.services', [])
 		}
 		var tous = Profils.all();
 		console.log(tous);
+		$state.go("Map");
 	});
     socket.on('NEWSESSION', function (data)
 	{
