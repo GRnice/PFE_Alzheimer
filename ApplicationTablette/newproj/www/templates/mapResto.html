@@ -1,4 +1,4 @@
-<ion-content class="padding has-header">
+<ion-content style="padding-top: 0.5%">
 
 
 <!-- <div class="bar bar-header">
@@ -47,7 +47,7 @@
 <div class="row">
 
     <div class="row">
-        <div class="col col-25" id="leftSideBar" style="height:100%; background-color: lightblue; padding-top:5%;">
+        <div class="col col-33" id="leftSideBar" style="height:100%; background-color: lightblue; padding-top:5%;">
             <div ng-show="visibleMapMenu">
                 <div class="list">
 
@@ -75,7 +75,7 @@
                             </div>
 
                         </div>
-                        <div id="{{profil.nom}}" class="card" style="visibility: hidden; height: 0%; width: 0%">
+                        <div id="{{profil.nom}}" class="card" ng-show="cardVisible[{{profil.id}}]">
                             <div class="item item-avatar">
                             <img ng-src="{{avatar}}">
                                 <h2>{{nom}}</h2>
@@ -113,7 +113,7 @@
         </div>
 
 
-        <div class="col col-75" id="map" style="height:97%; padding-top:3%;" data-tap-disabled="true" > </div>
+        <div class="col col-75" id="map" style="height:97%; padding-top:2%;" data-tap-disabled="true" > </div>
     </div>
 
 
