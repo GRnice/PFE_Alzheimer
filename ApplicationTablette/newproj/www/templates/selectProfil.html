@@ -1,5 +1,5 @@
 <ion-view view-title="Selection du profil">
-    <ion-list>
+    <ion-list style="padding-top: 0.5%">
       <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="profil in profils" ng-click="profilSelected({{profil.id}})" type="item-text-wrap">
         <img ng-src="{{profil.face}}">
         <h2>{{profil.prenom}}</h2>
