@@ -42,9 +42,8 @@ angular.module('starter', ['ionic','starter.controllers','starter.services','ngC
 	})
 	.state('SelectProfil', {
 		url: '/selectProfil',
-		params: {'id' : null},
 		templateUrl: 'templates/selectProfil.html',
-		controller : 'ctrlSelectProfil'
+		controller : 'ctrlListeProfils'
 	});
 	
   $urlRouterProvider.otherwise("/map");

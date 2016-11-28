@@ -30,6 +30,12 @@
                     <!-- Tab 1 content -->
                 </div>
 
+                <div id="profilsTab" class="tab-item" ng-click="showProfils()">
+                    <span class="icon ion-person-stalker"></span>
+                    Profils
+                    <!-- Tab 1 content -->
+                </div>
+
                 <div id="settingsTab" class="tab-item" ng-click="showConfig()">
                     <span class="icon ion-gear-a"></span>
                     Settings
@@ -49,7 +55,7 @@
                 <div class="list">
 
 
-                    <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="profil in profils" ng-click="profilSelected({{profil.id}})" type="item-text-wrap">
+                    <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="profil in profilsSelected" ng-click="profilSelected({{profil.id}})" type="item-text-wrap">
 
                         <img ng-src="{{profil.face}}">
 

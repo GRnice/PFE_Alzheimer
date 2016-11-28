@@ -31,8 +31,8 @@ angular.module('starter.services', [])
 
 .factory('Socket', function($state,Profils)
 {
-	var socket = io("http://192.168.1.13:2000");
-	
+	var socket = io("http://127.0.0.1:2000");
+	var id;
 	
 	socket.on('connect', function(data)
 	{
@@ -58,7 +58,8 @@ angular.module('starter.services', [])
 		alert("NOUVELLE SESSION !");
 		console.log("NOUVELLE SESSION")
 		console.log(data);
-		$state.go('SelectProfil',{id : data});
+		id = data;
+		// $state.go('SelectProfil',{id : data});
 	});
     
     socket.on('message', function(data) {
@@ -72,7 +73,10 @@ angular.module('starter.services', [])
 		sendMessage: function(entete,corps)
 		{
 			socket.emit(entete,corps);
-		}
+		},
+		data: function () {
+			return id;
+        }
 	};
 })
 
