@@ -87,6 +87,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
                 tracker.position = (longitude,latitude)
                 self.dict[socket] = tracker
+                self.serverAssistant.event("POSITION",socket,tracker)
 
             elif (entete == "STOPSUIVI"):
                 tracker = self.getTracker(socket)
@@ -187,7 +188,6 @@ class PatientServer(Thread):
                 
             liste.extend(self.CONNECTION_LIST)
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
-            print("D")
             for sock in read_sockets:
                  
                 #New connection

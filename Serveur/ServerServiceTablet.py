@@ -101,6 +101,10 @@ class ServerAssistant(Thread):
     def event(self,evt,socket,tracker):
         if (evt == "STARTSUIVI"):
             self.poolerEvent.broadcast(("NEWSESSION",tracker.id))
+
+        elif (evt == "POSITION"):
+            self.poolerEvent.broadcast(("UPDATE",
+                                        str(tracker.id)+"*"+str(tracker.position[0])+"*"+str(tracker.position[1])))
                 
     def stopServer(self):
         self.sio.disconnect()
