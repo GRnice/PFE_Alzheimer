@@ -3,6 +3,14 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils)
 {
+
+	$scope.up = function()
+    {
+        Socket.sendMessage("UP","up1");	
+    }
+	
+	setInterval($scope.up,2000);
+	
     $scope.visibleMapMenu = true;
     $scope.visibleConfig = false;
     // Visibility

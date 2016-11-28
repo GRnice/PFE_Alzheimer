@@ -36,7 +36,7 @@ def startSockerIOassistantServeur(port,serverAssistant):
 
     @sio.on("UP",namespace="/")
     def up(sid,data):
-        print('up')
+        print(data)
         event = serverAssistant.poolerEvent.nextEventFor(sid)
         if event != None:
             header = event[0]

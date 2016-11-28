@@ -29,7 +29,7 @@ angular.module('starter.services', [])
   };
 })
 
-/*.factory('Socket', function($state,Profils)
+.factory('Socket', function($state,Profils)
 {
 	var socket = io("http://192.168.1.13:2000");
 	
@@ -42,7 +42,6 @@ angular.module('starter.services', [])
 	socket.on("PROFILES", function(data)
 	{
 		data = data.split("$");
-		alert("OUI");
 		console.log(data);
 		for (var i = 0 ; i < data.length ; i++)
 		{
@@ -56,7 +55,7 @@ angular.module('starter.services', [])
 	});
     socket.on('NEWSESSION', function (data)
 	{
-		alert("LOL");
+		alert("NOUVELLE SESSION !");
 		console.log("NOUVELLE SESSION")
 		console.log(data);
 		$state.go('SelectProfil',{id : data});
@@ -72,10 +71,11 @@ angular.module('starter.services', [])
 		},
 		sendMessage: function(entete,corps)
 		{
-			socket.emit(entete,{data : corps});
+			socket.emit(entete,corps);
 		}
 	};
-})*/
+})
+
 .factory('ProfilSelected', function()
 {
 	var profilSelected = 0;
