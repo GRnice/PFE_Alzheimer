@@ -58,6 +58,9 @@ angular.module('starter.controllers', ['ionic'])
                         }
                         $scope.cardVisible[$scope.profils[n].id] = false;
                     }
+                    $scope.duree = 90;
+                    $scope.batterie = 50;
+                    $scope.reseau = "On";
                     console.log($scope.profils);
                 });
             });
