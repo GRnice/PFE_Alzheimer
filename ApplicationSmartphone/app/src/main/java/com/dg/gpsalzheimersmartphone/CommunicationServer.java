@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-
 /**
  *
  * Class used to manage the socket (IO) with the server
@@ -24,7 +23,7 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "10.212.119.255";
+    public static final String SOCKET_ADDR = "192.168.1.13";
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String STOPSUIVI = "STOPSUIVI";

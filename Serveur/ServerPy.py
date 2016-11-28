@@ -9,36 +9,6 @@ from ServerServiceTablet import *
 
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
 
-class Profile:
-    def __init__(self, nom, prenom):
-        self.firstName = prenom
-        self.lastName = nom
-        
-class ManagerProfile:
-    def __init__(self):
-        self.listProfile = []
-
-    
-    def read(self, nomFichier):
-        with open(nomFichier, 'r') as f:
-            for line in f:
-                myLine = line.strip()
-                listLine = myLine.split(",")
-                p = Profile(listLine[0], listLine[1])
-                self.listProfile.append(p)
-        f.close()
-
-        for elt in self.listProfile:
-            print(elt.firstName + " " + elt.lastName)
-        
-
-    def write(self, nomFichier, profile):
-        with open(nomFichier, 'a') as out:
-            out.write(profile.firstName + "," + 
-                      profile.lastName + "\n")
-        out.close()
-        
-
 class Tracker: ## Classe representant un tracker
     def __init__(self):
         self.id = None
@@ -47,10 +17,10 @@ class Tracker: ## Classe representant un tracker
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
 
-
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
-    def __init__(self):
+    def __init__(self,serverAssistant):
         self.dict = dict()
+        self.serverAssistant = serverAssistant
         print("Mapper ready [ok]")
     def addTracker(self,socket):
         print("add tracker")
@@ -66,7 +36,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             return self.dict[socket]
 
     def getSockets(self):
-        return self.dict.keys()
+        with lockMap:
+            return self.dict.keys()
             
 
     def apply(self,commande):
@@ -91,7 +62,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 tracker.id = idTel
                 self.dict[socket] = tracker
                 print("Demarrage du suivi pour le tel à l'id : ",idTel)
-                socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
+                self.serverAssistant.event("STARTSUIVI",socket,tracker)
+                #socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
 
 
             elif (entete == "POSITION"):
@@ -102,7 +74,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     print("Erreur, tracker inconnu")
                     return
 
-                print("Nouvelle position connue pour : (",longitude,",",latitude,")")
+                print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
                 tracker.position = (longitude,latitude)
                 self.dict[socket] = tracker
 
@@ -113,6 +85,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
             elif (entete == "CONTINUE"):
+                print("CONTINUE RECEIVE")
                 idTel = requeteArray[1]
                 nwTracker = self.dict[socket]
                 
@@ -167,11 +140,12 @@ class PatientServer(Thread):
     def __init__(self,port,sizeBuffer,maxClientSocket):
         Thread.__init__(self)
         self.PORT = port
+        self.serveAssistant = ServerAssistant(2000)
         self.RECV_BUFFER = sizeBuffer
         self.maxClientSocket = maxClientSocket
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
         self.serverOnline = True
-        self.mapper = Mapper() # HashMap<socket,Profil>
+        self.mapper = Mapper(self.serveAssistant) # HashMap<socket,Profil>
 
     def getMapper(self):
         return self.mapper
@@ -180,6 +154,7 @@ class PatientServer(Thread):
         self.serverOnline = False
     
     def run(self):
+        self.serveAssistant.start()
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('', self.PORT))
         server_socket.listen(self.maxClientSocket)
@@ -195,9 +170,10 @@ class PatientServer(Thread):
             liste = []
             with lockMap:
                 liste = list(self.mapper.getSockets()) # les sockets
+                
             liste.extend(self.CONNECTION_LIST)
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
-     
+            print("D")
             for sock in read_sockets:
                  
                 #New connection
@@ -239,22 +215,8 @@ class PatientServer(Thread):
         print("=============SERVEUR OFFLINE=============")
 
 if __name__ == "__main__":
-    serveAssistant = ServerAssistant(2000)
     servePatient = PatientServer(3000,4096,200) # sur le port 3000
-    
-    serveAssistant.start()
-    servePatient.start()
-##    message = " "
-##    print("ALT-F4 pour tuer le serveur")
-##    while True:
-##        message = input("entrez une commande: ")
-##        ## STOP -> envoyer STOP au premier socket trouvé dans la hashmap<socket,Tracker>
-##        if message == "STOP" and len(list(servePatient.mapper.dict.keys())) > 0:
-##            with lockPool:
-##                poolRequest.put((list(servePatient.mapper.dict.keys())[0],"STOPSUIVI")) # fonctionne uniquement
-##            
-
-    serveAssistant.join()
+    servePatient.start()          
     servePatient.join()
 
 ## TEST POOL

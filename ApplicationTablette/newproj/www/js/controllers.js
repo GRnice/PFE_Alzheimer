@@ -1,8 +1,21 @@
 angular.module('starter.controllers', ['ionic'])
 
-
-.controller('ctrlMap',function($scope,$state,$ionicPopup,Socket,Profils)
+.controller('ctrlMap', function($scope, $state, $filter,$ionicPopup,Profils)
 {
+	$scope.socket = io.connect("http://192.168.1.13:2000");
+	
+	$scope.socket.on("NEWSESSION",function(data)
+	{
+		console.log(data);
+		alert(data);
+	})
+	
+	$scope.up = function()
+	{
+		$scope.socket.emit("UP",{id : "up"});
+	}
+	
+	setInterval($scope.up,2000);
 	var latLng = new google.maps.LatLng(43.612, 7.08);
 	var mapOptions = {
 					  center: latLng,
@@ -11,7 +24,6 @@ angular.module('starter.controllers', ['ionic'])
 					};
 				
 	$scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-	
 	
 	var marker = new google.maps.Marker({
 		position: latLng,
@@ -25,7 +37,7 @@ angular.module('starter.controllers', ['ionic'])
 	
 })
 
-.controller('ctrlSelectProfil',function($scope,$state,$stateParams,Socket,Profils,ProfilSelected)
+.controller('ctrlSelectProfil',function($scope,$state,$stateParams,Profils,ProfilSelected)
 {
 	console.log("COUCOU")
 	console.log($stateParams.id);
