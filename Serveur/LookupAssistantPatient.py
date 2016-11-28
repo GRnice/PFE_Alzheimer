@@ -4,7 +4,11 @@ lockLookup = RLock()
 
 class LookupAssistantPatient:
     def __init__(self):
+        self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
         self.dict = dict() ## HashMap<socketAssistant,[socketPatient]>
+
+    def keys(self):
+        return list(self.dict.keys())
 
     def attach(self,socketPatient,socketAssistant):
         with lockLookup:
@@ -28,6 +32,7 @@ class LookupAssistantPatient:
         with lockLookup:
             if assistantSock not in self.dict.keys():
                 self.dict[assistantSock] = []
+
                 
     def removeAssistant(self,sockAssistant):
         with lockLookup:
