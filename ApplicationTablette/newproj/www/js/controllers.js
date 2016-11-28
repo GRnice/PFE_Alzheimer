@@ -9,15 +9,19 @@ angular.module('starter.controllers', ['ionic'])
     $scope.showMap = function(){
         $scope.visibleMapMenu = true;
         $scope.visibleConfig = false;
-      document.getElementById("mapTab").classList.toggle("active");
-      document.getElementById("settingsTab").classList.toggle("active");
+        if(!document.getElementById("mapTab").classList.contains("active")){
+          document.getElementById("mapTab").classList.toggle("active");
+          document.getElementById("settingsTab").classList.toggle("active");
+        }
     };
     
     $scope.showConfig = function(){
         $scope.visibleMapMenu = false;
         $scope.visibleConfig = true;
+      if(!document.getElementById("settingsTab").classList.contains("active")){
         document.getElementById("mapTab").classList.toggle("active");
         document.getElementById("settingsTab").classList.toggle("active");
+      }
     };
 
     $scope.profils = Profils.all();
