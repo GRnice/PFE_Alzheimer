@@ -75,7 +75,7 @@
                             </div>
 
                         </div>
-                        <div id="{{profil.nom}}" class="card" style="visibility: hidden; height: 0%; width: 0%">
+                        <div id="{{profil.nom}}" class="card" ng-show="cardVisible[{{profil.id}}]">
                             <div class="item item-avatar">
                             <img ng-src="{{avatar}}">
                                 <h2>{{nom}}</h2>

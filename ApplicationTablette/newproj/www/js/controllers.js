@@ -35,7 +35,8 @@ angular.module('starter.controllers', ['ionic'])
 					};
 				
 	$scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
+    $scope.cardVisible = [];
+    $scope.index = 0;
     $scope.$on('$createPositions',
     function(event, markers){
         console.log(markers);
@@ -46,9 +47,14 @@ angular.module('starter.controllers', ['ionic'])
                 $scope.$apply(function () {
                     $scope.nom = Profils.all()[marker.id].nom;
                     $scope.avatar = "img/test.png";
-                    document.getElementById($scope.nom).style.visibility = "visible";
-                    document.getElementById($scope.nom).style.height = "50%";
-                    document.getElementById($scope.nom).style.width = "100%";
+                    $scope.cardVisible[$scope.profils[marker.id].id] = true;
+                    for(var n = 0; n < $scope.profils.length; n++){
+                        if(n == marker.id){
+                            continue;
+                        }
+                        $scope.cardVisible[$scope.profils[n].id] = false;
+                    }
+                    console.log($scope.profils);
                 });
             });
 		}
