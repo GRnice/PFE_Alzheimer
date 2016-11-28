@@ -39,20 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final Button buttonSwitchConnexion = (Button) findViewById(R.id.button);
-        final Button buttonStopSuivi = (Button) findViewById(R.id.button2);
 
-        buttonStopSuivi.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent();
-                intent.setAction(ACTION_SEND_TO_SERVER);
-                intent.putExtra(STOPSUIVI,true);
-                sendBroadcast(intent);
-                MainActivity.this.finish();
-            }
-        });
 
         buttonSwitchConnexion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
                     etat = 0;
                     Intent intent = new Intent();
                     intent.setAction(ACTION_SEND_TO_SERVER);
+                    intent.putExtra(STOPSUIVI,true);
                     sendBroadcast(intent);
-                    buttonSwitchConnexion.setText("ACTIVER LE SUIVI");
+                    MainActivity.this.finish();
                 }
             }
         });
