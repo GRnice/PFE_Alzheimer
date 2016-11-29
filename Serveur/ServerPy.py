@@ -151,15 +151,15 @@ class Pool(Thread):
 ###############################################
 ###############################################
 class PatientServer(Thread):
-    def __init__(self,port,sizeBuffer,maxClientSocket):
+    def __init__(self,portPatient,portAssistant,sizeBuffer,maxClientSocket):
         Thread.__init__(self)
-        self.PORT = port
+        self.PORT = portPatient
         
         self.RECV_BUFFER = sizeBuffer
         self.maxClientSocket = maxClientSocket
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
         self.serverOnline = True
-        self.serveAssistant = ServerAssistant(2000)
+        self.serveAssistant = ServerAssistant(portAssistant)
         self.mapper = Mapper(self.serveAssistant) # HashMap<socket,Profil>
         self.serveAssistant.setMapper(self.mapper)
     def getMapper(self):
@@ -230,7 +230,7 @@ class PatientServer(Thread):
         print("=============SERVEUR OFFLINE=============")
 
 if __name__ == "__main__":
-    servePatient = PatientServer(3000,4096,200) # sur le port 3000
+    servePatient = PatientServer(3000,3100,4096,200) # sur le port 3000
     servePatient.start()          
     servePatient.join()
 

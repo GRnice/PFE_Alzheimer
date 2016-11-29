@@ -28,12 +28,13 @@ angular.module('starter.services', [])
 	}
   };
 })
-  .factory('Tels', function() {
+.factory('Tels', function() {
     // Might use a resource here that returns a JSON array
 
     // Some fake testing data
     var tels = [];
   var idTelCurrent;
+  
     return {
       all: function() {
         return tels;
@@ -81,7 +82,7 @@ angular.module('starter.services', [])
   })
 .factory('Socket', function($state,$rootScope,Profils,Tels)
 {
-	var socket = io("http://127.0.0.1:2000");
+	var socket = io("http://10.212.123.252:3100");
 	var id;
   var idTel;
 	socket.on('connect', function(data)
@@ -136,7 +137,6 @@ angular.module('starter.services', [])
 .factory('ProfilSelected', function($state,$rootScope,Profils,Tels)
 {
 	var profilSelected = 0;
-
 
 return{
 
