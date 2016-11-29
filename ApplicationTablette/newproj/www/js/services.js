@@ -82,7 +82,7 @@ angular.module('starter.services', [])
   })
 .factory('Socket', function($state,$rootScope,Profils,Tels)
 {
-	var socket = io("http://10.212.123.252:3100");
+	var socket = io("http://127.0.0.1:3100");
 	var id;
   var idTel;
 	socket.on('connect', function(data)
@@ -99,7 +99,7 @@ angular.module('starter.services', [])
 			profile = data[i];
 			profile = profile.split(",");
 			console.log(profile);
-			Profils.add({id : i, prenom: profile[0], nom: profile[1],idTel:null})
+			Profils.add({id : i, prenom: profile[0], nom: profile[1],idTel:null, position: {longitude: null , latitude: null}})
 		}
 		var tous = Profils.all();
 		console.log(tous);
@@ -117,6 +117,11 @@ angular.module('starter.services', [])
 
     socket.on('message', function(data) {
         console.log(data);
+    });
+
+    socket.on('UPDATE', function (data) {
+        var liste = data.split("*");
+        $rootScope.$broadcast('$updatePositions', liste);
     });
 	
 	return{

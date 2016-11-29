@@ -32,6 +32,40 @@ angular.module('starter.controllers', ['ionic'])
 
     });
 
+    $scope.$on('$updatePositions',
+        function(event, liste){
+            var idTel = liste[0];
+            console.log("idTel1");
+            console.log(idTel);
+            var position = {
+                longitude : liste[1],
+                latitude : liste[2]
+            };
+            for(var i = 0; i < $scope.profilsSelected.length; i++){
+                console.log("idTel2");
+                console.log($scope.profilsSelected[i].idTel);
+                if($scope.profilsSelected[i].idTel === idTel){
+                    $scope.profilsSelected[i].position = position;
+                    console.log($scope.profilsSelected[i]);
+                }
+            }
+            console.log("LAT");
+            console.log(position.latitude);
+            console.log("LONG");
+            console.log(position.longitude);
+            console.log("Markers");
+            console.log($scope.markers);
+            for(i = 0; i < $scope.markers.length; i++){
+                if($scope.profilsSelected[i].id === $scope.markers[i].id){
+                    $scope.markers[i].setPosition(new google.maps.LatLng( $scope.profilsSelected[i].position.latitude, $scope.profilsSelected[i].position.longitude));
+                }
+            }
+            console.log("Markers after");
+            console.log($scope.markers);
+
+
+        });
+
 
 
 
@@ -41,6 +75,7 @@ angular.module('starter.controllers', ['ionic'])
     }
 
 	setInterval($scope.up,2000);
+	$scope.markers = [];
 
     $scope.visibleMapMenu = true;
     $scope.visibleConfig = false;
@@ -103,6 +138,7 @@ angular.module('starter.controllers', ['ionic'])
         }
          console.log(marker);
 			  marker.setMap($scope.map);
+			  $scope.markers[$scope.markers.length] = marker;
 			  $scope.cardVisible[ProfilSelected.get().id] = false;
         google.maps.event.addListener(marker, 'click', function () {
           $scope.$apply(function () {
