@@ -89,7 +89,7 @@ angular.module('starter.services', [])
 	{
 		console.log("connecte");
 	});
-
+	
 	socket.on("PROFILES", function(data)
 	{
 		data = data.split("$");
@@ -107,7 +107,6 @@ angular.module('starter.services', [])
 	});
     socket.on('NEWSESSION', function (data)
 	{
-		alert("NOUVELLE SESSION !");
 		console.log("NOUVELLE SESSION");
 		console.log(data);
 		idTel = data;
@@ -119,7 +118,7 @@ angular.module('starter.services', [])
     socket.on('message', function(data) {
         console.log(data);
     });
-
+	
 	return{
 		get: function(){
 			return socket;
@@ -134,17 +133,17 @@ angular.module('starter.services', [])
 	};
 })
 
-.factory('ProfilSelected', function($state,$rootScope,Profils,Tels)
+.factory('ProfilSelected', function()
 {
 	var profilSelected = 0;
 
 return{
-
+	
 		get: function()
 		{
 			return profilSelected;
 		},
-
+		
 		set: function(profil)
 		{
 			console.log(profil);
