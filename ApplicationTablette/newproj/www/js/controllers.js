@@ -95,92 +95,55 @@ angular.module('starter.controllers', ['ionic'])
     function(event, marker){
         $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
         console.log(marker);
-        for(var i = 0; i < $scope.profilsSelected.length; i++){
-			marker.setMap($scope.map);
-            google.maps.event.addListener(marker, 'click', function () {
-                $scope.$apply(function () {
-                    $scope.nom = ProfilSelected.get().nom;
-                    $scope.avatar = "img/test.png";
-                    $scope.cardVisible[ProfilSelected.get().id] = true;
-                    for(var n = 0; n < $scope.profilsSelected.length; n++){
-                        if(n == marker.id){
-                            continue;
-                        }
-                        $scope.cardVisible[ProfilSelected.get().id] = false;
-                    }
-                    $scope.duree = 90;
-                    $scope.batterie = 50;
-                    $scope.reseau = "On";
-                    console.log(ProfilSelected.get());
-                });
-            });
-		}        
-   
-		console.log($scope.profilsSelected);
-        $scope.showMap();
+			  marker.setMap($scope.map);
+			  $scope.cardVisible[ProfilSelected.get().id] = false;
+        google.maps.event.addListener(marker, 'click', function () {
+          $scope.$apply(function () {
+            $scope.nom = ProfilSelected.get().nom;
+            $scope.avatar = "img/test.png";
+            $scope.cardVisible[marker.id] = true;
+            for(var n = 0; n < $scope.profilsSelected.length; n++){
+              if(n == marker.id){
+                continue;
+              }
+              $scope.cardVisible[$scope.profilsSelected[n].id] = false;
+            }
+            $scope.duree = 90;
+            $scope.batterie = 50;
+            $scope.reseau = "On";
+            console.log($scope.profilsSelected);
+            console.log($scope.cardVisible);
+          });
+        });
+		// console.log($scope.profilsSelected);
+		$scope.showMap();
     });
 
 })
-
-
-
-//
-// .controller('ctrlSelectProfil',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
-// {
-// 	console.log($stateParams.id);
-// 	$scope.profils = Profils.all();
-//
-// 	$scope.profilSelected = function(id)
-// 	{
-// 		var id = parseInt(id);
-// 		var leProfil = Profils.get(id);
-// 		ProfilSelected.set(leProfil);
-// 		Socket.sendMessage("FOLLOW",$stateParams.id);
-//         var positions = [];
-//         var markers = [];
-//         positions[0] = new google.maps.LatLng(43.612, 7.08);
-//         positions[1] = new google.maps.LatLng(43.610, 7.09);
-//         for(var i = 0; i < Profils.all().length; i++){
-//             console.log("here1");
-//             var marker = new google.maps.Marker({
-//                 position: positions[i],
-//                 animation: google.maps.Animation.DROP,
-// 				icon: 'img/test.png',
-//                 id: i
-//             });
-//             markers[i] = marker;
-//             // marker.setMap($scope.map);
-//         }
-//         $rootScope.$broadcast('$createPositions', markers);
-// 		$state.go("Map");
-//
-// 	}
-// });
-
 
 .controller('ctrlListeProfils',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
 {
 
 	console.log($stateParams.id);
 	$scope.profils = Profils.all();
-    
-	$scope.profilSelected = function(id)
+  $scope.positions = [];
+  $scope.positions[0] = new google.maps.LatLng(43.612, 7.08);
+  $scope.positions[1] = new google.maps.LatLng(43.610, 7.09);
+  $scope.positions[2] = new google.maps.LatLng(43.608, 7.09);
+  $scope.positions[3] = new google.maps.LatLng(43.609, 7.09);
+
+  $scope.profilSelected = function(id)
 	{
 		var id = parseInt(id);
 		var leProfil = Profils.get(id);
 		ProfilSelected.set(leProfil);
 		Socket.sendMessage("FOLLOW",$stateParams.id+"*"+leProfil.prenom+"*"+leProfil.nom);
-        var positions = [];
-        var markers = [];
-        positions[0] = new google.maps.LatLng(43.612, 7.08);
-        positions[1] = new google.maps.LatLng(43.610, 7.09);
             var marker = new google.maps.Marker({
-                position: positions[0],
+                position: $scope.positions[ProfilSelected.get().id],
                 animation: google.maps.Animation.DROP,
                 icon: 'img/test.png',
                 id: ProfilSelected.get().id
             });
-            // marker.setMap($scope.map);
 
         $rootScope.$broadcast('$createPositions', marker);
         $state.go("Map");
