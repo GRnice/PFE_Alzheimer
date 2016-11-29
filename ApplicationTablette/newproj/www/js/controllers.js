@@ -96,18 +96,23 @@ angular.module('starter.controllers', ['ionic'])
     $scope.index = 0;
     $scope.$on('$createPositions',
     function(event, marker){
-        $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
+        if(! $scope.profilsSelected.includes(ProfilSelected.get())) {
+           $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
         Tels.addTelToProfile(Tels.getIdCurrent(),ProfilSelected.get().id,$scope.profilsSelected);
-        console.log(marker);
+       
+        }
+         console.log(marker);
 			  marker.setMap($scope.map);
 			  $scope.cardVisible[ProfilSelected.get().id] = false;
         google.maps.event.addListener(marker, 'click', function () {
           $scope.$apply(function () {
+              console.log("marker");
+            console.log(marker.id);
             $scope.nom = ProfilSelected.get().nom;
             $scope.avatar = "img/test.png";
             $scope.cardVisible[marker.id] = true;
             for(var n = 0; n < $scope.profilsSelected.length; n++){
-              if(n == marker.id){
+              if($scope.profilsSelected[n].id == marker.id){
                 continue;
               }
               $scope.cardVisible[$scope.profilsSelected[n].id] = false;
