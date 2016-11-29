@@ -44,6 +44,14 @@ def startSockerIOassistantServeur(port,serverAssistant):
 
         serverAssistant.lookup.attach(sockPatient,sid)
         sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+
+    @sio.on('STOPPROMENADE',namespace="/")
+    def stopPromenade(sid,data):
+        print("stop promenade",sid)
+        idTel = data[0]
+        sockPatient = serverAssistant.mapper.getSocketById(idTel)
+        sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
+        serverAssistant.lookup.removePatient(sockPatient)
         
 
     @sio.on("UP",namespace="/")
