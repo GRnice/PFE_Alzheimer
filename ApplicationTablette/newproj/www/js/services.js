@@ -82,7 +82,7 @@ angular.module('starter.services', [])
   })
 .factory('Socket', function($state,$rootScope,Profils,Tels)
 {
-	var socket = io("http://127.0.0.1:3100");
+	var socket = io("http://10.212.109.255:3100");
 	var id;
   var idTel;
 	socket.on('connect', function(data)

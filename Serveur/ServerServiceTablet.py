@@ -23,7 +23,6 @@ def startSockerIOassistantServeur(port,serverAssistant):
     @sio.on('connect', namespace='/')
     def connect(sid, environ):
         print("connect ", sid)
-        print(sio)
         print(sid)
         serverAssistant.addAssistant(sid)
         print("SEND",sio.emit("PROFILES",serverAssistant.getProfilsToString(),room=sid))

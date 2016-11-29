@@ -17,6 +17,7 @@ class PoolerAssistance:
     def broadcast(self,event):
         with lockEventPoolAssistance:
             keys = self.dict.keys()
+            print(keys)
             for cle in keys:
                 queue = self.dict[cle]
                 queue.put(event)
