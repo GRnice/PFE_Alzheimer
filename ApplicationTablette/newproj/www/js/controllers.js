@@ -1,7 +1,7 @@
 angular.module('starter.controllers', ['ionic'])
 
 
-.controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils, ProfilSelected)
+.controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils, ProfilSelected,Tels)
 {
 
     $scope.$on('$notifSession',
@@ -16,29 +16,32 @@ angular.module('starter.controllers', ['ionic'])
             confirmPopup.then(function(res) {
                 if(res) {
                     console.log('OK');
-                    $state.go("SelectProfil", { id: Socket.data() });
+                    $state.go("SelectProfil", { idTel: Socket.data() });
+                  Tels.add(Socket.data());
+                  Tels.set(Socket.data());
+
                 } else {
                     console.log('Cancel');
                     }
-                });   
-        
+                });
+
         };
         if(notifBool) {
             $scope.showConfirm();
         }
 
     });
-            
-    
-       
-            
+
+
+
+
 	$scope.up = function()
     {
-        Socket.sendMessage("UP","up1");	
+        Socket.sendMessage("UP","up1");
     }
-	
+
 	setInterval($scope.up,2000);
-	
+
     $scope.visibleMapMenu = true;
     $scope.visibleConfig = false;
     // Visibility
@@ -51,7 +54,7 @@ angular.module('starter.controllers', ['ionic'])
             document.getElementById("profilsTab").classList.remove("active");
         }
     };
-    
+
     $scope.showConfig = function(){
         $scope.visibleMapMenu = false;
         $scope.visibleConfig = true;
@@ -87,13 +90,14 @@ angular.module('starter.controllers', ['ionic'])
 					  zoom: 15,
 					  mapTypeId: google.maps.MapTypeId.ROADMAP
 					};
-				
+
 	$scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
     $scope.cardVisible = [];
     $scope.index = 0;
     $scope.$on('$createPositions',
     function(event, marker){
         $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
+        Tels.addTelToProfile(Tels.getIdCurrent(),ProfilSelected.get().id,$scope.profilsSelected);
         console.log(marker);
         for(var i = 0; i < $scope.profilsSelected.length; i++){
 			marker.setMap($scope.map);
@@ -114,8 +118,8 @@ angular.module('starter.controllers', ['ionic'])
                     console.log(ProfilSelected.get());
                 });
             });
-		}        
-   
+		}
+
 		console.log($scope.profilsSelected);
         $scope.showMap();
     });
@@ -158,18 +162,18 @@ angular.module('starter.controllers', ['ionic'])
 // });
 
 
-.controller('ctrlListeProfils',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
+.controller('ctrlListeProfils',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected,Tels)
 {
 
 	console.log($stateParams.id);
 	$scope.profils = Profils.all();
-    
+
 	$scope.profilSelected = function(id)
 	{
 		var id = parseInt(id);
 		var leProfil = Profils.get(id);
 		ProfilSelected.set(leProfil);
-		Socket.sendMessage("FOLLOW",$stateParams.id+"*"+leProfil.prenom+"*"+leProfil.nom);
+		Socket.sendMessage("FOLLOW",$stateParams.idTel+"*"+leProfil.prenom+"*"+leProfil.nom);
         var positions = [];
         var markers = [];
         positions[0] = new google.maps.LatLng(43.612, 7.08);

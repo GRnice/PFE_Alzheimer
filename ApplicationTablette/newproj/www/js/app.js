@@ -44,7 +44,7 @@ angular.module('starter', ['ionic','starter.controllers','starter.services','ngC
 		url: '/selectProfil',
 		templateUrl: 'templates/selectProfil.html',
         params: {
-            id: null
+            idTel: null
         },
 		controller : 'ctrlListeProfils'
 	});
