@@ -6,6 +6,7 @@ import time
 import socket, select
 import queue
 from ServerServiceTablet import *
+import sys
 
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
 
@@ -18,17 +19,20 @@ class Tracker: ## Classe representant un tracker
         self.etat = 0
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
+        
+        self.lastEmit = None # date de la dernier emission du tracker
 
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
         self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
-        self.dict = dict()
+        self.dict = dict() # <sockPatient,Tracker>
+        
         self.serverAssistant = serverAssistant
         print("Mapper ready [ok]")
     def addTracker(self,socket):
-        print("add tracker")
-        print(socket)
         with lockMap:
+            print("add tracker")
+            print(socket)
             self.dict[socket] = Tracker()
 
     def delTracker(self,socket):
@@ -70,6 +74,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker = self.getTracker(socket)
             tracker.etat = 1
             tracker.id = idTel
+            tracker.lastEmit = time.time()
             self.dict[socket] = tracker
             self.mapIdSock[idTel] = socket
             print("Demarrage du suivi pour le tel à l'id : ",idTel)
@@ -87,6 +92,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
             print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
             tracker.position = (longitude,latitude)
+            tracker.lastEmit = time.time()
             self.dict[socket] = tracker
             self.serverAssistant.event("POSITION",socket,tracker)
 
@@ -108,6 +114,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     nwTracker.id = idTel
                     nwTracker.position = old.position
                     nwTracker.etat = old.etat
+                    nwTracker.lastEmit = time.time()
                     self.dict[socket] = nwTracker
                     self.mapIdSock[idTel] = socket
                     del self.mapIdSock[key]
@@ -183,14 +190,12 @@ class PatientServer(Thread):
         print("=============SERVEUR ONLINE=============")
         while self.serverOnline:
         # Get the list sockets which are ready to be read through select
-            liste = []
-            with lockMap:
-                liste = list(self.mapper.getSockets()) # les sockets
+            
+            liste = list(self.mapper.getSockets()) # les sockets
                 
             liste.extend(self.CONNECTION_LIST)
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
             for sock in read_sockets:
-                 
                 #New connection
                 if sock == server_socket:
                     sockfd, addr = server_socket.accept()
@@ -233,67 +238,3 @@ if __name__ == "__main__":
     servePatient = PatientServer(3000,3100,4096,200) # sur le port 3000
     servePatient.start()          
     servePatient.join()
-
-## TEST POOL
-##mapper = Mapper()
-##pool = Pool(mapper)
-##pool.start()
-##with mlock:
-##    poolRequest.put(("0","first request"))
-##    poolRequest.put(("0","second request"))
-##    poolRequest.put(("1","third request"))
-
-
-##if __name__ == "__main__":
-##      
-##    CONNECTION_LIST = []    # list of socket clients
-##    RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
-##    PORT = 3000
-##         
-##    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-##
-##    server_socket.bind(('', PORT))
-##    server_socket.listen(1000)
-## 
-##    # Add server socket to the list of readable connections
-##    CONNECTION_LIST.append(server_socket)
-## 
-##    print("Chat server started on port " + str(PORT))
-## 
-##    while 1:
-##        # Get the list sockets which are ready to be read through select
-##        read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
-## 
-##        for sock in read_sockets:
-##             
-##            #New connection
-##            if sock == server_socket:
-##                # Handle the case in which there is a new connection recieved through server_socket
-##                sockfd, addr = server_socket.accept()
-##                CONNECTION_LIST.append(sockfd)
-##                print("Client (%s, %s) connected" % addr)
-##                 
-##            #Some incoming message from a client
-##            else:
-##                # Data recieved from client, process it
-##                try:
-##                    #In Windows, sometimes when a TCP program closes abruptly,
-##                    # a "Connection reset by peer" exception will be thrown
-##                    data = sock.recv(RECV_BUFFER)
-##                    
-##                    # echo back the client message
-##                    if data:
-##                        print(data)
-##                        sock.send("COUCOU CA MARCHE\r\n".encode('utf-8'))
-##                        #sock.send('OK ... ' + data)
-##                 
-##                # client disconnected, so remove from socket list
-##                except:
-##                    broadcast_data(sock, "Client (%s, %s) is offline" % addr)
-##                    print("Client (%s, %s) is offline" % addr)
-##                    sock.close()
-##                    CONNECTION_LIST.remove(sock)
-##                    continue
-##
-##         
-##    server_socket.close()

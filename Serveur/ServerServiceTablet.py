@@ -44,6 +44,7 @@ def startSockerIOassistantServeur(port,serverAssistant):
         serverAssistant.lookup.attach(sockPatient,sid)
         sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
 
+
     @sio.on('STOPPROMENADE',namespace="/")
     def stopPromenade(sid,data):
         print("stop promenade",sid)
@@ -55,6 +56,7 @@ def startSockerIOassistantServeur(port,serverAssistant):
 
     @sio.on("UP",namespace="/")
     def up(sid,data):
+        print("up",sid)
         event = serverAssistant.poolerEvent.nextEventFor(sid)
         if event != None:
             header = event[0]

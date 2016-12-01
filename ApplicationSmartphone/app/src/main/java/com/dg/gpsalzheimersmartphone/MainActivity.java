@@ -1,8 +1,10 @@
 package com.dg.gpsalzheimersmartphone;
 
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.provider.Settings;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.support.v7.app.AppCompatActivity;
@@ -17,17 +19,23 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String STARTSUIVI = "STARTSUIVI";
     private int etat = 0;
-//    private MyReceiver myReceiver;
+    private Button buttonSwitchConnexion;
+    private ServiceListenerReceiver serviceListener;
     public final static String ACTION_SEND_TO_SERVER = "DATA_TO_SERVICE";
     public static String android_id;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
+        serviceListener = new ServiceListenerReceiver();
+        registerNewReceiver(serviceListener,ServiceSocket.MESSAGE_FROM_SERVICE);
+
         android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        buttonSwitchConnexion = (Button) findViewById(R.id.button);
 
         if (! isMyServiceRunning(ServiceSocket.class))
         {
@@ -37,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("username","Rémy");
             wakeful.startWakefulService(this,intent);
         }
-
-        final Button buttonSwitchConnexion = (Button) findViewById(R.id.button);
 
 
         buttonSwitchConnexion.setOnClickListener(new View.OnClickListener() {
@@ -61,11 +67,18 @@ public class MainActivity extends AppCompatActivity {
                     intent.setAction(ACTION_SEND_TO_SERVER);
                     intent.putExtra(STOPSUIVI,true);
                     sendBroadcast(intent);
-                    MainActivity.this.finish();
                 }
             }
         });
     }
+
+    public void registerNewReceiver(BroadcastReceiver receiver,String action)
+    {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ServiceSocket.MESSAGE_FROM_SERVICE);
+        registerReceiver(receiver,intentFilter);
+    }
+
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -88,12 +101,18 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this,ServiceSocket.class);
             wakeful.startWakefulService(this,intent);
         }
+
+        buttonSwitchConnexion = (Button) findViewById(R.id.button);
+        if (etat == 1)
+        {
+            buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
+        }
     }
 
     @Override
     protected void onDestroy()
     {
-
+        unregisterReceiver(serviceListener);
         super.onDestroy();
     }
 
@@ -101,6 +120,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop()
     {
         super.onStop();
+    }
+
+    /**
+     * Service Listener écoute le service, si l'application se termine ou non
+     */
+    public class ServiceListenerReceiver extends BroadcastReceiver
+    {
+
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            boolean mustKill = intent.getBooleanExtra("KILL",false);
+
+            if (mustKill)
+            {
+                MainActivity.this.finishAffinity();
+            }
+        }
     }
 
 
