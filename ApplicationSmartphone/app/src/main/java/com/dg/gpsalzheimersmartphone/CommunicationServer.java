@@ -23,7 +23,7 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "10.212.109.255";
+    public static final String SOCKET_ADDR = "10.212.123.252";
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String STOPSUIVI = "STOPSUIVI";
@@ -45,6 +45,7 @@ public class CommunicationServer extends Thread implements Runnable
         actionIntent = action;
     }
 
+
     public synchronized void setService(Service ser)
     {
         this.service = ser;
@@ -53,8 +54,6 @@ public class CommunicationServer extends Thread implements Runnable
     public void run()
     {
         String line;
-
-
 
         try
         {
@@ -81,8 +80,10 @@ public class CommunicationServer extends Thread implements Runnable
         {
             intent = new Intent();
             intent.setAction(ServiceSocket.ACTION_RECEIVE_FROM_SERVER);
-            try {
-                    line = input.readLine();
+            try
+            {
+                line = input.readLine();
+
                 if (line != null)
                 {
                     if(line.equals(STOPSUIVI)){
@@ -94,17 +95,13 @@ public class CommunicationServer extends Thread implements Runnable
                     {
                         this.service.sendBroadcast(intent);
                     }
-
                     Log.e("RECEIVE THIS -> ",line);
                 }
 
-                sleep(2000);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            catch(InterruptedException e)
+            } catch (IOException e)
             {
                 e.printStackTrace();
+                break;
             }
         }
 
@@ -129,7 +126,7 @@ public class CommunicationServer extends Thread implements Runnable
         // liberer la ressource
         this.run = false;
         this.deconnect();
-
+        super.interrupt();
     }
 }
 
