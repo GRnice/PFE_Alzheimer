@@ -108,7 +108,7 @@ angular.module('starter.controllers', ['ionic'])
       for (var i=0;i<$scope.profilsSelected.length;i++){
           if($scope.profilsSelected[i].id==id){
               $scope.profilsSelected[i].highlighted= !$scope.profilsSelected[i].highlighted;
-              $scope.profilsSelected[i].idImage=false;
+              $scope.profilsSelected[i].idImage=!$scope.profilsSelected[i].idImage;
           }
           else{
               $scope.profilsSelected[i].highlighted=false;
