@@ -185,7 +185,7 @@ angular.module('starter.controllers', ['ionic'])
             var marker = new google.maps.Marker({
                 position: $scope.positions[ProfilSelected.get().id],
                 animation: google.maps.Animation.DROP,
-                icon: 'img/person-flat.png',
+                icon: 'img/person-flat2.png',
                 id: ProfilSelected.get().id
             });
 
