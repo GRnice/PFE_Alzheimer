@@ -113,8 +113,13 @@ angular.module('starter.controllers', ['ionic'])
           else{
               $scope.profilsSelected[i].highlighted=false;
               $scope.profilsSelected[i].idImage=true;
-
           }
+          for(var j = 0; j < $scope.markers.length; j++){
+              if($scope.markers[j].id == id){
+                  $scope.map.panTo($scope.markers[j].position);
+              }
+          }
+
       }
     };
 
