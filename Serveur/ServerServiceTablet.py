@@ -29,20 +29,37 @@ def startSockerIOassistantServeur(port,serverAssistant):
         #sio.emit("NEWSESSION","12fa90c",room=sid)
 
     @sio.on('FOLLOW',namespace="/")
-    def follow(sid,data):
+    def follow(assistant,data):
         # message attendu "idTel*prenom*nom"
-        print(sid)
+        print(assistant)
         data = data.split("*")
-        idTel = data[0]
-        prenom = data[1]
-        nom = data[2]
-        sockPatient = serverAssistant.mapper.getSocketById(idTel)
-        tracker = serverAssistant.mapper.getTracker(sockPatient)
-        tracker.nom = nom
-        tracker.prenom = prenom
+        if (len(data) == 1):
+            # si (FOLLOW,idTel)
+            idTel = data[0]
+            sockPatient = serverAssistant.mapper.getSocketById(idTel)
+            tracker = serverAssistant.mapper.getTracker(sockPatient)
+            tracker.nbFollower += 1
+            serverAssistant.lookup.attach(sockPatient,assistant)
 
-        serverAssistant.lookup.attach(sockPatient,sid)
-        sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+        elif (len(data) == 3):
+            # si (FOLLOW,idTel*prenom*nom)
+            idTel = data[0]
+            prenom = data[1]
+            nom = data[2]
+            sockPatient = serverAssistant.mapper.getSocketById(idTel)
+            tracker = serverAssistant.mapper.getTracker(sockPatient)
+            if (tracker.nbFollower == 0): # le premier qui défini le profil du device
+                tracker.nom = nom
+                tracker.prenom = prenom
+                print("OKPROMENADE envoyé")
+                ## serverAssistant.poolerEvent.broadcast("SYNCH
+                sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+
+            serverAssistant.lookup.attach(sockPatient,assistant)
+            tracker.nbFollower += 1
+
+        print("un follower en +")
+            
 
 
     @sio.on('STOPPROMENADE',namespace="/")
