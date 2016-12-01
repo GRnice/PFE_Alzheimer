@@ -5,11 +5,11 @@ angular.module('starter.controllers', ['ionic'])
 {
     $scope.profils = Profils.all();
     $scope.profilsSelected = [];
-    
+
     $scope.visibleMapMenu = true;
     $scope.visibleConfig = false;
-    
-    
+
+
     $scope.$on('$navigMap',
               function(event, visibility) {
         $scope.visibleMapMenu = visibility[0];
@@ -17,7 +17,7 @@ angular.module('starter.controllers', ['ionic'])
         console.log("NAVIGMAP")
         console.log(visibility);
     })
-    
+
     $scope.$on('$createPositions',
     function(event, marker){
         console.log("ProfilSelected");
@@ -25,35 +25,19 @@ angular.module('starter.controllers', ['ionic'])
         if(! $scope.profilsSelected.includes(ProfilSelected.get())) {
            $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
         Tels.addTelToProfile(Tels.getIdCurrent(),ProfilSelected.get().id,$scope.profilsSelected);
-       
+
         }
          console.log(marker);
 			  marker.setMap($scope.map);
 			  $scope.markers[$scope.markers.length] = marker;
-			  $scope.cardVisible[ProfilSelected.get().id] = false;
         google.maps.event.addListener(marker, 'click', function () {
           $scope.$apply(function () {
-              console.log("marker");
-            console.log(marker.id);
-            $scope.nom = ProfilSelected.get().nom;
-            $scope.cardVisible[marker.id] = true;
-            for(var n = 0; n < $scope.profilsSelected.length; n++){
-              if($scope.profilsSelected[n].id == marker.id){
-                continue;
-              }
-              $scope.cardVisible[$scope.profilsSelected[n].id] = false;
-            }
-            $scope.duree = 90;
-            $scope.batterie = 50;
-            $scope.reseau = "On";
-            console.log($scope.profilsSelected);
-            console.log($scope.cardVisible);
           });
         });
 		// console.log($scope.profilsSelected);
         $rootScope.$broadcast("$selectionProfile");
 		//$scope.showMap();
-       
+
     });
 
 
@@ -119,11 +103,23 @@ angular.module('starter.controllers', ['ionic'])
 
         });
 
+    $scope.profilSelected =  function(id){
+      for (var i=0;i<$scope.profilsSelected.length;i++){
+          if($scope.profilsSelected[i].id==id){
+              $scope.profilsSelected[i].highlighted=true;
+          }
+          else{
+              $scope.profilsSelected[i].highlighted=false;
+
+          }
+      }
+    };
+
 
 	$scope.up = function()
     {
         Socket.sendMessage("UP","up1");
-    }
+    };
 
 	setInterval($scope.up,2000);
 	$scope.markers = [];
@@ -131,14 +127,18 @@ angular.module('starter.controllers', ['ionic'])
     var positions = [];
     positions[0] = new google.maps.LatLng(43.612, 7.08);
 	positions[1] = new google.maps.LatLng(43.610, 7.09);
-    
-       $scope.showMap = function(){
+    $scope.pulse = 70;
+    $scope.duree = 90;
+    $scope.batterie = 50;
+    $scope.reseau = "On";
+
+    $scope.showMap = function(){
         var visibleMapMenu = true;
         var visibleConfig = false;
         $rootScope.$broadcast('$navigation', [visibleMapMenu, visibleConfig]);
     };
-    
-    
+
+
 
 	var mapOptions = {
 					  center: positions[0],
@@ -147,9 +147,10 @@ angular.module('starter.controllers', ['ionic'])
 					};
 
 	$scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-    $scope.cardVisible = [];
     $scope.index = 0;
-    
+
+
+
 })
 
 .controller('ctrlListeProfils',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
@@ -182,13 +183,13 @@ angular.module('starter.controllers', ['ionic'])
 })
 
 .controller('ctrNavBar', function($scope,$rootScope ,$state,Socket,Profils) {
-    
+
     $scope.$on('$selectionProfile',
         function(event){
         $scope.showMap()
-    }); 
-    
-   
+    });
+
+
     // Visibility
     $scope.showMap = function(){
         if(!document.getElementById("mapTab").classList.contains("active")){
@@ -208,7 +209,7 @@ angular.module('starter.controllers', ['ionic'])
       }
         $rootScope.$broadcast("$navigMap",[false, true] );
         $state.go("Map");
-        
+
     };
 
     $scope.showProfils = function(){

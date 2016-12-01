@@ -3,185 +3,136 @@
 
 <!-- <div class="bar bar-header">
     <div class="tabs-striped tabs-top tabs-background-positive tabs-color-light">
-   
+
     <div class="tabs">
-        
+
         <a class="tab-item active" ng-click="show(mapView)">
-                 
+
             <i class="icon ion-map"></i>
             Test
           </a>
-        
+
           <a class="tab-item" ng-click="show(configurationView)">
             <i class="icon ion-gear-a"></i>
             Settings
           </a>
     </div>
 
-    </div>   
+    </div>
 </div>  -->
 
 
 
-    <div class="row">
-        <div class="col col-33" id="leftSideBar" style="height:100%; background-color: lightblue; padding-top:5%;">
-            <div ng-show="visibleMapMenu">
-                <div class="list">
+  <div class="row">
+    <div class="col col-33" id="leftSideBar" style="height:100%; background-color: lightblue; padding-top:5%;">
+      <div ng-show="visibleMapMenu">
 
 
-                    <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="profil in profilsSelected" ng-click="profilSelected({{profil.id}})" type="item-text-wrap">
 
-                        <img ng-src="{{profil.face}}">
+        <ion-item class="item-remove-animate card" ng-repeat="profil in profilsSelected" type="item-text-wrap">
 
-                        <div class="row">
+          <div id="{{profil.nom}}" ng-click="profilSelected({{profil.id}})">
+            <div class="item item-avatar">
+              <img ng-src="{{profil.face}}">
+              <div class="row">
 
-                            <div class="col col-50">
-                                <h2>{{profil.prenom}}</h2>
-                                <p>{{profil.nom}} </p>
-                            </div>
+                <div class="col col-30">
+                  <h2>{{profil.prenom}}</h2>
+                  <p>{{profil.nom}} </p>
+                </div>
 
-                            <!--   <ion-checkbox ng-model="isChecked">Suivre </ion-checkbox>  -->
-                            <div class="col col-50">
-                                <label class="checkbox" ng-model="isChecked">
-                                    <input type="checkbox"> Suivre
-                                </label>
-                            </div>
+                <div class="row  item-toggle">
+                  <div class=" col col-20 item-icon">
+                    <i class="icon ion-wifi"></i>
+                  </div>
+                  <div class=" col col-20 item-icon">
+                    <i class="icon ion-clock"></i>
+                  </div>
+                  <div class=" col col-20 item-icon">
+                    <i class="icon ion-battery-half"></i>
+                  </div>
+                  <div class=" col col-20 item-icon">
+                    <i class="icon ion-ios-pulse"></i>
+                  </div>
+                  <label class="toggle toggle-assertive">
+                    <input type="checkbox">
+                    <div class="track">
+                      <div class="handle"></div>
+                    </div>
+                  </label>
+                </div>
 
-                            <div class="item-icon-right">
-                                <i class="icon ion-heart"></i>
-                            </div>
 
-                        </div>
-                        <div id="{{profil.nom}}" class="card" ng-show="cardVisible[{{profil.id}}]">
-                            <div class="item item-avatar">
-                            <img ng-src="{{profil.face}}">
-                                <h2>{{nom}}</h2>
-                            </div>
-                            <div class="item item-body">
-                                <div class="row">
-                                    <div class="col col-25">
-                                        <span>{{duree}}s</span>
-                                    </div>
-                                    <div class="col col-25 col-offset-66">
-                                        <i class="ion-android-stopwatch"></i>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col col-25">
-                                        <span>{{batterie}}%</span>
-                                    </div>
-                                    <div class="col col-25 col-offset-66">
-                                        <i class="ion-battery-half"></i>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col col-25">
-                                        <span>{{reseau}}</span>
-                                    </div>
-                                    <div class="col col-25 col-offset-66">
-                                        <i class="ion-wifi"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ion-item>
-                </div> <!-- List -->
-            </div>  <!-- LeftBarMenu -->
-
-            <div ng-show="visibleConfig">
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <button class="button button-dark">
-                    button-dark
-                </button>
-                <br>
-                <br>
-                <br>
-                <button class="button button-dark">
-                    button-dark
-                </button>
-                <br>
+              </div>
             </div>
+            <div class="item item-body" ng-show="profil.highlighted">
+              <div class="row">
+                <div class="col col-25">
+                  <span>{{pulse}}bpm</span>
+                </div>
+                <div class="col col-25 col-offset-50">
+                  <i class="icon icon-right ion-ios-pulse"></i>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-25">
+                  <span>{{duree}}s</span>
+                </div>
+                <div class="col col-25 col-offset-50">
+                  <i class="icon icon-right ion-clock"></i>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-25">
+                  <span>{{batterie}}%</span>
+                </div>
+                <div class="col col-25 col-offset-50">
+                  <i class="icon icon-right ion-battery-half"></i>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-25">
+                  <span>{{reseau}}</span>
+                </div>
+                <div class="col col-25 col-offset-50">
+                  <i class="icon icon-right ion-wifi"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-item>
+      </div>  <!-- LeftBarMenu -->
 
-        </div>
+      <div ng-show="visibleConfig">
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <button class="button button-dark">
+          button-dark
+        </button>
+        <br>
+        <br>
+        <br>
+        <button class="button button-dark">
+          button-dark
+        </button>
+        <br>
+      </div>
 
-
-        <div class="col col-67" id="map" data-tap-disabled="true" > </div>
     </div>
 
 
+    <div class="col col-67" id="map" data-tap-disabled="true" > </div>
+  </div>
 
 
-    <!--<div class="col col-25" id="leftSideBar" style="height:100%; background-color: lightblue;">-->
-         <!---->
-          <!--<div ng-show="visibleMapMenu">-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<button class="button button-dark">-->
-                  <!--button-dark-->
-             <!--</button>-->
-              <!--<div class="card">-->
-                  <!--<div class="item item-avatar">-->
-                      <!--<img ng-src="{{avatar}}">-->
-                      <!--<h2>{{nom}}</h2>-->
-                  <!--</div>-->
-                  <!--<div class="item item-body">-->
-                      <!--Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget pharetra tortor. Proin quis eros imperdiet, facilisis nisi in, tincidunt orci. Nam tristique elit massa, quis faucibus augue finibus ac.-->
-                  <!--</div>-->
-              <!--</div>-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<button class="button button-dark">-->
-                  <!--button-dark-->
-             <!--</button>-->
-              <!--<br>-->
 
-              <!--<label class="toggle">-->
-               <!--<input type="checkbox">-->
-               <!--<div class="track">-->
-                 <!--<div class="handle"></div>-->
-               <!--</div>-->
-            <!--</label>-->
-          <!--</div>-->
-          <!---->
-          <!--<div ng-show="visibleConfig">-->
-                        <!--<br>-->
-              <!--<br>-->
-              <!--<br>-->
-                       <!--<br>-->
-              <!--<br>-->
-              <!--<br>-->
-                       <!--<br>-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<button class="button button-dark">-->
-                  <!--button-dark-->
-             <!--</button>-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<br>-->
-              <!--<button class="button button-dark">-->
-                  <!--button-dark-->
-             <!--</button>-->
-              <!--<br>-->
-          <!--</div>-->
-          <!---->
-    <!--</div>-->
-          <!---->
-    <!---->
-        <!--<div class="col col-75" id="map" style="height:97%; padding-top:3%;" data-tap-disabled="true" > </div>-->
-<!--</div>-->
 
-<!-- <div id="map" style="height:100%; padding-left: 30%;" data-tap-disabled="true"></div>
-<div id="leftSideBar" style="height:100%; color:darkblue;"></div> -->
 
 </ion-content>

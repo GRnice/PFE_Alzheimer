@@ -99,7 +99,7 @@ angular.module('starter.services', [])
 			profile = data[i];
 			profile = profile.split(",");
 			console.log(profile);
-			Profils.add({id : i, prenom: profile[0], nom: profile[1],idTel:null, position: {longitude: null , latitude: null}, face: 'img/person-flat.png'})
+			Profils.add({id : i, prenom: profile[0], nom: profile[1],idTel:null, position: {longitude: null , latitude: null}, highlighted: false, face: 'img/person-flat.png'})
 		}
 		var tous = Profils.all();
 		console.log(tous);

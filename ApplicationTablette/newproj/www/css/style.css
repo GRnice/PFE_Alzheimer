@@ -1,1 +1,11 @@
 /* Empty. Add your own CSS if you like */
+.icon {
+    font-size: 35px;
+}
+.toggle input:checked + .track {
+    border-color: #1570a5 !important;
+    background-color: #1570a5!important;
+
+
+}
+
