@@ -21,6 +21,7 @@ class Tracker: ## Classe representant un tracker
         # 1 -> connecté avec information;
         
         self.lastEmit = None # date de la dernier emission du tracker
+        self.nbFollower = 0
 
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
