@@ -30,24 +30,8 @@ angular.module('starter.controllers', ['ionic'])
          console.log(marker);
 			  marker.setMap($scope.map);
 			  $scope.markers[$scope.markers.length] = marker;
-			  $scope.cardVisible[ProfilSelected.get().id] = false;
         google.maps.event.addListener(marker, 'click', function () {
           $scope.$apply(function () {
-              console.log("marker");
-            console.log(marker.id);
-            $scope.nom = ProfilSelected.get().nom;
-            $scope.cardVisible[marker.id] = true;
-            for(var n = 0; n < $scope.profilsSelected.length; n++){
-              if($scope.profilsSelected[n].id == marker.id){
-                continue;
-              }
-              $scope.cardVisible[$scope.profilsSelected[n].id] = false;
-            }
-            $scope.duree = 90;
-            $scope.batterie = 50;
-            $scope.reseau = "On";
-            console.log($scope.profilsSelected);
-            console.log($scope.cardVisible);
           });
         });
 		// console.log($scope.profilsSelected);
@@ -118,6 +102,18 @@ angular.module('starter.controllers', ['ionic'])
 
 
         });
+
+    $scope.profilSelected =  function(id){
+      for (var i=0;i<$scope.profilsSelected.length;i++){
+          if($scope.profilsSelected[i].id==id){
+              $scope.profilsSelected[i].highlighted=true;
+          }
+          else{
+              $scope.profilsSelected[i].highlighted=false;
+
+          }
+      }
+    };
 
 
 	$scope.up = function()
