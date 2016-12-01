@@ -4,6 +4,7 @@ package com.dg.gpsalzheimersmartphone;
 import android.app.Service;
 
 import android.content.Intent;
+import android.os.MemoryFile;
 import android.util.Log;
 
 
@@ -23,7 +24,9 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
+
     public static final String SOCKET_ADDR = "10.212.123.252";
+
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String STOPSUIVI = "STOPSUIVI";
@@ -127,6 +130,10 @@ public class CommunicationServer extends Thread implements Runnable
         this.run = false;
         this.deconnect();
         super.interrupt();
+    }
+
+    public synchronized Socket getSocket() {
+        return m_sock;
     }
 }
 

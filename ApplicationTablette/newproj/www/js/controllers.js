@@ -3,6 +3,59 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ctrlMap',function($scope,$state,$rootScope,$ionicPopup,Socket,Profils, ProfilSelected,Tels)
 {
+    $scope.profils = Profils.all();
+    $scope.profilsSelected = [];
+    
+    $scope.visibleMapMenu = true;
+    $scope.visibleConfig = false;
+    
+    
+    $scope.$on('$navigMap',
+              function(event, visibility) {
+        $scope.visibleMapMenu = visibility[0];
+        $scope.visibleConfig = visibility[1];
+        console.log("NAVIGMAP")
+        console.log(visibility);
+    })
+    
+    $scope.$on('$createPositions',
+    function(event, marker){
+        console.log("ProfilSelected");
+                console.log($scope.profilsSelected);
+        if(! $scope.profilsSelected.includes(ProfilSelected.get())) {
+           $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
+        Tels.addTelToProfile(Tels.getIdCurrent(),ProfilSelected.get().id,$scope.profilsSelected);
+       
+        }
+         console.log(marker);
+			  marker.setMap($scope.map);
+			  $scope.markers[$scope.markers.length] = marker;
+			  $scope.cardVisible[ProfilSelected.get().id] = false;
+        google.maps.event.addListener(marker, 'click', function () {
+          $scope.$apply(function () {
+              console.log("marker");
+            console.log(marker.id);
+            $scope.nom = ProfilSelected.get().nom;
+            $scope.cardVisible[marker.id] = true;
+            for(var n = 0; n < $scope.profilsSelected.length; n++){
+              if($scope.profilsSelected[n].id == marker.id){
+                continue;
+              }
+              $scope.cardVisible[$scope.profilsSelected[n].id] = false;
+            }
+            $scope.duree = 90;
+            $scope.batterie = 50;
+            $scope.reseau = "On";
+            console.log($scope.profilsSelected);
+            console.log($scope.cardVisible);
+          });
+        });
+		// console.log($scope.profilsSelected);
+        $rootScope.$broadcast("$selectionProfile");
+		//$scope.showMap();
+       
+    });
+
 
     $scope.$on('$notifSession',
         function(event, notifBool){
@@ -67,8 +120,6 @@ angular.module('starter.controllers', ['ionic'])
         });
 
 
-
-
 	$scope.up = function()
     {
         Socket.sendMessage("UP","up1");
@@ -77,48 +128,17 @@ angular.module('starter.controllers', ['ionic'])
 	setInterval($scope.up,2000);
 	$scope.markers = [];
 
-    $scope.visibleMapMenu = true;
-    $scope.visibleConfig = false;
-    // Visibility
-    $scope.showMap = function(){
-        $scope.visibleMapMenu = true;
-        $scope.visibleConfig = false;
-        if(!document.getElementById("mapTab").classList.contains("active")){
-          document.getElementById("mapTab").classList.add("active");
-          document.getElementById("settingsTab").classList.remove("active");
-            document.getElementById("profilsTab").classList.remove("active");
-        }
-    };
-
-    $scope.showConfig = function(){
-        $scope.visibleMapMenu = false;
-        $scope.visibleConfig = true;
-      if(!document.getElementById("settingsTab").classList.contains("active")){
-        document.getElementById("mapTab").classList.remove("active");
-        document.getElementById("settingsTab").classList.add("active");
-        document.getElementById("profilsTab").classList.remove("active");
-      }
-    };
-
-    $scope.showProfils = function(){
-        $scope.visibleMapMenu = false;
-        $scope.visibleConfig = false;
-        if(!document.getElementById("profilsTab").classList.contains("active")){
-            document.getElementById("mapTab").classList.remove("active");
-            document.getElementById("settingsTab").classList.remove("active");
-            document.getElementById("profilsTab").classList.add("active");
-        }
-        $state.go("SelectProfil", { id: Socket.data() });
-    };
-
-    $scope.profils = Profils.all();
-    $scope.profilsSelected = [];
-
-
     var positions = [];
     positions[0] = new google.maps.LatLng(43.612, 7.08);
 	positions[1] = new google.maps.LatLng(43.610, 7.09);
-
+    
+       $scope.showMap = function(){
+        var visibleMapMenu = true;
+        var visibleConfig = false;
+        $rootScope.$broadcast('$navigation', [visibleMapMenu, visibleConfig]);
+    };
+    
+    
 
 	var mapOptions = {
 					  center: positions[0],
@@ -129,41 +149,7 @@ angular.module('starter.controllers', ['ionic'])
 	$scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
     $scope.cardVisible = [];
     $scope.index = 0;
-    $scope.$on('$createPositions',
-    function(event, marker){
-        if(! $scope.profilsSelected.includes(ProfilSelected.get())) {
-           $scope.profilsSelected[$scope.profilsSelected.length] = ProfilSelected.get();
-        Tels.addTelToProfile(Tels.getIdCurrent(),ProfilSelected.get().id,$scope.profilsSelected);
-       
-        }
-         console.log(marker);
-			  marker.setMap($scope.map);
-			  $scope.markers[$scope.markers.length] = marker;
-			  $scope.cardVisible[ProfilSelected.get().id] = false;
-        google.maps.event.addListener(marker, 'click', function () {
-          $scope.$apply(function () {
-              console.log("marker");
-            console.log(marker.id);
-            $scope.nom = ProfilSelected.get().nom;
-            $scope.avatar = "img/test.png";
-            $scope.cardVisible[marker.id] = true;
-            for(var n = 0; n < $scope.profilsSelected.length; n++){
-              if($scope.profilsSelected[n].id == marker.id){
-                continue;
-              }
-              $scope.cardVisible[$scope.profilsSelected[n].id] = false;
-            }
-            $scope.duree = 90;
-            $scope.batterie = 50;
-            $scope.reseau = "On";
-            console.log($scope.profilsSelected);
-            console.log($scope.cardVisible);
-          });
-        });
-		// console.log($scope.profilsSelected);
-		$scope.showMap();
-    });
-
+    
 })
 
 .controller('ctrlListeProfils',function($scope,$state,$rootScope,$stateParams,Socket,Profils,ProfilSelected)
@@ -186,12 +172,51 @@ angular.module('starter.controllers', ['ionic'])
             var marker = new google.maps.Marker({
                 position: $scope.positions[ProfilSelected.get().id],
                 animation: google.maps.Animation.DROP,
-                icon: 'img/test.png',
+                icon: 'img/person-flat2.png',
                 id: ProfilSelected.get().id
             });
 
         $rootScope.$broadcast('$createPositions', marker);
         $state.go("Map");
-
     }
+})
+
+.controller('ctrNavBar', function($scope,$rootScope ,$state,Socket,Profils) {
+    
+    $scope.$on('$selectionProfile',
+        function(event){
+        $scope.showMap()
+    }); 
+    
+   
+    // Visibility
+    $scope.showMap = function(){
+        if(!document.getElementById("mapTab").classList.contains("active")){
+          document.getElementById("mapTab").classList.add("active");
+          document.getElementById("settingsTab").classList.remove("active");
+            document.getElementById("profilsTab").classList.remove("active");
+        }
+        $rootScope.$broadcast("$navigMap",[true, false] );
+        $state.go("Map");
+    };
+
+    $scope.showConfig = function(){
+      if(!document.getElementById("settingsTab").classList.contains("active")){
+        document.getElementById("mapTab").classList.remove("active");
+        document.getElementById("settingsTab").classList.add("active");
+        document.getElementById("profilsTab").classList.remove("active");
+      }
+        $rootScope.$broadcast("$navigMap",[false, true] );
+        $state.go("Map");
+        
+    };
+
+    $scope.showProfils = function(){
+        if(!document.getElementById("profilsTab").classList.contains("active")){
+            document.getElementById("mapTab").classList.remove("active");
+            document.getElementById("settingsTab").classList.remove("active");
+            document.getElementById("profilsTab").classList.add("active");
+        }
+        $state.go("SelectProfil", { id: Socket.data() });
+    };
 });

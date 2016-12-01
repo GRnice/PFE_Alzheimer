@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.IOException;
+
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 import static com.dg.gpsalzheimersmartphone.MainActivity.android_id;
 
@@ -186,6 +188,12 @@ public class ServiceSocket extends Service implements LocationListener
                 messageForActivity.putExtra("KILL",true);
                 sendBroadcast(messageForActivity);
                 ServiceSocket.this.stopSelf();
+                try {
+                    ServiceSocket.this.comm.getSocket().close();
+                } catch (IOException e) {
+                    Log.e("Socket", "Oops");
+                    e.printStackTrace();
+                }
             }
 
             if (startGps)
