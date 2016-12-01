@@ -32,6 +32,7 @@ angular.module('starter.controllers', ['ionic'])
 			  $scope.markers[$scope.markers.length] = marker;
         google.maps.event.addListener(marker, 'click', function () {
           $scope.$apply(function () {
+              $scope.profilSelected(marker.id);
           });
         });
 		// console.log($scope.profilsSelected);
