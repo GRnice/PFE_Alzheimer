@@ -34,7 +34,7 @@ angular.module('starter.services', [])
     // Some fake testing data
     var tels = [];
   var idTelCurrent;
-  
+
     return {
       all: function() {
         return tels;
@@ -82,14 +82,14 @@ angular.module('starter.services', [])
   })
 .factory('Socket', function($state,$rootScope,Profils,Tels)
 {
-	var socket = io("http://10.212.109.255:3100");
+	var socket = io("http://localhost:3100");
 	var id;
   var idTel;
 	socket.on('connect', function(data)
 	{
 		console.log("connecte");
 	});
-	
+
 	socket.on("PROFILES", function(data)
 	{
 		data = data.split("$");
@@ -99,7 +99,7 @@ angular.module('starter.services', [])
 			profile = data[i];
 			profile = profile.split(",");
 			console.log(profile);
-			Profils.add({id : i, prenom: profile[0], nom: profile[1],idTel:null, position: {longitude: null , latitude: null}})
+			Profils.add({id : i, prenom: profile[0], nom: profile[1],idTel:null, position: {longitude: null , latitude: null},highlighted: false})
 		}
 		var tous = Profils.all();
 		console.log(tous);
@@ -123,7 +123,7 @@ angular.module('starter.services', [])
         var liste = data.split("*");
         $rootScope.$broadcast('$updatePositions', liste);
     });
-	
+
 	return{
 		get: function(){
 			return socket;
@@ -143,12 +143,12 @@ angular.module('starter.services', [])
 	var profilSelected = 0;
 
 return{
-	
+
 		get: function()
 		{
 			return profilSelected;
 		},
-		
+
 		set: function(profil)
 		{
 			console.log(profil);
