@@ -135,13 +135,7 @@ angular.module('starter.controllers', ['ionic'])
        $scope.showMap = function(){
         var visibleMapMenu = true;
         var visibleConfig = false;
-        
-      /*  if(!document.getElementById("mapTab").classList.contains("active")){
-            document.getElementById("mapTab").classList.add("active");
-            document.getElementById("settingsTab").classList.remove("active");
-            document.getElementById("profilsTab").classList.remove("active");
-        }*/
-           $rootScope.$broadcast('$navigation', [visibleMapMenu, visibleConfig]);
+        $rootScope.$broadcast('$navigation', [visibleMapMenu, visibleConfig]);
     };
     
     
@@ -168,19 +162,6 @@ angular.module('starter.controllers', ['ionic'])
   $scope.positions[1] = new google.maps.LatLng(43.610, 7.09);
   $scope.positions[2] = new google.maps.LatLng(43.608, 7.09);
   $scope.positions[3] = new google.maps.LatLng(43.609, 7.09);
-    
-    /*   $scope.showProfile = function(){
-        var visibleProfile = true;
-        var visibleMap = false;
-        
-       /* if(!document.getElementById("mapTab").classList.contains("active")){
-            document.getElementById("mapTab").classList.add("active");
-            document.getElementById("settingsTab").classList.remove("active");
-            document.getElementById("profilsTab").classList.remove("active");
-        }
-           $rootScope.$broadcast('$navigation', [visibleProfile, visibleMap]);
-    };
-    */
 
   $scope.profilSelected = function(id)
 	{
