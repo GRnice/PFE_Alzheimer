@@ -145,7 +145,6 @@ angular.module('starter.controllers', ['ionic'])
               console.log("marker");
             console.log(marker.id);
             $scope.nom = ProfilSelected.get().nom;
-            $scope.avatar = "img/test.png";
             $scope.cardVisible[marker.id] = true;
             for(var n = 0; n < $scope.profilsSelected.length; n++){
               if($scope.profilsSelected[n].id == marker.id){
@@ -186,7 +185,7 @@ angular.module('starter.controllers', ['ionic'])
             var marker = new google.maps.Marker({
                 position: $scope.positions[ProfilSelected.get().id],
                 animation: google.maps.Animation.DROP,
-                icon: 'img/test.png',
+                icon: 'img/person-flat.png',
                 id: ProfilSelected.get().id
             });
 
