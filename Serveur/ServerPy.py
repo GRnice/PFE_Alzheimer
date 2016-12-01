@@ -23,6 +23,16 @@ class Tracker: ## Classe representant un tracker
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
 
+    def reset(self):
+        self.id = None
+        self.nom = None
+        self.prenom = None
+        self.position = tuple()
+        self.etat = 0
+        self.lastEmit = None
+        self.nbFollower = 0
+
+
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
         self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
@@ -99,7 +109,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
-            tracker.etat = 0
+            tracker.reset()
             print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
