@@ -10,7 +10,7 @@ class LookupAssistantPatient:
         return list(self.dict.keys())
 
     def attach(self,socketPatient,socketAssistant):
-        print(socketPatient,"attach with",socketAssistant)
+        #print(socketPatient,"attach with",socketAssistant)
         with lockLookup:
             if socketAssistant in self.dict.keys():
                 listeSocketPatient = self.dict[socketAssistant]

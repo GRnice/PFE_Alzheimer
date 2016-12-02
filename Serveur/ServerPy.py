@@ -19,7 +19,7 @@ class Tracker: ## Classe representant un tracker
         self.etat = 0
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
-        
+        # 172.20.10.2
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
 
@@ -42,7 +42,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         print("Mapper ready [ok]")
     def addTracker(self,socket):
         with lockMap:
-            print("add tracker")
+            #print("add tracker")
             print(socket)
             self.dict[socket] = Tracker()
 
@@ -88,7 +88,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker.lastEmit = time.time()
             self.dict[socket] = tracker
             self.mapIdSock[idTel] = socket
-            print("Demarrage du suivi pour le tel à l'id : ",idTel)
+            #print("Demarrage du suivi pour le tel à l'id : ",idTel)
             self.serverAssistant.event("STARTSUIVI",socket,tracker)
             #socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
 
@@ -98,7 +98,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             latitude = float(requeteArray[2])
             tracker = self.getTracker(socket)
             if (tracker == None):
-                print("Erreur, tracker inconnu")
+                # print("Erreur, tracker inconnu")
                 return
 
             print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
@@ -110,7 +110,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
             tracker.reset()
-            print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
+            #print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
         elif (entete == "CONTINUE"):
@@ -205,6 +205,16 @@ class PatientServer(Thread):
             liste = list(self.mapper.getSockets()) # les sockets
                 
             liste.extend(self.CONNECTION_LIST)
+            socketsClients = list(self.mapper.getSockets())
+            print("====== ALL TRACKERS ========")
+            for sock in socketsClients:
+                tracker = self.mapper.getTracker(sock)
+                print("id : ",tracker.id,
+                      ", etat : ",tracker.etat,
+                      ", nom : ",tracker.nom,
+                      ", prenom : ",tracker.prenom,
+                      ", position : ",tracker.position,
+                      ", follower : ",tracker.nbFollower)
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
             for sock in read_sockets:
                 #New connection

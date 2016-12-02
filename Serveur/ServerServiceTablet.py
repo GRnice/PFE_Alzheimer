@@ -22,16 +22,16 @@ def startSockerIOassistantServeur(port,serverAssistant):
     
     @sio.on('connect', namespace='/')
     def connect(sid, environ):
-        print("connect ", sid)
-        print(sid)
+        #print("connect ", sid)
+        #print(sid)
         serverAssistant.addAssistant(sid)
-        print("SEND",sio.emit("PROFILES",serverAssistant.getProfilsToString(),room=sid))
+        sio.emit("PROFILES",serverAssistant.getProfilsToString(),room=sid)
         #sio.emit("NEWSESSION","12fa90c",room=sid)
 
     @sio.on('FOLLOW',namespace="/")
     def follow(assistant,data):
         # message attendu "idTel*prenom*nom"
-        print(assistant)
+        #print(assistant)
         data = data.split("*")
         if (len(data) == 1):
             # si (FOLLOW,idTel)
@@ -51,20 +51,20 @@ def startSockerIOassistantServeur(port,serverAssistant):
             if (tracker.nbFollower == 0): # le premier qui défini le profil du device
                 tracker.nom = nom
                 tracker.prenom = prenom
-                print("OKPROMENADE envoyé")
+                #print("OKPROMENADE envoyé")
                 ## serverAssistant.poolerEvent.broadcast("SYNCH
                 sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
 
             serverAssistant.lookup.attach(sockPatient,assistant)
             tracker.nbFollower += 1
 
-        print("un follower en +")
+        #print("un follower en +")
             
 
 
     @sio.on('STOPPROMENADE',namespace="/")
     def stopPromenade(sid,data):
-        print("stop promenade",sid)
+        #print("stop promenade",sid)
         idTel = data[0]
         sockPatient = serverAssistant.mapper.getSocketById(idTel)
         sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
@@ -73,23 +73,23 @@ def startSockerIOassistantServeur(port,serverAssistant):
 
     @sio.on("UP",namespace="/")
     def up(sid,data):
-        print("up",sid)
+        #print("up",sid)
         event = serverAssistant.poolerEvent.nextEventFor(sid)
         if event != None:
             header = event[0]
             body = event[1]
-            print("send it ->",body)
+            #print("send it ->",body)
             sio.emit(header,body,room=sid)
         
     @sio.on('chat', namespace='/')
     def message(sid, data):
-        print("message ", data)
+        #print("message ", data)
         sio.emit('message','COUCOU', room=sid)
 
     @sio.on('disconnect', namespace='/')
     def disconnect(sid):
-        print('disconnect ', sid)
-        print("remove du lookup")
+        #print('disconnect ', sid)
+        #print("remove du lookup")
         serverAssistant.removeAssistant(sid)
         
 
