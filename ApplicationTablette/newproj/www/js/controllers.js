@@ -105,6 +105,7 @@ angular.module('starter.controllers', ['ionic'])
         });
 
     $scope.profilSelected =  function(id){
+        console.log("hello");
       for (var i=0;i<$scope.profilsSelected.length;i++){
           if($scope.profilsSelected[i].id==id){
               $scope.profilsSelected[i].highlighted= !$scope.profilsSelected[i].highlighted;
@@ -121,6 +122,20 @@ angular.module('starter.controllers', ['ionic'])
           }
 
       }
+    };
+
+    $scope.stopAlert = function (id) {
+        if(document.getElementById("button" + id).classList.contains("ion-eye")){
+            document.getElementById("button" + id).classList.remove("ion-eye");
+            document.getElementById("button" + id).classList.remove("button-calm");
+            document.getElementById("button" + id).classList.add("ion-eye-disabled");
+            document.getElementById("button" + id).classList.add("button-assertive");
+        }else{
+            document.getElementById("button" + id).classList.remove("ion-eye-disabled");
+            document.getElementById("button" + id).classList.remove("button-assertive");
+            document.getElementById("button" + id).classList.add("ion-eye");
+            document.getElementById("button" + id).classList.add("button-calm");
+        }
     };
 
 
