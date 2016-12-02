@@ -31,39 +31,42 @@
 
         <ion-item class="item-remove-animate card" ng-repeat="profil in profilsSelected" type="item-text-wrap">
 
-          <div id="{{profil.nom}}" ng-click="profilSelected({{profil.id}})">
-            <div class="item item-avatar">
+          <div id="{{profil.nom}}">
+            <div class="item item-avatar row">
               <img ng-src="{{profil.face}}">
-              <div class="row">
-
-                <div class="col col-30">
-                  <h2>{{profil.prenom}}</h2>
-                  <p>{{profil.nom}} </p>
-                </div>
-
-                <div class="row  item-toggle " ng-show="profil.idImage">
-                  <div class=" col col-25 item-icon">
-                    <i class="icon ion-wifi"></i>
+              <div class="col col-90" ng-click="profilSelected({{profil.id}})">
+                <div class="row">
+                  <div class="col col-33">
+                    <div class="row">
+                      <div class="col col-25"></div>
+                      <div class="col col-50"><h2>{{profil.prenom}}</h2>
+                        <p>{{profil.nom}} </p></div>
+                      <div class="col col-25"></div>
+                    </div>
                   </div>
-                  <div class=" col col-25 item-icon">
-                    <i class="icon ion-clock"></i>
-                  </div>
-                  <div class=" col col-25 item-icon">
-                    <i class="icon ion-battery-half"></i>
-                  </div>
-                  <div class=" col col-25 item-icon">
-                    <i class="icon ion-ios-pulse"></i>
-                  </div>
-
-                </div>
-                  <label class="toggle toggle-assertive">
-                      <input type="checkbox">
-                      <div class="track">
-                          <div class="handle"></div>
+                  <div class="col col-67">
+                    <div class="row" ng-show="profil.idImage">
+                      <div class=" col col-25 item-icon">
+                        <i class="icon ion-wifi"></i>
                       </div>
-                  </label>
+                      <div class=" col col-25 item-icon">
+                        <i class="icon ion-clock"></i>
+                      </div>
+                      <div class=" col col-25 item-icon">
+                        <i class="icon ion-battery-half"></i>
+                      </div>
+                      <div class=" col col-25 item-icon">
+                        <i class="icon ion-ios-pulse"></i>
+                      </div>
 
+                    </div>
+                  </div>
+
+                </div>
               </div>
+              <button id="button{{profil.id}}" class="col col-10 pull-right button button-calm button-outline icon ion-eye" style="margin-top: 3%; margin-bottom: 3%" ng-click="stopAlert({{profil.id}})">
+
+              </button>
             </div>
             <div class="item item-body" ng-show="profil.highlighted">
               <div class="row">
