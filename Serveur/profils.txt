@@ -1,4 +1,4 @@
-Tallarida,Laurie
-Veng,Laure
-Art,Christophe
-Hankier,julian
+Tallarida,Laurie,BarriereNormal
+Veng,Laure,BarriereNormal
+Art,Christophe,BarriereAlerte
+Hankier,julian,BarriereNormal

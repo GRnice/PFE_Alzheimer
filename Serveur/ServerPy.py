@@ -10,6 +10,8 @@ import sys
 
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
 
+lockMap = RLock()
+
 class Tracker: ## Classe representant un tracker
     def __init__(self):
         self.id = None
@@ -22,6 +24,7 @@ class Tracker: ## Classe representant un tracker
         # 172.20.10.2
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
+
 
     def reset(self):
         self.id = None
@@ -36,36 +39,93 @@ class Tracker: ## Classe representant un tracker
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
         self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
-        self.dict = dict() # <sockPatient,Tracker>
+        self.dictSocketPatient = dict() # <sockPatient,Tracker>
+
+        self.dictAssistance = dict() # HashMap<sockAssistant,sockPatient>
         
         self.serverAssistant = serverAssistant
+        self.serverAssistant.setMapper(self)
         print("Mapper ready [ok]")
+
     def addTracker(self,socket):
         with lockMap:
             #print("add tracker")
             print(socket)
-            self.dict[socket] = Tracker()
+            self.dictSocketPatient[socket] = Tracker()
 
     def delTracker(self,socket):
         with lockMap:
-            if socket in self.dict.keys():
-                del self.dict[socket]
+            if socket in self.dictSocketPatient.keys():
+                del self.dictSocketPatient[socket]
 
     def getTracker(self,socket):
         with lockMap:
-            if socket in self.dict.keys():
-                return self.dict[socket]
+            if socket in self.dictSocketPatient.keys():
+                return self.dictSocketPatient[socket]
 
-    def getSocketById(self,idTel):
+    def getSocketPatientById(self,idTel):
         with lockMap:
             if idTel in self.mapIdSock.keys():
                 return self.mapIdSock[idTel]
 
-    def getSockets(self):
+    def getTrackerById(self,idTel):
         with lockMap:
-            return self.dict.keys()
-            
+            if idTel in self.mapIdSock.keys():
+                sock = self.mapIdSock[idTel]
+                return self.getTracker(sock)
 
+    def getSocketPatient(self):
+        with lockMap:
+            return self.dictSocketPatient.keys()
+
+    #################################################
+
+
+    def getSocketsAssistant(self):
+        return self.dictAssistance.keys()
+
+    
+    def attachAssistant(self,socketPatient,socketAssistant):
+        #print(socketPatient,"attach with",socketAssistant)
+        with lockMap:
+            if socketAssistant in self.dictAssistance.keys():
+                listeSocketPatient = self.dictAssistance[socketAssistant]
+                listeSocketPatient.append(socketPatient)
+
+            else:
+                self.dictAssistance[socketAssistant] = [socketPatient]
+
+    def detachAssistant(self,socketPatient,socketAssistant):
+        with lockMap:
+            if socketAssistant in self.dictAssistance.keys():
+                listeSpatient = self.dictAssistance[socketAssistant]
+                if socketPatient in listeSpatient:
+                    index = listeSpatient.index(socketPatient)
+                    listeSpatient.pop(index)
+                    self.dictAssistance[socketAssistant] = listeSpatient
+
+    def addAssistant(self,assistantSock):
+        with lockMap:
+            if assistantSock not in self.dictAssistance.keys():
+                self.dictAssistance[assistantSock] = []
+
+                
+    def removeAssistant(self,sockAssistant):
+        with lockMap:
+            if sockAssistant in self.dictAssistance.keys():
+                del self.dictAssistance[sockAssistant]
+
+    def removePatient(self,sockPatient):
+        with lockMap:
+            allAssistants = list(self.dictAssistance.keys())
+            for assistantSock in allAssistants:
+                listeSock = self.dictAssistance[assistantSock]
+                if (sockPatient in listeSock):
+                    index = listeSock.index(sockPatient)
+                    listeSock.pop(index)
+                    self.dictAssistance[assistantSock] = listeSock
+
+                    
     def apply(self,commande):
         ## parse la commande et applique la commande
         # commande contient un tuple (socket , commande)
@@ -169,7 +229,7 @@ class Pool(Thread):
 ###############################################
 ###############################################
 class PatientServer(Thread):
-    def __init__(self,portPatient,portAssistant,sizeBuffer,maxClientSocket):
+    def __init__(self,portPatient,sizeBuffer,maxClientSocket,mapper):
         Thread.__init__(self)
         self.PORT = portPatient
         
@@ -177,9 +237,8 @@ class PatientServer(Thread):
         self.maxClientSocket = maxClientSocket
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
         self.serverOnline = True
-        self.serveAssistant = ServerAssistant(portAssistant)
-        self.mapper = Mapper(self.serveAssistant) # HashMap<socket,Profil>
-        self.serveAssistant.setMapper(self.mapper)
+        self.mapper = mapper # HashMap<socket,Profil>
+
     def getMapper(self):
         return self.mapper
 
@@ -187,8 +246,6 @@ class PatientServer(Thread):
         self.serverOnline = False
     
     def run(self):
-        
-        self.serveAssistant.start()
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('', self.PORT))
         server_socket.listen(self.maxClientSocket)
@@ -202,10 +259,10 @@ class PatientServer(Thread):
         while self.serverOnline:
         # Get the list sockets which are ready to be read through select
             
-            liste = list(self.mapper.getSockets()) # les sockets
+            liste = list(self.mapper.getSocketPatient()) # les sockets
                 
             liste.extend(self.CONNECTION_LIST)
-            socketsClients = list(self.mapper.getSockets())
+            socketsClients = list(self.mapper.getSocketPatient())
             print("====== ALL TRACKERS ========")
             for sock in socketsClients:
                 tracker = self.mapper.getTracker(sock)
@@ -256,6 +313,10 @@ class PatientServer(Thread):
         print("=============SERVEUR OFFLINE=============")
 
 if __name__ == "__main__":
-    servePatient = PatientServer(3000,3100,4096,200) # sur le port 3000
-    servePatient.start()          
+    serveAssistant = AssistanceServer(3100,4096,100) # port 3100
+    mapper = Mapper(serveAssistant)
+    servePatient = PatientServer(3000,4096,200,mapper) # sur le port 3000
+    servePatient.start()
+    serveAssistant.start()
     servePatient.join()
+    serveAssistant.join()

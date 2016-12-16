@@ -1,7 +1,8 @@
 class Profile:
-    def __init__(self, nom, prenom):
+    def __init__(self, nom, prenom,risqueFranchissementBarriere):
         self.firstName = prenom
         self.lastName = nom
+        self.risqueFranchissementBarriere = risqueFranchissementBarriere
         
 class ManagerProfile:
     def __init__(self):
@@ -10,7 +11,7 @@ class ManagerProfile:
     def __str__(self):
         chaine = ""
         for elt in self.listProfile:
-            chaine += elt.firstName+","+elt.lastName+"$"
+            chaine += elt.lastName+","+elt.firstName+","+elt.risqueFranchissementBarriere+"*"
 
         return chaine[0:-1]
 
@@ -19,7 +20,7 @@ class ManagerProfile:
             for line in f:
                 myLine = line.strip()
                 listLine = myLine.split(",")
-                p = Profile(listLine[0], listLine[1])
+                p = Profile(listLine[0], listLine[1],listLine[2])
                 self.listProfile.append(p)
         f.close()
 
@@ -30,6 +31,7 @@ class ManagerProfile:
     def write(self, nomFichier, profile):
         with open(nomFichier, 'a') as out:
             out.write(profile.firstName + "," + 
-                      profile.lastName + "\n")
+                      profile.lastName + "," +
+                      profile.risqueFranchissementBarriere + "\n")
         out.close()
         

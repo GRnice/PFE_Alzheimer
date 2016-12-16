@@ -1,142 +1,160 @@
-import socketio
-import eventlet
-import eventlet.wsgi
-import time
-import queue
-from flask import Flask, render_template
-import json
+import socket , select
 
 from threading import Thread,RLock
 import Profils
 import LookupAssistantPatient
-import PoolerAssistance
 
 lockPool = RLock()
-lockMap = RLock()
 
-
-
-def startSockerIOassistantServeur(port,serverAssistant):
-    sio = socketio.Server(logger=False)
-    app = Flask(__name__)
-    
-    @sio.on('connect', namespace='/')
-    def connect(sid, environ):
-        #print("connect ", sid)
-        #print(sid)
-        serverAssistant.addAssistant(sid)
-        sio.emit("PROFILES",serverAssistant.getProfilsToString(),room=sid)
-        #sio.emit("NEWSESSION","12fa90c",room=sid)
-
-    @sio.on('FOLLOW',namespace="/")
-    def follow(assistant,data):
-        # message attendu "idTel*prenom*nom"
-        #print(assistant)
-        data = data.split("*")
-        if (len(data) == 1):
-            # si (FOLLOW,idTel)
-            idTel = data[0]
-            sockPatient = serverAssistant.mapper.getSocketById(idTel)
-            tracker = serverAssistant.mapper.getTracker(sockPatient)
-            tracker.nbFollower += 1
-            serverAssistant.lookup.attach(sockPatient,assistant)
-
-        elif (len(data) == 3):
-            # si (FOLLOW,idTel*prenom*nom)
-            idTel = data[0]
-            prenom = data[1]
-            nom = data[2]
-            sockPatient = serverAssistant.mapper.getSocketById(idTel)
-            tracker = serverAssistant.mapper.getTracker(sockPatient)
-            if (tracker.nbFollower == 0): # le premier qui défini le profil du device
-                tracker.nom = nom
-                tracker.prenom = prenom
-                #print("OKPROMENADE envoyé")
-                ## serverAssistant.poolerEvent.broadcast("SYNCH
-                sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
-
-            serverAssistant.lookup.attach(sockPatient,assistant)
-            tracker.nbFollower += 1
-
-        #print("un follower en +")
-            
-
-
-    @sio.on('STOPPROMENADE',namespace="/")
-    def stopPromenade(sid,data):
-        #print("stop promenade",sid)
-        idTel = data[0]
-        sockPatient = serverAssistant.mapper.getSocketById(idTel)
-        sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
-        serverAssistant.lookup.removePatient(sockPatient)
-        
-
-    @sio.on("UP",namespace="/")
-    def up(sid,data):
-        #print("up",sid)
-        event = serverAssistant.poolerEvent.nextEventFor(sid)
-        if event != None:
-            header = event[0]
-            body = event[1]
-            #print("send it ->",body)
-            sio.emit(header,body,room=sid)
-        
-    @sio.on('chat', namespace='/')
-    def message(sid, data):
-        #print("message ", data)
-        sio.emit('message','COUCOU', room=sid)
-
-    @sio.on('disconnect', namespace='/')
-    def disconnect(sid):
-        #print('disconnect ', sid)
-        #print("remove du lookup")
-        serverAssistant.removeAssistant(sid)
-        
-
-    app = socketio.Middleware(sio, app)
-    eventlet.wsgi.server(eventlet.listen(('', port)), app) 
-            
-
-class ServerAssistant(Thread):
-    def __init__(self,port):
+################################################
+################################################
+################################################
+##
+## ASSISTANT_SERVEUR <---------------> Assistant
+##
+################################################
+################################################
+################################################
+class AssistanceServer(Thread):
+    def __init__(self,portAssistant,sizeBuffer,maxClientSocket):
         Thread.__init__(self)
-        self.PORT = port
-        self.RECV_BUFFER = 4096
-        self.maxTabletSocket = 100
-        self.lookup = LookupAssistantPatient.LookupAssistantPatient()
-        self.poolerEvent = PoolerAssistance.PoolerAssistance()
+        self.PORT = portAssistant
+        
+        self.RECV_BUFFER = sizeBuffer
+        self.maxClientSocket = maxClientSocket
+        self.CONNECTION_LIST = [] # liste des patients connectés (socket)
+        self.serverOnline = False
+
         self.managerProfils = Profils.ManagerProfile()
         self.managerProfils.read("./profils.txt")
-        self.socketIoThread = Thread(target=startSockerIOassistantServeur,args=(port,self))
-        self.socketIoThread.start()
+
 
     def setMapper(self,mapper):
         self.mapper = mapper
 
-    def addAssistant(self,sid):
-        self.lookup.addAssistant(sid)
-        self.poolerEvent.addAssistant(sid)
+    def stopServer(self):
+        self.serverOnline = False
 
-    def removeAssistant(self,sid):
-        self.lookup.removeAssistant(sid)
-        self.poolerEvent.removeAssistant(sid)
+    def broadcast(self,messageString):
+        allAssistants = self.mapper.getSocketsAssistant()
+        for assistant in allAssistants:
+            assistant.send(messageString.encode("utf-8"))
 
-    def getProfilsToString(self):
-        return str(self.managerProfils)
-
-    def event(self,evt,socket,tracker):
+    def event(self, evt, socket, tracker):
         if (evt == "STARTSUIVI"):
-            self.poolerEvent.broadcast(("NEWSESSION",tracker.id))
+            print("(startsuivi) DEMANDE D'UN SUIVI POUR ",tracker.id)
+            self.broadcast("NEWSESSION$"+tracker.id+"\r\n")
 
         elif (evt == "POSITION"):
-            self.poolerEvent.broadcast(("UPDATE",
-                                        str(tracker.id)+"*"+str(tracker.position[0])+"*"+str(tracker.position[1])))
-                
-    def stopServer(self):
-        self.sio.disconnect()
+            print("(update) TRANSMISSION DE LA POSITION DE ",tracker.id)
+            self.broadcast("UPDATE$"+str(tracker.id) + "*" + str(tracker.position[0]) + "*" +
+                                       str(tracker.position[1])+"\r\n")
 
+
+    def addAssistant(self,sid):
+        self.mapper.addAssistant(sid)
+
+
+    def removeAssistant(self,sid):
+        self.mapper.removeAssistant(sid)
+
+    def follow(self,sockAssistant,data):
+        print(self.mapper.getSocketPatient())
+        data = data.split("*")
+        if (len(data) == 1):
+            # si FOLLOW$idTel
+            idTel = data[0]
+            tracker = self.mapper.getTrackerById(idTel)
+            tracker.nbFollower += 1
+            self.mapper.attach(sockPatient,sockAssistant)
+
+        elif (len(data) == 3):
+            # si FOLLOW$idTel*prenom*nom
+            idTel = data[0]
+            prenom = data[1]
+            nom = data[2]
+            tracker = self.mapper.getTrackerById(idTel)
+
+            if (tracker.nbFollower == 0): # le premier qui défini le profil du device
+                tracker.nom = nom
+                tracker.prenom = prenom
+                print("OKPROMENADE POUR ",tracker.id)
+                sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+
+            self.mapper.attach(sockPatient,sockAssistant)
+            tracker.nbFollower += 1
+
+    def stopPromenade(self,sockAssistant,data):
+        data = data.split("*")
+        idTel = data[0]
+        sockPatient = self.mapper.getSocketById(idTel)
+        print('(stopsuivi) ARRET DU SUIVI DE ',idTel)
+        sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
+        self.mapper.removePatient(sockPatient)
+
+    
     def run(self):
-        ## while
-        pass
+        self.serverOnline = True
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind(('', self.PORT))
+        server_socket.listen(self.maxClientSocket)
+        # Add server socket to the list of readable connections
+        self.CONNECTION_LIST.append(server_socket)
 
+        print("Serveur Assistant on port " + str(self.PORT) + " [ok]")
+        print("=============SERVEUR ONLINE=============")
+        while self.serverOnline:
+        # Get the list sockets which are ready to be read through select
+            
+            liste = list(self.mapper.getSocketsAssistant()) # les sockets des assistants
+            liste.extend(self.CONNECTION_LIST)
+            socketsClients = list(self.mapper.getSocketsAssistant())
 
+            read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
+            
+            for sock in read_sockets:
+                #New connection
+                if sock == server_socket:
+                    sockfd, addr = server_socket.accept()
+                    self.addAssistant(sockfd)
+                    message = "PROFILES$"+str(self.managerProfils)+"\r\n"
+                    sockfd.send(message.encode('utf-8'))
+                    print("Assistant (%s, %s) connected" % addr)
+                    
+                else:
+                    # Data recieved from client, process it
+                    try:
+                        #In Windows, sometimes when a TCP program closes abruptly,
+                        # a "Connection reset by peer" exception will be thrown
+                        data = sock.recv(self.RECV_BUFFER)
+                        
+                        if len(data) > 0:
+                            
+                            message = (data.decode('utf-8')).split("$")
+                            # Si c'est un follow
+                            if message[0] == "FOLLOW":
+                                #"entete$idelTel*prenom*nom"
+                                self.follow(sock,message[1])
+
+                            elif message[0] == "STOPPROMENADE":
+                                # "entete$idTel"
+                                self.stopPromenade(sock,message[1])
+
+                        else:
+                            print("Assistant (%s) is offline" % sock)
+                            sock.close()
+                            self.removeAssistant(sock)
+
+         
+                     
+                    # client disconnected, so remove from socket list
+                    except Exception as err:
+                        #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
+                        print("(fail) Assistant (%s) is offline" % sock)
+                        print("raison du crash",err)
+                        sock.close()
+                        self.removeAssistant(sock)
+
+             
+        server_socket.close()
+        print("=============SERVEUR OFFLINE=============")
