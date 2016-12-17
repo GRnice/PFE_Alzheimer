@@ -64,15 +64,17 @@ class AssistanceServer(Thread):
         if (len(data) == 1):
             # si FOLLOW$idTel
             idTel = data[0]
+            sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
             tracker.nbFollower += 1
-            self.mapper.attach(sockPatient,sockAssistant)
+            self.mapper.attachAssistant(sockPatient,sockAssistant)
 
         elif (len(data) == 3):
             # si FOLLOW$idTel*prenom*nom
             idTel = data[0]
             prenom = data[1]
             nom = data[2]
+            sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
 
             if (tracker.nbFollower == 0): # le premier qui défini le profil du device
@@ -81,7 +83,7 @@ class AssistanceServer(Thread):
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
 
-            self.mapper.attach(sockPatient,sockAssistant)
+            self.mapper.attachAssistant(sockPatient,sockAssistant)
             tracker.nbFollower += 1
 
     def stopPromenade(self,sockAssistant,data):

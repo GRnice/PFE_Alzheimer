@@ -117,7 +117,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
     def removePatient(self,sockPatient):
         with lockMap:
-            allAssistants = list(self.dictAssistance.keys())
+            allAssistants = list(self.dictAssistance.getSocketPatient())
             for assistantSock in allAssistants:
                 listeSock = self.dictAssistance[assistantSock]
                 if (sockPatient in listeSock):
@@ -146,7 +146,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker.etat = 1
             tracker.id = idTel
             tracker.lastEmit = time.time()
-            self.dict[socket] = tracker
+            self.dictSocketPatient[socket] = tracker
             self.mapIdSock[idTel] = socket
             #print("Demarrage du suivi pour le tel à l'id : ",idTel)
             self.serverAssistant.event("STARTSUIVI",socket,tracker)
@@ -164,7 +164,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
             tracker.position = (longitude,latitude)
             tracker.lastEmit = time.time()
-            self.dict[socket] = tracker
+            self.dictSocketPatient[socket] = tracker
             self.serverAssistant.event("POSITION",socket,tracker)
 
         elif (entete == "STOPSUIVI"):
@@ -176,9 +176,9 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         elif (entete == "CONTINUE"):
             print("CONTINUE RECEIVE")
             idTel = requeteArray[1]
-            nwTracker = self.dict[socket]
+            nwTracker = self.dictSocketPatient[socket]
             
-            allkeys = list(self.dict.keys())
+            allkeys = list(self.dictSocketPatient.getSocketPatient())
             for key in allkeys:
                 if self.dict[key].id == idTel:
                     old = self.dict[key]

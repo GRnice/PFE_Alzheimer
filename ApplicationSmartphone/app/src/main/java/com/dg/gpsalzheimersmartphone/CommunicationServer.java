@@ -22,10 +22,11 @@ import java.net.Socket;
  *
  * Created by Team PFE 2016-2017 Cheebane-Dib-Giangrasso-Hossam
  */
+
 public class CommunicationServer extends Thread implements Runnable
 {
 
-    public static final String SOCKET_ADDR = "10.212.123.252";
+    public static final String SOCKET_ADDR = "192.168.1.13";
 
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
