@@ -220,6 +220,17 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Log.e("ALL_PROFILES",allProfiles);
                 profilsManager.setAllProfils(getPreferences(Context.MODE_PRIVATE),allProfiles);
             }
+
+            else if (arg1.hasExtra("UPDATE"))
+            {
+                // update d'un profil suivi
+            }
+
+            else if (arg1.hasExtra("SYNCH"))
+            {
+
+                // synchronisation des tablettes (nouvelle promenade, nouveau profil)
+            }
         }
     }
     

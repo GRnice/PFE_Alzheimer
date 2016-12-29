@@ -13,6 +13,8 @@ import com.dg.apptabletteandroid.Communication.CommunicationServer;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.NetworkUtil;
 
+import java.util.Queue;
+
 /**
  * Ce service recoit tous les messages provenants du serveur
  */
@@ -109,10 +111,23 @@ public class ServiceAdmin extends Service
                     break;
                 }
 
+                case "SYNCH":
+                {
+                    // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
+                    // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
+                    // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
+                    // SYNCH syntaxe -> SYNCH$CHANGEPROFIL_nom*prenom*
+                    break;
+                }
+
                 case "UPDATE":
                 {
-                    // METTRE A JOUR UN PROFIL
+                    // METTRE A JOUR UN PROFIL SUIVI
                     Log.e("UPDATE",content);
+                    Intent intent = new Intent();
+                    /**
+                     * a completer
+                     */
                     break;
                 }
 
@@ -127,7 +142,6 @@ public class ServiceAdmin extends Service
         }
 
     }
-
 
     /**
      * ActivityReceiver, recoit les messages venants de l'activite
