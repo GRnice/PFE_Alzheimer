@@ -1,16 +1,21 @@
 package com.dg.apptabletteandroid.Profils;
 
 
+import android.app.Fragment;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dg.apptabletteandroid.Data.Profil;
+import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.R;
+import com.dg.apptabletteandroid.fragments.MapFragment_;
+import com.dg.apptabletteandroid.fragments.ProfilEdit;
 
 import org.w3c.dom.Text;
 
@@ -36,10 +41,20 @@ public class AdapterListing extends ArrayAdapter<Profil> {
         View rowView = inflater.inflate(R.layout.item_adapter_profil_listing, parent, false);
         TextView nomPrenom = (TextView) rowView.findViewById(R.id.prenomNomItem);
         ImageView image = (ImageView) rowView.findViewById(R.id.photoProfil);
+        Button editButton = (Button) rowView.findViewById(R.id.buttonEdit);
 
         Profil profil = getItem(position);
-
         nomPrenom.setText(profil.getPrenom()+" "+profil.getNom());
+
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragEditProfil = ProfilEdit.newInstance();
+                ((Main2Activity) getContext()).pushFragmentFromActivity(fragEditProfil);
+
+            }
+        });
 
         return rowView;
     }

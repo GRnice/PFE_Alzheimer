@@ -203,7 +203,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     {
 
     }
-
+    
+    public void pushFragmentFromActivity(Fragment frag) {
+        fragmentManager.pushFragment(frag,Main2Activity.this);
+    }
 
     /**
      * ServiceReceiver -> recoit les messages du service
