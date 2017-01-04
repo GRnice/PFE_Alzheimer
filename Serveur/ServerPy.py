@@ -117,13 +117,16 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
     def removePatient(self,sockPatient):
         with lockMap:
-            allAssistants = list(self.dictAssistance.getSocketPatient())
+            allAssistants = list(self.getSocketsAssistant())
             for assistantSock in allAssistants:
                 listeSock = self.dictAssistance[assistantSock]
                 if (sockPatient in listeSock):
+                    idTel = self.getTracker(sockPatient).id
+                    print("wtf",idTel)
                     index = listeSock.index(sockPatient)
                     listeSock.pop(index)
                     self.dictAssistance[assistantSock] = listeSock
+                    assistantSock.send(("SYNCH$STOPPROMENADE_"+str(idTel)+"\r\n").encode('utf-8'))
 
                     
     def apply(self,commande):
@@ -169,6 +172,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
+            self.removePatient(socket)
             tracker.reset()
             #print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))

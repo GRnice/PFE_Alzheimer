@@ -4,7 +4,6 @@ package com.dg.gpsalzheimersmartphone;
 import android.app.Service;
 
 import android.content.Intent;
-import android.os.MemoryFile;
 import android.util.Log;
 
 
@@ -26,7 +25,7 @@ import java.net.Socket;
 public class CommunicationServer extends Thread implements Runnable
 {
 
-    public static final String SOCKET_ADDR = "192.168.1.13";
+    public static final String SOCKET_ADDR = "172.20.10.3";
 
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";

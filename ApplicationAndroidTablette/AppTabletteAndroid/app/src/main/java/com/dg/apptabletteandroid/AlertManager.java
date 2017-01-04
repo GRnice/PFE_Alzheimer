@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
+import com.dg.apptabletteandroid.Data.Profil;
+
+import java.util.ArrayList;
+
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
@@ -17,16 +21,39 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class AlertManager
 {
+    private ArrayList<String> listOfIdTelOnListening; // liste des idTels a écouter
+
     public AlertManager()
     {
-
+        this.listOfIdTelOnListening = new ArrayList<>();
     }
 
-    public void notifNewSession(Context context,String idTracker)
+    /**
+     * alertManager ecoutera les alertes pour cet idTel
+     * @param idTel
+     */
+    public void addListening(String idTel)
+    {
+        this.listOfIdTelOnListening.add(idTel);
+    }
+
+    /**
+     * alertManager n'ecoutera plus les alertes pour cet idTel
+     * @param idTel
+     */
+    public void removeListening(String idTel)
+    {
+        if (listOfIdTelOnListening.contains(idTel))
+        {
+            this.listOfIdTelOnListening.remove(idTel);
+        }
+    }
+
+    public void notifNewSession(Context context,String idTel)
     {
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","NEWSESSION");
-        intent.putExtra("IDTEL",idTracker);
+        intent.putExtra("IDTEL",idTel);
 
         PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
         NotificationCompat.Builder mBuild =
@@ -48,4 +75,6 @@ public class AlertManager
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notif);
     }
+
+
 }

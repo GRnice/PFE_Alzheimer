@@ -206,7 +206,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
 
     /**
-     * ActivityReceiver, recoit les messages venants de l'activite
+     * ServiceReceiver -> recoit les messages du service
      */
     private class ServiceReceiver extends BroadcastReceiver
     {
@@ -226,9 +226,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 // update d'un profil suivi
             }
 
-            else if (arg1.hasExtra("SYNCH"))
+            else if (arg1.hasExtra("STOPPROMENADE"))
             {
-
+                String idTel = arg1.getStringExtra("STOPPROMENADE");
+                profilsManager.removeProfilOnPromenade(idTel);
                 // synchronisation des tablettes (nouvelle promenade, nouveau profil)
             }
         }

@@ -79,6 +79,7 @@ public class ProfilFragment extends Fragment
         AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,profilsManager.getAllProfils());
         this.listView.setAdapter(adapterListing);
 
+
         if (this.selectionProfilNewSession)
         {
             this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -86,7 +87,7 @@ public class ProfilFragment extends Fragment
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
-                    profilsManager.followProfil(idTel,profilselected);
+                    profilsManager.addProfilOnPromenade(idTel,profilselected);
                     Intent intent = new Intent();
                     intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
                     intent.putExtra("FOLLOW_NEW_SESSION","");

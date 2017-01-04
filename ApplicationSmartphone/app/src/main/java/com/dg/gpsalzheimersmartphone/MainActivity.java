@@ -18,10 +18,11 @@ import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 public class MainActivity extends AppCompatActivity {
 
     public static final String STARTSUIVI = "STARTSUIVI";
+    public final static String ACTION_SEND_TO_SERVER = "DATA_TO_SERVICE";
     private int etat = 0;
     private Button buttonSwitchConnexion;
     private ServiceListenerReceiver serviceListener;
-    public final static String ACTION_SEND_TO_SERVER = "DATA_TO_SERVICE";
+
     public static String android_id;
 
     @Override

@@ -24,7 +24,7 @@ import java.util.Set;
 public class ProfilsManager
 {
     private ArrayList<Profil> profilArrayList;
-    private HashMap<String,Profil> profilFollowed;
+    private HashMap<String,Profil> profilOnPromenade;
 
     /*
     Un profil sous la forme d'une string existe sous la forme suivante:
@@ -55,9 +55,15 @@ public class ProfilsManager
     }
 
 
-    public void followProfil(String idTel,Profil prof)
+    public void addProfilOnPromenade(String idTel,Profil prof)
     {
-            this.profilFollowed.put(idTel,prof);
+        this.profilOnPromenade.put(idTel,prof);
+    }
+
+    public void removeProfilOnPromenade(String idTel)
+    {
+        Log.e("ProfilManager",""+idTel+" is removed");
+        this.profilOnPromenade.remove(idTel);
     }
 
     public ArrayList<Profil> getAllProfils()
@@ -68,7 +74,7 @@ public class ProfilsManager
     public ProfilsManager(SharedPreferences sharedPreferences)
     {
         this.profilArrayList = new ArrayList<>(); // contiendra tous les profils
-        this.profilFollowed = new HashMap<>();
+        this.profilOnPromenade = new HashMap<>();
         Set<String> allProfils = sharedPreferences.getStringSet("profils",null);
         if (allProfils != null)
         {

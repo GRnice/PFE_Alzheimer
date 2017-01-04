@@ -6,13 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.dg.apptabletteandroid.AlertManager;
 import com.dg.apptabletteandroid.Communication.CommunicationServer;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.NetworkUtil;
+import com.dg.apptabletteandroid.Profils.ProfilsManager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Queue;
 
 /**
@@ -41,6 +45,8 @@ public class ServiceAdmin extends Service
             comm = new CommunicationServer();
         }
 
+        this.alertManager = new AlertManager();
+
         comm.setActionIntent(ACTION_FROM_SERVER);
         comm.setService(this);
         comm.start();
@@ -54,8 +60,6 @@ public class ServiceAdmin extends Service
         intentFilter = new IntentFilter();
         intentFilter.addAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
         registerReceiver(activityReceiver,intentFilter);
-
-        alertManager = new AlertManager();
 
         Log.e("CHECK SERVICE","RUN");
         return START_NOT_STICKY;
@@ -113,16 +117,56 @@ public class ServiceAdmin extends Service
 
                 case "SYNCH":
                 {
-                    // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
-                    // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
-                    // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
-                    // SYNCH syntaxe -> SYNCH$CHANGEPROFIL_nom*prenom*
+
+                    String typeSynch = content.split("\\_")[0];
+                    String params = content.split("\\_")[1];
+
+                    switch(typeSynch)
+                    {
+                        // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
+                        case "NWPROMENADE":
+                        {
+                            String[] listOfParams = params.split("\\*");
+                            break;
+                        }
+
+                        // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
+                        case "NWPROFIL":
+                        {
+                            String[] listOfParams = params.split("\\*");
+                            break;
+                        }
+
+                        // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
+                        case "RMPROFIL":
+                        {
+                            String[] listOfParams = params.split("\\*");
+                            break;
+                        }
+
+                        // SYNCH syntaxe -> SYNCH$STOPPROMENADE_idTel
+                        case "STOPPROMENADE":
+                        {
+                            alertManager.removeListening(params); // params est idTel ici
+                            Log.e("STOP PROMENADE",params); // idtel
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("STOPPROMENADE",params);
+                            sendBroadcast(intent);
+                            break;
+                        }
+                    }
+
+
+                    // SYNCH syntaxe -> SYNCH$CHANGEPROFIL_nom*prenom
+
                     break;
                 }
 
                 case "UPDATE":
                 {
                     // METTRE A JOUR UN PROFIL SUIVI
+                    // UPDATE$$idTel*longitude*latitude
                     Log.e("UPDATE",content);
                     Intent intent = new Intent();
                     /**
@@ -164,6 +208,7 @@ public class ServiceAdmin extends Service
                 String nom = arg1.getStringExtra("NOM");
                 Log.e("FOLLOW_NEW_SESSION",idTel);
                 comm.sendMessage("FOLLOW$"+idTel+"*"+prenom+"*"+nom);
+                alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
         }
     }
