@@ -54,10 +54,13 @@ public class ProfilsManager
     }
 
 
+
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
+        Log.d("idTel", idTel);
     }
+
 
     public void removeProfilOnPromenade(String idTel)
     {
@@ -101,6 +104,10 @@ public class ProfilsManager
         }
 
 
+    }
+
+    public HashMap<String, Profil> getProfilOnPromenade() {
+        return profilOnPromenade;
     }
 
 }

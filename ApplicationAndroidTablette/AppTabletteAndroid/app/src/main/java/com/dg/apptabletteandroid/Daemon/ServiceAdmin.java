@@ -172,9 +172,12 @@ public class ServiceAdmin extends Service
                 case "UPDATE":
                 {
                     // METTRE A JOUR UN PROFIL SUIVI
-                    // UPDATE$$idTel*longitude*latitude
+                    // UPDATE$idTel*longitude*latitude
                     Log.e("UPDATE",content);
                     Intent intent = new Intent();
+                    intent.putExtra("UPDATE", content);
+                    intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                    sendBroadcast(intent);
                     /**
                      * a completer
                      */

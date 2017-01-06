@@ -24,6 +24,8 @@ public class Profil
     private boolean suivi = false; // si ce profil est suivi par au moins une personne
     private boolean suiviParTabletteCourante = false; // si la tablette courante suis ce profil
     private boolean susceptibleDeFranchirLaBarriere = false;
+    private double longitude;
+    private double latitude;
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
     {
@@ -86,5 +88,21 @@ public class Profil
         }
 
         return sb.toString();
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 }
