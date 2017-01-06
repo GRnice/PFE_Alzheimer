@@ -20,6 +20,7 @@
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
             android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

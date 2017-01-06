@@ -21,7 +21,7 @@ import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
 
 
-public class ProfilFragment extends Fragment
+public class ProfilFragment extends BlankFragment
 {
     private ListView listView;
     private ProfilsManager profilsManager;
@@ -113,6 +113,19 @@ public class ProfilFragment extends Fragment
     {
         super.onDetach();
     }
+
+    /**
+     * Back pressed send from activity.
+     *
+     * @return if event is consumed, it will return true.
+     */
+    @Override
+    public void onBackPressed() {
+        Log.d("AAA", "BACKPressed profile");
+        Fragment fragmap = MapFragment_.newInstance();
+        ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
+    }
+
 
 
 }

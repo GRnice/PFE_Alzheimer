@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
 
-public class MapFragment_ extends Fragment
+public class MapFragment_ extends BlankFragment
 {
     MapView mMapView;
     private GoogleMap googleMap;
@@ -106,5 +107,16 @@ public class MapFragment_ extends Fragment
         super.onResume();
         this.mMapView.onResume();
     }
+
+    /**
+     * Back pressed send from activity.
+     *
+     * @return if event is consumed, it will return true.
+     */
+    @Override
+    public void onBackPressed() {
+        Log.d("AAA", "BACKPressed Map");
+    }
+
 
 }
