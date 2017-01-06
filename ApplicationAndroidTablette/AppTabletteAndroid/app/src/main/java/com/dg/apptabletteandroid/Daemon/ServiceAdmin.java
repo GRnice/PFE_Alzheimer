@@ -118,40 +118,46 @@ public class ServiceAdmin extends Service
                 case "SYNCH":
                 {
 
-                    String typeSynch = content.split("\\_")[0];
-                    String params = content.split("\\_")[1];
+                    String[] dataParams = content.split("\\_");
+                    String typeSynch = dataParams[0];
+
+                    Log.e("ARGSSYNCH",dataParams[1]);
 
                     switch(typeSynch)
                     {
                         // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
                         case "NWPROMENADE":
                         {
-                            String[] listOfParams = params.split("\\*");
+                            String[] args = dataParams[1].split("\\*");
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("NWPROMENADE",args);
+                            sendBroadcast(intent);
                             break;
                         }
 
                         // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
                         case "NWPROFIL":
                         {
-                            String[] listOfParams = params.split("\\*");
+
                             break;
                         }
 
                         // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
                         case "RMPROFIL":
                         {
-                            String[] listOfParams = params.split("\\*");
+
                             break;
                         }
 
                         // SYNCH syntaxe -> SYNCH$STOPPROMENADE_idTel
                         case "STOPPROMENADE":
                         {
-                            alertManager.removeListening(params); // params est idTel ici
-                            Log.e("STOP PROMENADE",params); // idtel
+                            alertManager.removeListening(dataParams[1]); // params est idTel ici
+                            Log.e("STOP PROMENADE",dataParams[1]); // idtel
                             Intent intent = new Intent();
                             intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("STOPPROMENADE",params);
+                            intent.putExtra("STOPPROMENADE",dataParams[1]);
                             sendBroadcast(intent);
                             break;
                         }

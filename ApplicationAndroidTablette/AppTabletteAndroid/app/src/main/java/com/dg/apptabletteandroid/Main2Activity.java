@@ -27,6 +27,8 @@ import com.dg.apptabletteandroid.fragments.MapFragment_;
 import com.dg.apptabletteandroid.fragments.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
+
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
 
@@ -231,6 +233,19 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String idTel = arg1.getStringExtra("STOPPROMENADE");
                 profilsManager.removeProfilOnPromenade(idTel);
                 // synchronisation des tablettes (nouvelle promenade, nouveau profil)
+            }
+
+            else if (arg1.hasExtra("NWPROMENADE"))
+            {
+
+                String[] params = arg1.getStringArrayExtra("NWPROMENADE");
+                String idTel = params[0];
+                String nom = params[1];
+                String prenom = params[2];
+                Log.e("synch",nom+" "+prenom);
+                Profil profilSelected = profilsManager.getProfil(nom,prenom);
+                profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.dg.apptabletteandroid.Profils;
 
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.dg.apptabletteandroid.Data.Profil;
@@ -31,8 +32,6 @@ public class ProfilsManager
         "nom,prenom,BarriereAlerte" si susceptible de franchir la barriere
         "nom,prenom,BarriereNormal" si non susceptible de franchir la barriere
      */
-
-
 
     public void setAllProfils(SharedPreferences sharedPreferences,String allSignaturesProfils)
     {
@@ -69,6 +68,19 @@ public class ProfilsManager
     public ArrayList<Profil> getAllProfils()
     {
         return this.profilArrayList;
+    }
+
+    public Profil getProfil(String nom,String prenom)
+    {
+        for (Profil profil : profilArrayList)
+        {
+            if (profil.getNom().equals(nom) && profil.getPrenom().equals(prenom))
+            {
+                return profil;
+            }
+        }
+
+        return null;
     }
 
     public ProfilsManager(SharedPreferences sharedPreferences)

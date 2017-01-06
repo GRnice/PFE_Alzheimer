@@ -122,11 +122,12 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 listeSock = self.dictAssistance[assistantSock]
                 if (sockPatient in listeSock):
                     idTel = self.getTracker(sockPatient).id
-                    print("wtf",idTel)
                     index = listeSock.index(sockPatient)
                     listeSock.pop(index)
                     self.dictAssistance[assistantSock] = listeSock
-                    assistantSock.send(("SYNCH$STOPPROMENADE_"+str(idTel)+"\r\n").encode('utf-8'))
+
+            idTel = self.getTracker(sockPatient).id
+            self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(idTel)+"\r\n")
 
                     
     def apply(self,commande):
