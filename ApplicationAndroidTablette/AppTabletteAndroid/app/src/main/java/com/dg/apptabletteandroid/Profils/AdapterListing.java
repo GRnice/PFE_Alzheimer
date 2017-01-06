@@ -46,6 +46,7 @@ public class AdapterListing extends ArrayAdapter<Profil> {
         final Profil profil = getItem(position);
         nomPrenom.setText(profil.getPrenom()+" "+profil.getNom());
 
+
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +55,7 @@ public class AdapterListing extends ArrayAdapter<Profil> {
                 ((Main2Activity) getContext()).pushFragmentFromActivity(fragEditProfil);
             }
         });
+
 
         return rowView;
     }

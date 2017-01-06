@@ -28,11 +28,13 @@ import com.dg.apptabletteandroid.fragments.MapFragment_;
 import com.dg.apptabletteandroid.fragments.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
+
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
 
     private FragmentManager fragmentManager;
-    private ProfilsManager profilsManager;
+    public static ProfilsManager profilsManager;
     private ServiceReceiver serviceReceiver;
 
     public final static String ACTION_FROM_SERVICE = "action.from.service";
@@ -42,7 +44,9 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
+        if(profilsManager == null){
+            profilsManager = new ProfilsManager(getPreferences(Context.MODE_PRIVATE));
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,7 +69,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
 
         fragmentManager = new FragmentManager();
-        profilsManager = new ProfilsManager(getPreferences(Context.MODE_PRIVATE));
 
         if (getIntent().getStringExtra("WAKE_UP") != null && getIntent().getStringExtra("WAKE_UP").equals("NEWSESSION"))
         {
@@ -231,6 +234,17 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             else if (arg1.hasExtra("UPDATE"))
             {
                 // update d'un profil suivi
+                String message = arg1.getStringExtra("UPDATE");
+                String[] parametres = message.split("\\*");
+                String idTel = parametres[0];
+                double longitude = Double.parseDouble(parametres[1]);
+                double latitude = Double.parseDouble(parametres[2]);
+                Profil profil = profilsManager.getProfilOnPromenade().get(idTel);
+                Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));
+                profil.setLongitude(longitude);
+                profil.setLatitude(latitude);
+                MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
+                mapFragment_.updateMap(profil);
             }
 
             else if (arg1.hasExtra("STOPPROMENADE"))
@@ -238,6 +252,19 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String idTel = arg1.getStringExtra("STOPPROMENADE");
                 profilsManager.removeProfilOnPromenade(idTel);
                 // synchronisation des tablettes (nouvelle promenade, nouveau profil)
+            }
+
+            else if (arg1.hasExtra("NWPROMENADE"))
+            {
+
+                String[] params = arg1.getStringArrayExtra("NWPROMENADE");
+                String idTel = params[0];
+                String nom = params[1];
+                String prenom = params[2];
+                Log.e("synch",nom+" "+prenom);
+                Profil profilSelected = profilsManager.getProfil(nom,prenom);
+                profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
         }
     }

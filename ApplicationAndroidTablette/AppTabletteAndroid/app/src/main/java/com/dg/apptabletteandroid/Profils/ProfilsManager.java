@@ -1,6 +1,7 @@
 package com.dg.apptabletteandroid.Profils;
 
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.dg.apptabletteandroid.Data.Profil;
@@ -32,8 +33,6 @@ public class ProfilsManager
         "nom,prenom,BarriereNormal" si non susceptible de franchir la barriere
      */
 
-
-
     public void setAllProfils(SharedPreferences sharedPreferences,String allSignaturesProfils)
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -55,10 +54,13 @@ public class ProfilsManager
     }
 
 
+
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
+        Log.d("idTel", idTel);
     }
+
 
     public void removeProfilOnPromenade(String idTel)
     {
@@ -69,6 +71,19 @@ public class ProfilsManager
     public ArrayList<Profil> getAllProfils()
     {
         return this.profilArrayList;
+    }
+
+    public Profil getProfil(String nom,String prenom)
+    {
+        for (Profil profil : profilArrayList)
+        {
+            if (profil.getNom().equals(nom) && profil.getPrenom().equals(prenom))
+            {
+                return profil;
+            }
+        }
+
+        return null;
     }
 
     public ProfilsManager(SharedPreferences sharedPreferences)
@@ -89,6 +104,10 @@ public class ProfilsManager
         }
 
 
+    }
+
+    public HashMap<String, Profil> getProfilOnPromenade() {
+        return profilOnPromenade;
     }
 
 }

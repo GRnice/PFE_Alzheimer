@@ -88,6 +88,7 @@ public class ProfilFragment extends BlankFragment
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
                     profilsManager.addProfilOnPromenade(idTel,profilselected);
+                    Log.d("SIZE", String.valueOf(profilsManager.getProfilOnPromenade().size()));
                     Intent intent = new Intent();
                     intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
                     intent.putExtra("FOLLOW_NEW_SESSION","");
@@ -95,6 +96,8 @@ public class ProfilFragment extends BlankFragment
                     intent.putExtra("NOM",profilselected.getNom());
                     intent.putExtra("PRENOM",profilselected.getPrenom());
                     getActivity().sendBroadcast(intent);
+                    Fragment fragmap = MapFragment_.newInstance();
+                    ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
                 }
             });
         }

@@ -40,6 +40,13 @@ class AssistanceServer(Thread):
         for assistant in allAssistants:
             assistant.send(messageString.encode("utf-8"))
 
+    def broadcastFilter(self,messageString,socketAssistant):
+        # broadcast le message sauf a socketAssistant
+        allAssistants = self.mapper.getSocketsAssistant()
+        for assistant in allAssistants:
+            if (assistant != socketAssistant):
+                assistant.send(messageString.encode("utf-8"))
+
     def event(self, evt, socket, tracker):
         if (evt == "STARTSUIVI"):
             print("(startsuivi) DEMANDE D'UN SUIVI POUR ",tracker.id)
@@ -51,9 +58,17 @@ class AssistanceServer(Thread):
                                        str(tracker.position[1])+"\r\n")
 
 
-    def addAssistant(self,sid):
-        self.mapper.addAssistant(sid)
-
+    def addAssistant(self,sockAssistant):
+        self.mapper.addAssistant(sockAssistant)
+        # lui transmettre tous les promenés.
+        listOfSocketPatient = list(self.mapper.getSocketPatient())
+        
+        for sockPatient in listOfSocketPatient:
+            tracker = self.mapper.getTracker(sockPatient)
+            if tracker.id != None: # si le tracker courant a recu un OKPROMENADE
+                message = "SYNCH$NWPROMENADE_"+tracker.id+"*"+tracker.nom+"*"+tracker.prenom+"\r\n"
+                print("addAssistant, message --> ",message)
+                sockAssistant.send(message.encode('utf-8'))
 
     def removeAssistant(self,sid):
         self.mapper.removeAssistant(sid)
@@ -78,11 +93,12 @@ class AssistanceServer(Thread):
             tracker = self.mapper.getTrackerById(idTel)
 
             if (tracker.nbFollower == 0): # le premier qui défini le profil du device
-                tracker.nom = nom
-                tracker.prenom = prenom
+                tracker.nom = nom.rstrip()
+                tracker.prenom = prenom.rstrip()
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
-
+                self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)
+                
             self.mapper.attachAssistant(sockPatient,sockAssistant)
             tracker.nbFollower += 1
 
@@ -93,7 +109,6 @@ class AssistanceServer(Thread):
         print('(stopsuivi) ARRET DU SUIVI DE ',idTel)
         sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
         self.mapper.removePatient(sockPatient)
-
     
     def run(self):
         self.serverOnline = True
