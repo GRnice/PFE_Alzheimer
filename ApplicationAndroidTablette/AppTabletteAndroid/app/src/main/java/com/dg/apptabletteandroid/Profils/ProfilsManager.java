@@ -32,8 +32,6 @@ public class ProfilsManager
         "nom,prenom,BarriereNormal" si non susceptible de franchir la barriere
      */
 
-
-
     public void setAllProfils(SharedPreferences sharedPreferences,String allSignaturesProfils)
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -55,10 +53,13 @@ public class ProfilsManager
     }
 
 
+
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
+        Log.d("idTel", idTel);
     }
+
 
     public void removeProfilOnPromenade(String idTel)
     {
@@ -89,6 +90,10 @@ public class ProfilsManager
         }
 
 
+    }
+
+    public HashMap<String, Profil> getProfilOnPromenade() {
+        return profilOnPromenade;
     }
 
 }

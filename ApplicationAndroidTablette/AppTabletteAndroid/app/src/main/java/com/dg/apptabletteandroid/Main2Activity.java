@@ -31,7 +31,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 {
 
     private FragmentManager fragmentManager;
-    private ProfilsManager profilsManager;
+    public static ProfilsManager profilsManager;
     private ServiceReceiver serviceReceiver;
 
     public final static String ACTION_FROM_SERVICE = "action.from.service";
@@ -41,7 +41,9 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
+        if(profilsManager == null){
+            profilsManager = new ProfilsManager(getPreferences(Context.MODE_PRIVATE));
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -64,7 +66,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
 
         fragmentManager = new FragmentManager();
-        profilsManager = new ProfilsManager(getPreferences(Context.MODE_PRIVATE));
 
         if (getIntent().getStringExtra("WAKE_UP") != null && getIntent().getStringExtra("WAKE_UP").equals("NEWSESSION"))
         {
@@ -227,6 +228,17 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             else if (arg1.hasExtra("UPDATE"))
             {
                 // update d'un profil suivi
+                String message = arg1.getStringExtra("UPDATE");
+                String[] parametres = message.split("\\*");
+                String idTel = parametres[0];
+                double longitude = Double.parseDouble(parametres[1]);
+                double latitude = Double.parseDouble(parametres[2]);
+                Profil profil = profilsManager.getProfilOnPromenade().get(idTel);
+                Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));
+                profil.setLongitude(longitude);
+                profil.setLatitude(latitude);
+                MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
+                mapFragment_.updateMap(profil);
             }
 
             else if (arg1.hasExtra("STOPPROMENADE"))

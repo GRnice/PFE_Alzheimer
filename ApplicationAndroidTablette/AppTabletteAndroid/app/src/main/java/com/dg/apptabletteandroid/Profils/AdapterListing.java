@@ -41,20 +41,20 @@ public class AdapterListing extends ArrayAdapter<Profil> {
         View rowView = inflater.inflate(R.layout.item_adapter_profil_listing, parent, false);
         TextView nomPrenom = (TextView) rowView.findViewById(R.id.prenomNomItem);
         ImageView image = (ImageView) rowView.findViewById(R.id.photoProfil);
-        Button editButton = (Button) rowView.findViewById(R.id.buttonEdit);
+//        Button editButton = (Button) rowView.findViewById(R.id.buttonEdit);
 
         Profil profil = getItem(position);
         nomPrenom.setText(profil.getPrenom()+" "+profil.getNom());
 
 
-        editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Fragment fragEditProfil = ProfilEdit.newInstance();
-                ((Main2Activity) getContext()).pushFragmentFromActivity(fragEditProfil);
-
-            }
-        });
+//        editButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Fragment fragEditProfil = ProfilEdit.newInstance();
+//                ((Main2Activity) getContext()).pushFragmentFromActivity(fragEditProfil);
+//
+//            }
+//        });
 
         return rowView;
     }
