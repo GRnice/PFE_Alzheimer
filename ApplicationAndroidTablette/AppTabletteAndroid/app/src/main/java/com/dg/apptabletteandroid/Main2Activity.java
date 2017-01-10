@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Data.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
+import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.dg.apptabletteandroid.fragments.MapFragment_;
 import com.dg.apptabletteandroid.fragments.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
@@ -110,7 +111,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else if(fragmentManager.getCurrentFragment() != null) {
+            ((BlankFragment)fragmentManager.getCurrentFragment()).onBackPressed();
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -263,6 +267,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
         }
+    }
+
+    public ProfilsManager getProfilsManager() {
+        return profilsManager;
     }
     
 }

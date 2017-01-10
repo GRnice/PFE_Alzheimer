@@ -28,4 +28,10 @@ public class BlankFragment extends Fragment
         return inflater.inflate(R.layout.fragment_blank, container, false);
     }
 
+    /**
+     * Could handle back press.
+     * @return true if back press was handled
+     */
+    public void onBackPressed() {}
+
 }

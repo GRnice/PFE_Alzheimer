@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MapFragment_ extends Fragment
+public class MapFragment_ extends BlankFragment
 {
     MapView mMapView;
     private GoogleMap googleMap;
@@ -136,6 +136,17 @@ public class MapFragment_ extends Fragment
         this.mMapView.onResume();
     }
 
+
+    /**
+     * Back pressed send from activity.
+     *
+     * @return if event is consumed, it will return true.
+     */
+    @Override
+    public void onBackPressed() {
+        Log.d("AAA", "BACKPressed Map");
+    }
+
     public void updateMap(Profil profil){
         LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
         if ((profilsAffiches.get(profil) == null)){
@@ -145,6 +156,7 @@ public class MapFragment_ extends Fragment
             Marker marker = profilsAffiches.get(profil);
             marker.setPosition(latLng);
         }
+
     }
 
 
