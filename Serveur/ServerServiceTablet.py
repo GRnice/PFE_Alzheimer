@@ -78,7 +78,7 @@ class AssistanceServer(Thread):
         data = data.split("*")
         if (len(data) == 1):
             # si FOLLOW$idTel
-            idTel = data[0]
+            idTel = data[0].rstrip()
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
             tracker.nbFollower += 1
@@ -86,9 +86,9 @@ class AssistanceServer(Thread):
 
         elif (len(data) == 3):
             # si FOLLOW$idTel*prenom*nom
-            idTel = data[0]
-            prenom = data[1]
-            nom = data[2]
+            idTel = data[0].rstrip()
+            prenom = data[1].rstrip()
+            nom = data[2].rstrip()
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
 
@@ -109,6 +109,9 @@ class AssistanceServer(Thread):
         print('(stopsuivi) ARRET DU SUIVI DE ',idTel)
         sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
         self.mapper.removePatient(sockPatient)
+
+    def stopServer(self):
+        self.serverOnline = False
     
     def run(self):
         self.serverOnline = True
@@ -150,6 +153,7 @@ class AssistanceServer(Thread):
                             message = (data.decode('utf-8')).split("$")
                             # Si c'est un follow
                             if message[0] == "FOLLOW":
+                                print('follow received')
                                 #"entete$idelTel*prenom*nom"
                                 self.follow(sock,message[1])
 

@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.sql.SQLData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +68,7 @@ public class MapFragment_ extends Fragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
+
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
@@ -74,8 +76,8 @@ public class MapFragment_ extends Fragment
                 int res = getActivity().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
                 // For showing a move to my location button
                 googleMap.setMyLocationEnabled(false);
-                LatLng sydney = new LatLng(43.6155793,7.0696861);
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(10).build();
+                LatLng sophia = new LatLng(43.6155793,7.0696861);
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(10).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                 Log.d("Map", String.valueOf(profilsAffiches.size()));
                 for(Map.Entry<Profil, Marker> entry : profilsAffiches.entrySet()){
