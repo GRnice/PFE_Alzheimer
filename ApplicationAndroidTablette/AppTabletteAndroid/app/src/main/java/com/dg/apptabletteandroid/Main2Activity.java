@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.WakefulBroadcastReceiver;
@@ -21,7 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
-import com.dg.apptabletteandroid.Data.Profil;
+import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.dg.apptabletteandroid.fragments.MapFragment_;
@@ -29,6 +30,7 @@ import com.dg.apptabletteandroid.fragments.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -178,6 +180,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     public void onResume()
     {
         super.onResume();
+        Intent intentBackground = new Intent();
+        intentBackground.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+        intentBackground.putExtra("ACTIVITY_BACKGROUND","FOREGROUND");
+        sendBroadcast(intentBackground);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Main2Activity.ACTION_FROM_SERVICE);
         this.serviceReceiver = new ServiceReceiver();
@@ -188,6 +194,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     public void onPause()
     {
         super.onPause();
+        Intent intentBackground = new Intent();
+        intentBackground.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+        intentBackground.putExtra("ACTIVITY_BACKGROUND","BACKGROUND");
+        sendBroadcast(intentBackground);
         unregisterReceiver(serviceReceiver);
     }
 
@@ -224,6 +234,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         public void onReceive(Context arg0,Intent arg1)
         {
 
+            // recuperations de tous les profils
             if (arg1.hasExtra("ALL_PROFILES"))
             {
                 String allProfiles = arg1.getStringExtra("ALL_PROFILES");
@@ -231,6 +242,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 profilsManager.setAllProfils(getPreferences(Context.MODE_PRIVATE),allProfiles);
             }
 
+            // indique que un patient a changé de positions
             else if (arg1.hasExtra("UPDATE"))
             {
                 // update d'un profil suivi
@@ -243,20 +255,30 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));
                 profil.setLongitude(longitude);
                 profil.setLatitude(latitude);
-                MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
-                mapFragment_.updateMap(profil);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
+                    mapFragment_.update(profil);
+                }
+
             }
 
+            // indique que une promenade se termine pour cet idTel
             else if (arg1.hasExtra("STOPPROMENADE"))
             {
                 String idTel = arg1.getStringExtra("STOPPROMENADE");
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    Profil profilStopped = profilsManager.getProfilOnPromenade().get(idTel);
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).removeProfil(profilStopped);
+                }
                 profilsManager.removeProfilOnPromenade(idTel);
                 // synchronisation des tablettes (nouvelle promenade, nouveau profil)
             }
 
+            // indique que un patient est en promenade et est suivi par au moins un assistant.
             else if (arg1.hasExtra("NWPROMENADE"))
             {
-
                 String[] params = arg1.getStringArrayExtra("NWPROMENADE");
                 String idTel = params[0];
                 String nom = params[1];
@@ -265,6 +287,18 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
                 profilsManager.addProfilOnPromenade(idTel,profilSelected);
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
+            }
+
+            // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan
+            if (arg1.hasExtra("SYNCH_ACTIVITY"))
+            {
+                // pour indiquer que l'intent a été bien recu.
+                String addr_receiver = arg1.getStringExtra("SYNCH_ACTIVITY");
+                Intent intentcheck = new Intent();
+                intentcheck.setAction(addr_receiver);
+                Log.e("CHECK ACTIVITY","INTENT SYNCH");
+                intentcheck.putExtra("CHECK",true);
+                sendBroadcast(intentcheck);
             }
         }
     }

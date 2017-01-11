@@ -1,4 +1,4 @@
-package com.dg.apptabletteandroid.Data;
+package com.dg.apptabletteandroid.Profils;
 
 /**
  * Created by Remy on 08/12/2016.

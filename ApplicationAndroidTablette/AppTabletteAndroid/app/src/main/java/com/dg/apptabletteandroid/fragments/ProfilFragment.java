@@ -3,7 +3,6 @@ package com.dg.apptabletteandroid.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -14,7 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
-import com.dg.apptabletteandroid.Data.Profil;
+import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.AdapterListing;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;

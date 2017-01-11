@@ -11,16 +11,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dg.apptabletteandroid.Data.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.R;
-import com.dg.apptabletteandroid.fragments.MapFragment_;
 import com.dg.apptabletteandroid.fragments.ProfilEdit;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Remy on 14/12/2016.

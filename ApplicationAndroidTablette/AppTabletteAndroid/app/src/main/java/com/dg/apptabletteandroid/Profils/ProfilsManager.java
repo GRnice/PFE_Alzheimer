@@ -1,10 +1,7 @@
 package com.dg.apptabletteandroid.Profils;
 
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.util.Log;
-
-import com.dg.apptabletteandroid.Data.Profil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

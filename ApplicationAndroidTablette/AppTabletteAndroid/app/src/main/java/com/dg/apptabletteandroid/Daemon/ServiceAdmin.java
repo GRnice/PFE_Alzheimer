@@ -28,6 +28,7 @@ public class ServiceAdmin extends Service
     ServerReceiver serverReceiver; // ce receiver attrapera tous les messages provenants du serveur
     ActivityReceiver activityReceiver; // ce receiver recevra tous les messages provenants de l'activité
     AlertManager alertManager; // le manager des alertes
+    DataKeeper dataKeeper; // stocke tous les messages recus en attendant que l'activite revienne en premier plan
 
     boolean activity_is_on_background; // true -> application en background ; false -> application au premier plan
 
@@ -47,6 +48,7 @@ public class ServiceAdmin extends Service
 
         this.alertManager = new AlertManager();
 
+        this.dataKeeper = new DataKeeper();
         comm.setActionIntent(ACTION_FROM_SERVER);
         comm.setService(this);
         comm.start();
@@ -111,7 +113,15 @@ public class ServiceAdmin extends Service
                     Intent intent = new Intent();
                     intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                     intent.putExtra("ALL_PROFILES",content);
-                    sendBroadcast(intent);
+                    if (activity_is_on_background)
+                    {
+                        dataKeeper.addData(intent);
+                    }
+                    else
+                    {
+                        sendBroadcast(intent);
+                    }
+
                     break;
                 }
 
@@ -132,7 +142,14 @@ public class ServiceAdmin extends Service
                             Intent intent = new Intent();
                             intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                             intent.putExtra("NWPROMENADE",args);
-                            sendBroadcast(intent);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            }
+                            else
+                            {
+                                sendBroadcast(intent);
+                            }
                             break;
                         }
 
@@ -158,7 +175,14 @@ public class ServiceAdmin extends Service
                             Intent intent = new Intent();
                             intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                             intent.putExtra("STOPPROMENADE",dataParams[1]);
-                            sendBroadcast(intent);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            }
+                            else
+                            {
+                                sendBroadcast(intent);
+                            }
                             break;
                         }
                     }
@@ -174,10 +198,14 @@ public class ServiceAdmin extends Service
                     // METTRE A JOUR UN PROFIL SUIVI
                     // UPDATE$idTel*longitude*latitude
                     Log.e("UPDATE",content);
-                    Intent intent = new Intent();
-                    intent.putExtra("UPDATE", content);
-                    intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                    sendBroadcast(intent);
+                    if (! activity_is_on_background)
+                    {
+                        Intent intent = new Intent();
+                        intent.putExtra("UPDATE", content);
+                        intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                        sendBroadcast(intent);
+                    }
+
                     /**
                      * a completer
                      */
@@ -207,7 +235,18 @@ public class ServiceAdmin extends Service
 
             if (arg1.hasExtra("ACTIVITY_BACKGROUND"))
             {
+
                 activity_is_on_background = arg1.getStringExtra("ACTIVITY_BACKGROUND").equals("BACKGROUND");
+
+                if (activity_is_on_background)
+                {
+                    dataKeeper.subscrive(ServiceAdmin.this);
+
+                }
+                else
+                {
+                    dataKeeper.publish(ServiceAdmin.this);
+                }
             }
 
             if (arg1.hasExtra("FOLLOW_NEW_SESSION"))
@@ -238,7 +277,11 @@ public class ServiceAdmin extends Service
             {
                 if(status==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED)
                 {
-                    // couper le socket
+                    if (connected)
+                    {
+                        // couper le socket
+                    }
+
                 }
                 else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status== NetworkUtil.NETWORK_STATUS_WIFI)
                 {

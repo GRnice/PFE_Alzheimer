@@ -4,19 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
-import com.dg.apptabletteandroid.Data.Profil;
+import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
-import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
 
 /**

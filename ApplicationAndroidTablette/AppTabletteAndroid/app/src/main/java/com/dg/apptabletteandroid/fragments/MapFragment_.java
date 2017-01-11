@@ -6,14 +6,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dg.apptabletteandroid.Data.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
+import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,11 +25,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.sql.SQLData;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class MapFragment_ extends BlankFragment
@@ -73,6 +75,19 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+                ProfilsManager profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
+                Set<Profil> allProfilsAffiches = profilsAffiches.keySet();
+                Collection<Profil> allProfilsOnPromenade = profilsManager.getProfilOnPromenade().values();
+                for (Profil profil : allProfilsAffiches)
+                {
+                    if (! allProfilsOnPromenade.contains(profil))
+                    {
+                        profilsAffiches.get(profil).remove();
+                        profilsAffiches.remove(profil);
+                    }
+                }
+
+
                 int res = getActivity().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
                 // For showing a move to my location button
                 googleMap.setMyLocationEnabled(false);
@@ -147,7 +162,37 @@ public class MapFragment_ extends BlankFragment
         Log.d("AAA", "BACKPressed Map");
     }
 
-    public void updateMap(Profil profil){
+    // Met à jour la map
+    public void refresh()
+    {
+        ProfilsManager profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
+        Set<Profil> allProfilsAffiches = profilsAffiches.keySet();
+        Collection<Profil> allProfilsOnPromenade = profilsManager.getProfilOnPromenade().values();
+        for (Profil profil : allProfilsAffiches)
+        {
+            if (! allProfilsOnPromenade.contains(profil))
+            {
+                profilsAffiches.get(profil).remove();
+                profilsAffiches.remove(profil);
+            }
+        }
+
+        googleMap.clear();
+
+        Iterator<Profil> profilsPromenade = profilsAffiches.keySet().iterator();
+        while(profilsPromenade.hasNext())
+        {
+            Profil profil = profilsPromenade.next();
+            profilsAffiches.get(profil).remove();
+            LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
+            Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+            profilsAffiches.put(profil,marker);
+        }
+    }
+
+    // ajout ou mise à jour du marker d'un profil
+    public void update(Profil profil)
+    {
         LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
         if ((profilsAffiches.get(profil) == null)){
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
@@ -159,5 +204,12 @@ public class MapFragment_ extends BlankFragment
 
     }
 
+    // suppression d'un profil a afficher
+    public void removeProfil(Profil profilStopped)
+    {
+        profilsAffiches.get(profilStopped).remove();
+        profilsAffiches.remove(profilStopped);
+        this.refresh();
+    }
 
 }
