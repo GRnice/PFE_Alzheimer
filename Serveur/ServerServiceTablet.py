@@ -150,7 +150,7 @@ class AssistanceServer(Thread):
                         
                         if len(data) > 0:
                             
-                            message = (data.decode('utf-8')).split("$")
+                            message = (data.decode('utf-8')).rstrip().split("$")
                             # Si c'est un follow
                             if message[0] == "FOLLOW":
                                 print('follow received')
