@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+
+import com.dg.apptabletteandroid.fragments.ProfilFragment;
 
 /**
  * Created by Remy on 14/12/2016.
@@ -45,5 +48,13 @@ public class FragmentManager
         ft2.replace(R.id.fragment,frag);
         ft2.commit();
         fragmentCourant = frag;
+
+        FloatingActionButton fab = (FloatingActionButton) act.findViewById(R.id.fab);
+        if(fragmentCourant instanceof ProfilFragment) {
+            fab.show();
+        }
+        else {
+            fab.hide();
+        }
     }
 }

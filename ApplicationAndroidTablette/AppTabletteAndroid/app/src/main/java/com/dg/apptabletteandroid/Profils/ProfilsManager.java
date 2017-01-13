@@ -52,10 +52,20 @@ public class ProfilsManager
 
 
 
+
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
         Log.d("idTel", idTel);
+    }
+
+    public void removeProfile(String prenom, String nom) {
+        for(int i = 0; i < profilArrayList.size(); i++) {
+            if(profilArrayList.get(i).getPrenom().equals(prenom) && profilArrayList.get(i).getNom().equals(nom)) {
+                profilArrayList.remove(profilArrayList.get(i));
+                return;
+            }
+        }
     }
 
 
@@ -99,8 +109,19 @@ public class ProfilsManager
                 profilArrayList.add(Profil.buildProfilFromSignature(profilsign));
             }
         }
+    }
 
+    public void updateList(SharedPreferences sharedPreferences, ArrayList<Profil> listProfils) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        HashSet<String> newEnsembleProfils = new HashSet<>();
 
+        for(Profil elt: listProfils) {
+                newEnsembleProfils.add(elt.makeSignature());
+        }
+
+        editor.remove("profils");
+        editor.putStringSet("profils",newEnsembleProfils);
+        editor.commit();
     }
 
     public HashMap<String, Profil> getProfilOnPromenade() {

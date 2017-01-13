@@ -52,13 +52,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -287,6 +280,49 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
                 profilsManager.addProfilOnPromenade(idTel,profilSelected);
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
+            }
+
+            else if(arg1.hasExtra("NWPROFIL")) {  //NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
+                String[] params = arg1.getStringArrayExtra("NWPROFIL");
+                String nom = params[0];
+                String prenom = params[1];
+                String barriere = params[2];
+                Boolean barriereBool;
+                if(barriere.equals("BarriereNormal")) {
+                    barriereBool = false;
+                } else {
+                    barriereBool = true;
+                }
+                profilsManager.getAllProfils().add(new Profil(nom, prenom, barriereBool));
+
+            }
+
+            else if(arg1.hasExtra("RMPROFIL")) { // nom*prenom
+                String[] params = arg1.getStringArrayExtra("RMPROFIL");
+                String nom = params[0];
+                String prenom = params[1];
+                Log.e("SUPR", prenom + " " + nom);
+                profilsManager.removeProfile(prenom,nom);
+
+            }
+
+            else if(arg1.hasExtra("MODIFPROFIL")) {  //SYNCH$MODIFPROFIL_oldNom,prenom,Barriere*newNom,prenom,Barriere
+                String[] params = arg1.getStringArrayExtra("MODIFPROFIL");
+                String oldNom = params[0].split(",")[0];
+                String oldPrenom = params[0].split(",")[1];
+
+                String newNom = params[1].split(",")[0];
+                String newPrenom = params[1].split(",")[1];
+                String barriere = params[1].split(",")[2];
+
+                profilsManager.removeProfile(oldPrenom, oldNom);
+                Boolean barriereBool;
+                if(barriere.equals("BarriereNormal")) {
+                    barriereBool = false;
+                } else {
+                    barriereBool = true;
+                }
+                profilsManager.getAllProfils().add(new Profil(newNom, newPrenom, barriereBool));
             }
 
             // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan
