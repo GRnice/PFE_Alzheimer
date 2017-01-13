@@ -77,10 +77,10 @@ public class AddProfilFragment extends BlankFragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = prenom.getText().toString();
+                String firstName = prenom.getText().toString();
                 String lastName = nom.getText().toString();
-                Log.d("New", name + " " + lastName);
-                Profil newProfile = new Profil(name, lastName, barriereBool);
+                Log.d("New", nom + " " + prenom);
+                Profil newProfile = new Profil(lastName, firstName, barriereBool);
                 ((Main2Activity)getActivity()).getProfilsManager().getAllProfils().add(newProfile);
 
                 // activity me donne le shared preference
