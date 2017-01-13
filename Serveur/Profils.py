@@ -5,7 +5,8 @@ class Profile:
         self.risqueFranchissementBarriere = risqueFranchissementBarriere
         
 class ManagerProfile:
-    def __init__(self):
+    def __init__(self,nomFichier):
+        self.nomFichier = nomFichier
         self.listProfile = []
 
     def __str__(self):
@@ -15,10 +16,10 @@ class ManagerProfile:
 
         return chaine[0:-1]
 
-    def read(self, nomFichier):
-        with open(nomFichier, 'r') as f:
+    def read(self):
+        with open(self.nomFichier, 'r') as f:
             for line in f:
-                myLine = line.strip()
+                myLine = line.rstrip()
                 listLine = myLine.split(",")
                 p = Profile(listLine[0], listLine[1],listLine[2])
                 self.listProfile.append(p)
@@ -27,11 +28,36 @@ class ManagerProfile:
         for elt in self.listProfile:
             print(elt.firstName + " " + elt.lastName)
         
+    def addProfil(self,nom,prenom,barriere):
+        unProfil = Profile(nom,prenom,barriere)
+        self.listProfile.append(unProfil)
+        self.write()
 
-    def write(self, nomFichier, profile):
-        with open(nomFichier, 'a') as out:
-            out.write(profile.firstName + "," + 
-                      profile.lastName + "," +
-                      profile.risqueFranchissementBarriere + "\n")
+    def supprProfil(self,nom,prenom):
+        print("dans supprprofil")
+        for prof in self.listProfile:
+            if (prof.firstName == prenom and prof.lastName == nom):
+                print('suppression')
+                index = self.listProfile.index(prof)
+                self.listProfile.pop(index)
+                self.write()
+                return
+
+    def modifProfil(self,oldSignature,newSignature):
+        oldProf = oldSignature.split(",")
+        newProf = newSignature.split(",")
+        for prof in self.listProfile:
+            if (prof.firstName == oldProf[1] and prof.lastName == oldProf[0]):
+                prof.firstName = newProf[1]; prof.lastName = newProf[0]; prof.risqueFranchissementBarriere = newProf[2]
+                self.write()
+
+    def write(self):
+        chaine = ""
+        for elt in self.listProfile:
+            chaine += elt.lastName+","+elt.firstName+","+elt.risqueFranchissementBarriere+"\n"
+
+        
+        with open(self.nomFichier, 'w') as out:
+            out.write(chaine)
         out.close()
         

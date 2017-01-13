@@ -187,9 +187,6 @@ public class ServiceAdmin extends Service
                         }
                     }
 
-
-                    // SYNCH syntaxe -> SYNCH$CHANGEPROFIL_nom*prenom
-
                     break;
                 }
 

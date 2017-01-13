@@ -25,8 +25,8 @@ class AssistanceServer(Thread):
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
         self.serverOnline = False
 
-        self.managerProfils = Profils.ManagerProfile()
-        self.managerProfils.read("./profils.txt")
+        self.managerProfils = Profils.ManagerProfile("./profils.txt")
+        self.managerProfils.read()
 
 
     def setMapper(self,mapper):
@@ -65,7 +65,7 @@ class AssistanceServer(Thread):
         
         for sockPatient in listOfSocketPatient:
             tracker = self.mapper.getTracker(sockPatient)
-            if tracker.id != None: # si le tracker courant a recu un OKPROMENADE
+            if tracker.etat == 2: # si le tracker courant a recu un OKPROMENADE
                 message = "SYNCH$NWPROMENADE_"+tracker.id+"*"+tracker.nom+"*"+tracker.prenom+"\r\n"
                 print("addAssistant, message --> ",message)
                 sockAssistant.send(message.encode('utf-8'))
@@ -95,6 +95,7 @@ class AssistanceServer(Thread):
             if (tracker.nbFollower == 0): # le premier qui défini le profil du device
                 tracker.nom = nom.rstrip()
                 tracker.prenom = prenom.rstrip()
+                tracker.etat = 2
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
                 self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)
@@ -106,6 +107,8 @@ class AssistanceServer(Thread):
         data = data.split("*")
         idTel = data[0]
         sockPatient = self.mapper.getSocketById(idTel)
+        tracker = self.mapper.getTracker(sockPatient)
+        tracker.etat = 0
         print('(stopsuivi) ARRET DU SUIVI DE ',idTel)
         sockPatient.send("STOPSUIVI\r\n".encode("utf-8"))
         self.mapper.removePatient(sockPatient)
@@ -161,6 +164,32 @@ class AssistanceServer(Thread):
                                 # "entete$idTel"
                                 self.stopPromenade(sock,message[1])
 
+                            # ENTETE$nom,prenom,barriereAlerte | barriereNormal
+                            elif message[0] == "ADDPROFIL":
+                                print("ADDPROFIL",message[1])
+                                profilStr = message[1].split(',')
+                                nom = profilStr[0]; prenom = profilStr[1]; barriere = profilStr[2]
+                                self.managerProfils.addProfil(nom,prenom,barriere)
+                                self.broadcastFilter("SYNCH$NWPROFIL_"+nom+"*"+prenom+"*"+barriere+"\r\n",sock)
+
+                            elif message[0] == "SUPPRPROFIL":
+                                print('SUPPRPROFIL')
+                                print(message[1])
+                                profilStr = message[1].split(',')
+                                nom = profilStr[0]; prenom = profilStr[1]; barriere = profilStr[2]
+                                self.managerProfils.supprProfil(nom,prenom)
+                                print('send du synch')
+                                print("SYNCH$RMPROFIL_"+nom+"*"+prenom)
+                                self.broadcastFilter("SYNCH$RMPROFIL_"+nom+"*"+prenom+"\r\n",sock)
+
+                            elif message[0] == "MODIFPROFIL":
+                                print("MODIFPROFIL")
+                                oldAndNewProfil = message[1].split('*')
+                                self.managerProfils.modifProfil(oldAndNewProfil[0],oldAndNewProfil[1])
+                                print("send du synch modif")
+                                print("SYNCH$MODIFPROFIL_"+message[1])
+                                self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
+                                
                         else:
                             print("Assistant (%s) is offline" % sock)
                             sock.close()

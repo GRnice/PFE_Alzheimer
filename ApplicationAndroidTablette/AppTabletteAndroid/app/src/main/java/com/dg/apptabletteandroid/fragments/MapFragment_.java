@@ -207,9 +207,13 @@ public class MapFragment_ extends BlankFragment
     // suppression d'un profil a afficher
     public void removeProfil(Profil profilStopped)
     {
-        profilsAffiches.get(profilStopped).remove();
-        profilsAffiches.remove(profilStopped);
-        this.refresh();
+        if (profilsAffiches.containsKey(profilStopped))
+        {
+            profilsAffiches.get(profilStopped).remove();
+            profilsAffiches.remove(profilStopped);
+            this.refresh();
+        }
+
     }
 
 }

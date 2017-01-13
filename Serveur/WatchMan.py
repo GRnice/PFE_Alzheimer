@@ -19,10 +19,14 @@ class WatchMan:
 
     def loadCircles(self): # load all HITBOXS
         with open("listCercles.txt","r",encoding="utf-8") as file:
-            line = file.readline()
-            line = line.rstrip().split(",")
-            circle = Circle(line[0],line[1],line[2],line[3])
-            self.listOfCircles.append(circle)
+            lines = file.readlines()
+            for line in lines:
+                if (line[0] == "#"):
+                    continue
+                
+                line = line.rstrip().split(",")
+                circle = Circle(float(line[0]),float(line[1]),float(line[2]),float(line[3]))
+                self.listOfCircles.append(circle)
             
             
     def positionIsGood(self,longP,latP):

@@ -1,0 +1,2 @@
+#longitudeOrigine,latitudeOrigine,longExtremite,latExtremite
+7.071489,43.614939,7.071544,43.614894

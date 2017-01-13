@@ -6,6 +6,7 @@ import time
 import socket, select
 import queue
 from ServerServiceTablet import *
+from WatchMan import WatchMan
 import sys
 
 poolRequest = queue.Queue(500) # MAX 500 requetes à traiter
@@ -21,6 +22,7 @@ class Tracker: ## Classe representant un tracker
         self.etat = 0
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
+        # 2 -> connecté et suivi
         # 172.20.10.2
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
@@ -40,7 +42,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
         self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
         self.dictSocketPatient = dict() # <sockPatient,Tracker>
-
+        self.watchman = WatchMan()
         self.dictAssistance = dict() # HashMap<sockAssistant,sockPatient>
         
         self.serverAssistant = serverAssistant
@@ -115,6 +117,15 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             if sockAssistant in self.dictAssistance.keys():
                 del self.dictAssistance[sockAssistant]
 
+    def updateSocketPatient(self,nwSocketPatient,oldSocketPatient):
+        with lockMap:
+            allAssistants = list(self.getSocketsAssistant())
+            for assistantSock in allAssistants:
+                listeSock = self.dictAssistance[assistantSock]
+                if (oldSocketPatient in listeSock):
+                    index = listeSock.index(oldSocketPatient)
+                    listeSock[index] = nwSocketAssistant
+
     def removePatient(self,sockPatient):
         with lockMap:
             allAssistants = list(self.getSocketsAssistant())
@@ -171,6 +182,9 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             self.dictSocketPatient[socket] = tracker
             self.serverAssistant.event("POSITION",socket,tracker)
 
+            if (not self.watchman.positionIsGood(longitude,latitude)):
+                print("WARNING HORS ZONE /!\/!\\")
+
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
             self.removePatient(socket)
@@ -181,21 +195,29 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         elif (entete == "CONTINUE"):
             print("CONTINUE RECEIVE")
             idTel = requeteArray[1]
-            nwTracker = self.dictSocketPatient[socket]
-            
-            allkeys = list(self.dictSocketPatient.getSocketPatient())
-            for key in allkeys:
-                if self.dict[key].id == idTel:
-                    old = self.dict[key]
+            nwTracker = self.getTracker(socket)
+            oldSocket = self.mapIdSock[idTel]
+        
+            alltrackers = list(self.dictSocketPatient.values())
+    #                self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
+   #     self.dictSocketPatient = dict() # <sockPatient,Tracker>
+  #      self.watchman = WatchMan()
+ #       self.dictAssistance = dict() # HashMap<sockAssistant,sockPatient>
+ 
+            for tracker in alltrackers:
+                if tracker != nwTracker and tracker.id == idTel:
+                    print("JE TRAITE CONTINUE")
+                    oldTracker = tracker
                     nwTracker.id = idTel
-                    nwTracker.position = old.position
-                    nwTracker.etat = old.etat
+                    nwTracker.position = oldTracker.position
+                    nwTracker.etat = oldTracker.etat
                     nwTracker.lastEmit = time.time()
-                    self.dict[socket] = nwTracker
+                    nwTracker.nbFollower = oldTracker.nbFollower
+                    
+                    del self.dictSocketPatient[oldSocket]
                     self.mapIdSock[idTel] = socket
-                    del self.mapIdSock[key]
-                    key.close()
-                    del self.dict[key]
+                    self.dictSocketPatient[socket] = nwTracker
+                    self.updateSocketPatient(oldSocket,socket)
                     socket.send("OKPROMENADE\r\n".encode('utf-8'))
                     break
             
@@ -269,14 +291,7 @@ class PatientServer(Thread):
             liste.extend(self.CONNECTION_LIST)
             socketsClients = list(self.mapper.getSocketPatient())
             print("====== ALL TRACKERS ========")
-            for sock in socketsClients:
-                tracker = self.mapper.getTracker(sock)
-                print("id : ",tracker.id,
-                      ", etat : ",tracker.etat,
-                      ", nom : ",tracker.nom,
-                      ", prenom : ",tracker.prenom,
-                      ", position : ",tracker.position,
-                      ", follower : ",tracker.nbFollower)
+            print("NB sockets -> ",len(socketsClients))
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
             for sock in read_sockets:
                 #New connection
@@ -301,7 +316,9 @@ class PatientServer(Thread):
                             print("Client (%s) is offline" % sock)
                             sock.close()
                             with lockMap:
-                                self.mapper.delTracker(sock)
+                                tracker = self.mapper.getTracker(sock)
+                                if (tracker.etat != 2):
+                                    self.mapper.delTracker(sock)
 
          
                      
@@ -311,7 +328,10 @@ class PatientServer(Thread):
                         print("Client (%s) is offline" % sock)
                         sock.close()
                         with lockMap:
-                            self.mapper.delTracker(sock)
+                            tracker = self.mapper.getTracker(sock)
+                            if (tracker.etat != 2):
+                                print("suppression d'un socket, il n'est pas à l'etat 2")
+                                self.mapper.delTracker(sock)
 
              
         server_socket.close()

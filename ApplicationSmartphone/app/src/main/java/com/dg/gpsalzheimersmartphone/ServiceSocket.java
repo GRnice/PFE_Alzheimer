@@ -34,7 +34,7 @@ public class ServiceSocket extends Service implements LocationListener
     private ClientReceiver clientReceiver;
     private ServerReceiver serverReceiver;
     private NetworkChangeReceiver networkChangeReceiver;
-    private boolean gpsOn;
+    private boolean onPromenade;
 
     public ServiceSocket()
     {
@@ -79,7 +79,7 @@ public class ServiceSocket extends Service implements LocationListener
     {
         Log.e("DEAD","DEAD");
         comm.interrupt();
-        if (gpsOn)
+        if (onPromenade)
         {
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
@@ -183,6 +183,7 @@ public class ServiceSocket extends Service implements LocationListener
             boolean stop = arg1.getBooleanExtra(STOPSUIVI, false);
 
             if(stop){
+                onPromenade = false;
                 Intent messageForActivity = new Intent();
                 messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
                 messageForActivity.putExtra("KILL",true);
@@ -198,14 +199,14 @@ public class ServiceSocket extends Service implements LocationListener
 
             if (startGps)
             {
-                gpsOn = true;
+                onPromenade = true;
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
                 lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,0,ServiceSocket.this);
             }
             else if (!startGps)
             {
-                gpsOn = false;
+                onPromenade = false;
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 lm.removeUpdates(ServiceSocket.this);
             }
@@ -236,7 +237,7 @@ public class ServiceSocket extends Service implements LocationListener
                 }
                 else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status== NetworkUtil.NETWORK_STATUS_WIFI)
                 {
-                    if(!connected){
+                    if(!connected && onPromenade){
                         Intent intent1 = new Intent();
                         intent1.setAction(MainActivity.ACTION_SEND_TO_SERVER);
                         intent1.putExtra("CONTINUE*" + android_id, true);
