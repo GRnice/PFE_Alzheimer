@@ -19,6 +19,7 @@ public class Profil
         return prof;
     }
 
+
     private String nom = null;
     private String prenom = null;
     private boolean suivi = false; // si ce profil est suivi par au moins une personne
@@ -42,6 +43,10 @@ public class Profil
     public void susceptibleDeFranchirLaBarriere(boolean valeur)
     {
         this.susceptibleDeFranchirLaBarriere = valeur;
+    }
+
+    public Boolean getSusceptibleDeFranchirLaBarriere() {
+        return susceptibleDeFranchirLaBarriere;
     }
 
     public String getPrenom()

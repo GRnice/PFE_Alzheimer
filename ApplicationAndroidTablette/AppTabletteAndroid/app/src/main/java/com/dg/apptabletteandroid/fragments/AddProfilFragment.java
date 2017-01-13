@@ -1,10 +1,10 @@
 package com.dg.apptabletteandroid.fragments;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,29 +13,25 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
-import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
+import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
- * Created by dominiquedib on 04/01/2017.
+ * Created by dominiquedib on 13/01/2017.
  */
 
-public class ProfilEdit extends BlankFragment {
-    private Profil profilSelected;
+public class AddProfilFragment extends BlankFragment {
 
-    public ProfilEdit() {}
-
-    public ProfilEdit(Profil pr) {
-        this.profilSelected = pr;
-    }
+    public AddProfilFragment() {}
 
 
-    public static ProfilEdit newInstance(Profil pr)
+    public static AddProfilFragment newInstance()
     {
-        ProfilEdit fragment = new ProfilEdit(pr);
+        AddProfilFragment fragment = new AddProfilFragment();
         return fragment;
     }
 
@@ -49,15 +45,12 @@ public class ProfilEdit extends BlankFragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_profil_edit, container, false);
+        View view = inflater.inflate(R.layout.fragment_profil_add, container, false);
 
         final EditText prenom = (EditText) view.findViewById(R.id.editNameTextField);
         final EditText nom = (EditText) view.findViewById(R.id.editLastNameTextField);
         final Button buttonBarriere = (Button) view.findViewById(R.id.barriereButton);
-        Button modifButton = (Button) view.findViewById(R.id.buttonModifier);
-
-        prenom.setText(this.profilSelected.getPrenom());
-        nom.setText(this.profilSelected.getNom());
+        Button addButton = (Button) view.findViewById(R.id.buttonModifier);
 
         buttonBarriere.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,39 +74,31 @@ public class ProfilEdit extends BlankFragment {
         }
 
 
-        modifButton.setOnClickListener(new View.OnClickListener() {
+        addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String name = prenom.getText().toString();
                 String lastName = nom.getText().toString();
                 Log.d("New", name + " " + lastName);
-                Profil oldProfil = new Profil(profilSelected.getNom(), profilSelected.getPrenom(), profilSelected.getSusceptibleDeFranchirLaBarriere());
+                Profil newProfile = new Profil(name, lastName, barriereBool);
+                ((Main2Activity)getActivity()).getProfilsManager().getAllProfils().add(newProfile);
 
-                profilSelected.setNom(lastName);
-                profilSelected.setPrenom(name);
-                profilSelected.susceptibleDeFranchirLaBarriere(barriereBool);
-
-                // update sharedPreference
+                // activity me donne le shared preference
                 SharedPreferences shared = ((Main2Activity)getActivity()).getPreferences(Context.MODE_PRIVATE);
                 ArrayList<Profil> listProfils = ((Main2Activity)getActivity()).getProfilsManager().getAllProfils();
                 ((Main2Activity)getActivity()).getProfilsManager().updateList(shared, listProfils);
 
                 // send au service
-                // oldProfil*newProfil
                 Intent intent = new Intent();
                 intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-                intent.putExtra("MODIFPROFIL", oldProfil.makeSignature()+ "*" + profilSelected.makeSignature());
+                intent.putExtra("ADDPROFIL", newProfile.makeSignature()); // nom,prenom,BarriereNormal
                 getActivity().sendBroadcast(intent);
 
-
-                onBackPressed();  // retourn au fragment précedent (list des profil)
+                onBackPressed();  // retourne au fragment list de tous les profil
 
 
             }
         });
-
-
-
 
 
         return view;
@@ -164,6 +149,5 @@ public class ProfilEdit extends BlankFragment {
         Fragment fragProfils = ProfilFragment.newInstance(((Main2Activity)getActivity()).getProfilsManager());
         ((Main2Activity) getActivity()).pushFragmentFromActivity(fragProfils);
     }
-
 
 }

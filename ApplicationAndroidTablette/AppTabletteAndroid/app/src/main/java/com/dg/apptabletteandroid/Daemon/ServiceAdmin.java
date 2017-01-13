@@ -133,37 +133,61 @@ public class ServiceAdmin extends Service
 
                     Log.e("ARGSSYNCH",dataParams[1]);
 
-                    switch(typeSynch)
-                    {
+                    switch(typeSynch) {
                         // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
-                        case "NWPROMENADE":
-                        {
+                        case "NWPROMENADE": {
                             String[] args = dataParams[1].split("\\*");
                             Intent intent = new Intent();
                             intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("NWPROMENADE",args);
-                            if (activity_is_on_background)
-                            {
+                            intent.putExtra("NWPROMENADE", args);
+                            if (activity_is_on_background) {
                                 dataKeeper.addData(intent);
-                            }
-                            else
-                            {
+                            } else {
                                 sendBroadcast(intent);
                             }
                             break;
                         }
 
                         // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
-                        case "NWPROFIL":
-                        {
-
+                        case "NWPROFIL": {
+                            String[] args = dataParams[1].split("\\*");
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("NWPROFIL", args);
+                            if (activity_is_on_background) {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
                             break;
                         }
 
                         // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
-                        case "RMPROFIL":
-                        {
+                        case "RMPROFIL": {
+                            String[] args = dataParams[1].split("\\*");
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("RMPROFIL", args);
 
+                            if (activity_is_on_background) {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
+                            break;
+                        }
+
+                        case "MODIFPROFIL": { //SYNCH$MODIFPROFIL_oldNom,prenom,Barriere*newNom,prenom,Barriere
+                            String[] args = dataParams[1].split("\\*");
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("MODIFPROFIL", args);
+
+                            if (activity_is_on_background) {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
                             break;
                         }
 
@@ -257,6 +281,25 @@ public class ServiceAdmin extends Service
                 Log.e("FOLLOW_NEW_SESSION",idTel);
                 comm.sendMessage("FOLLOW$"+idTel+"*"+prenom+"*"+nom);
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
+            }
+
+            if(arg1.hasExtra("ADDPROFIL")) {
+                String newProfil = arg1.getStringExtra("ADDPROFIL");
+                Log.d("ADDPROFIL",newProfil);
+                comm.sendMessage("ADDPROFIL$" + newProfil);
+            }
+
+            if(arg1.hasExtra("SUPPRPROFIL")) {
+                String rmProfils =  arg1.getStringExtra("SUPPRPROFIL");
+                Log.d("SUPPRPROFIL", rmProfils);
+                comm.sendMessage("SUPPRPROFIL$" + rmProfils);
+            }
+
+            if(arg1.hasExtra("MODIFPROFIL")) {
+                String modifiedProfil = arg1.getStringExtra("MODIFPROFIL");  // ancienProfil*nouveauProfil
+                Log.d("MODIFPROFIL", modifiedProfil);
+                comm.sendMessage("MODIFPROFIL$" + modifiedProfil);
+
             }
         }
     }

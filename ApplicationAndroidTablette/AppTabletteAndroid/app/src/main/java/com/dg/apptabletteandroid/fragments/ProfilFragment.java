@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,15 @@ public class ProfilFragment extends BlankFragment
         Log.e("sizeallprofilarray",String.valueOf(profilsManager.getAllProfils().size()));
         AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,profilsManager.getAllProfils());
         this.listView.setAdapter(adapterListing);
+
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragmentAdd = AddProfilFragment.newInstance();
+                ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmentAdd);
+            }
+        });
 
 
         if (this.selectionProfilNewSession)
