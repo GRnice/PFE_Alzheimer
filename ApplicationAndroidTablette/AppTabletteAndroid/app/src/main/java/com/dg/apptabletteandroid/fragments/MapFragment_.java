@@ -6,10 +6,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -41,6 +45,13 @@ public class MapFragment_ extends BlankFragment
     private GoogleMap googleMap;
     private static HashMap<Profil, Marker> profilsAffiches = new HashMap<>();
     private static Bitmap bitmap;
+    private ListView listView;
+    private ProfilsManager profilsManager;
+
+//list
+
+    public List<Profil> listProfilsEnProm = new ArrayList<>();
+
 
     public MapFragment_()
     {
@@ -56,26 +67,71 @@ public class MapFragment_ extends BlankFragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+
+      //map
         super.onCreate(savedInstanceState);
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
+        profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
+        HashMap<String, Profil> profilsOnPromenade = profilsManager.getProfilOnPromenade();
+        for(Map.Entry<String, Profil> entry : profilsOnPromenade.entrySet()){
+            listProfilsEnProm.add(entry.getValue());
+        }
     }
+    public class CustomAdapter extends ArrayAdapter {
+        public List<View> views = new ArrayList<>();
+
+        public CustomAdapter() {
+            super(getActivity(), R.layout.item_profil_en_promenade, listProfilsEnProm);
+        }
+
+
+        @NonNull
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View itemView = convertView;
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            if(itemView == null){
+                itemView = inflater.inflate(R.layout.item_profil_en_promenade, parent, false);
+            }
+            View view = itemView.findViewById(R.id.details);
+            views.add(view);
+            return itemView;
+        }
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mMapView = (MapView) view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
+        //list
+        final CustomAdapter customAdapter = new CustomAdapter();
+        listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
+        listView.setAdapter(customAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                View view1 = customAdapter.views.get(i);
+                if(view1.getVisibility() == View.VISIBLE){
+                    customAdapter.views.get(i).setVisibility(View.GONE);
+                }else {
+                    customAdapter.views.get(i).setVisibility(View.VISIBLE);
+                }
+            }
 
+        });
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
-                ProfilsManager profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
                 Set<Profil> allProfilsAffiches = profilsAffiches.keySet();
                 Collection<Profil> allProfilsOnPromenade = profilsManager.getProfilOnPromenade().values();
                 for (Profil profil : allProfilsAffiches)

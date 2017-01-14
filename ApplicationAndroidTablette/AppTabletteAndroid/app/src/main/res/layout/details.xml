@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:stretchColumns="1"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<TableRow
+    android:layout_marginTop="10dp"
+    >
+
+    <ImageView
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:maxHeight="60dp"
+    android:maxWidth="60dp"
+    android:layout_marginLeft="5dp"
+    android:src="@drawable/wifi"
+    android:adjustViewBounds="true"
+    />
+
+    <TextView
+    android:layout_column="4"
+    android:text="Connecté"
+    android:layout_marginRight="15dp" />
+</TableRow>
+
+    <TableRow
+        android:layout_marginTop="10dp"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <ImageView
+            android:layout_column="0"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:maxHeight="60dp"
+            android:maxWidth="60dp"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/clock"
+            android:adjustViewBounds="true"
+            />
+        <TextView
+            android:layout_column="4"
+            android:text="5 minutes"
+            android:layout_marginRight="15dp">
+
+        </TextView>    </TableRow>
+
+    <TableRow>
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:maxHeight="60dp"
+            android:maxWidth="60dp"
+            android:layout_marginLeft="15dp"
+            android:src="@drawable/full"
+            android:adjustViewBounds="true"
+            />
+
+        <TextView
+            android:layout_column="4"
+            android:text="100%"
+            android:padding="15dp"
+            />
+    </TableRow>
+
+
+    </TableLayout>
