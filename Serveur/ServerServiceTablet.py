@@ -73,6 +73,10 @@ class AssistanceServer(Thread):
     def removeAssistant(self,sid):
         self.mapper.removeAssistant(sid)
 
+    def unfollow(self,sockAssistant,data):
+        socketPatient = self.mapper.getSocketpatientById(data)
+        self.mapper.detachAssistant(sockAssistant,socketPatient)
+
     def follow(self,sockAssistant,data):
         print(self.mapper.getSocketPatient())
         data = data.split("*")
@@ -159,6 +163,11 @@ class AssistanceServer(Thread):
                                 print('follow received')
                                 #"entete$idelTel*prenom*nom"
                                 self.follow(sock,message[1])
+
+                            elif message[0] == "UNFOLLOW":
+                                    # entete$idTel
+                                print('unfollow received')
+                                self.unfollow(sock,message[1])
 
                             elif message[0] == "STOPPROMENADE":
                                 # "entete$idTel"
