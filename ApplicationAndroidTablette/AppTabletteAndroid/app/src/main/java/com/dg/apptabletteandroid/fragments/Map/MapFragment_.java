@@ -1,4 +1,4 @@
-package com.dg.apptabletteandroid.fragments;
+package com.dg.apptabletteandroid.fragments.Map;
 
 import android.Manifest;
 import android.content.Context;
@@ -6,19 +6,18 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
+import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -29,7 +28,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -77,28 +75,6 @@ public class MapFragment_ extends BlankFragment
             listProfilsEnProm.add(entry.getValue());
         }
     }
-    public class CustomAdapter extends ArrayAdapter {
-        public List<View> views = new ArrayList<>();
-
-        public CustomAdapter() {
-            super(getActivity(), R.layout.item_profil_en_promenade, listProfilsEnProm);
-        }
-
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View itemView = convertView;
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            if(itemView == null){
-                itemView = inflater.inflate(R.layout.item_profil_en_promenade, parent, false);
-            }
-            View view = itemView.findViewById(R.id.details);
-            views.add(view);
-            return itemView;
-        }
-    }
-
 
 
     @Override
@@ -112,16 +88,21 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
         //list
-        final CustomAdapter customAdapter = new CustomAdapter();
+        final AdapterListingMap customAdapter = new AdapterListingMap(getActivity()
+                ,R.layout.item_profil_en_promenade
+                ,new ArrayList<>(profilsAffiches.keySet()));
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 View view1 = customAdapter.views.get(i);
-                if(view1.getVisibility() == View.VISIBLE){
+                if(view1.getVisibility() == View.VISIBLE)
+                {
                     customAdapter.views.get(i).setVisibility(View.GONE);
-                }else {
+                }
+                else
+                {
                     customAdapter.views.get(i).setVisibility(View.VISIBLE);
                 }
             }
@@ -218,8 +199,17 @@ public class MapFragment_ extends BlankFragment
         Log.d("AAA", "BACKPressed Map");
     }
 
+    // mise à jour de la listeView
+    public void refreshListe()
+    {
+        final AdapterListingMap customAdapter = new AdapterListingMap(getActivity()
+                ,R.layout.item_profil_en_promenade
+                ,new ArrayList<>(profilsAffiches.keySet()));
+        listView.setAdapter(customAdapter);
+    }
+
     // Met à jour la map
-    public void refresh()
+    public void refreshMap()
     {
         ProfilsManager profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
         Set<Profil> allProfilsAffiches = profilsAffiches.keySet();
@@ -244,6 +234,8 @@ public class MapFragment_ extends BlankFragment
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
             profilsAffiches.put(profil,marker);
         }
+
+        refreshListe();
     }
 
     // ajout ou mise à jour du marker d'un profil
@@ -253,6 +245,7 @@ public class MapFragment_ extends BlankFragment
         if ((profilsAffiches.get(profil) == null)){
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
             profilsAffiches.put(profil, marker);
+            refreshListe();
         }else{
             Marker marker = profilsAffiches.get(profil);
             marker.setPosition(latLng);
@@ -267,9 +260,11 @@ public class MapFragment_ extends BlankFragment
         {
             profilsAffiches.get(profilStopped).remove();
             profilsAffiches.remove(profilStopped);
-            this.refresh();
+            this.refreshMap();
         }
 
     }
+
+
 
 }

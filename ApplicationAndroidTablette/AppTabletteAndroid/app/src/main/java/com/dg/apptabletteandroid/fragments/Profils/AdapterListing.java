@@ -1,4 +1,4 @@
-package com.dg.apptabletteandroid.Profils;
+package com.dg.apptabletteandroid.fragments.Profils;
 
 
 import android.app.Fragment;
@@ -10,14 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
+import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
-import com.dg.apptabletteandroid.fragments.ProfilEdit;
-import com.dg.apptabletteandroid.fragments.ProfilFragment;
+import com.dg.apptabletteandroid.fragments.Profils.ProfilEdit;
+import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 
 import java.util.ArrayList;
 

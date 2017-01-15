@@ -6,12 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,12 +22,9 @@ import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
-import com.dg.apptabletteandroid.fragments.MapFragment_;
-import com.dg.apptabletteandroid.fragments.ProfilFragment;
+import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
+import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {

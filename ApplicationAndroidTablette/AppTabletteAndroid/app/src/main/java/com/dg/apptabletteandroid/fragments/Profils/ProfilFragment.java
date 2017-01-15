@@ -1,4 +1,4 @@
-package com.dg.apptabletteandroid.fragments;
+package com.dg.apptabletteandroid.fragments.Profils;
 
 
 import android.content.Context;
@@ -16,9 +16,10 @@ import android.widget.ListView;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
-import com.dg.apptabletteandroid.Profils.AdapterListing;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
+import com.dg.apptabletteandroid.fragments.BlankFragment;
+import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
 
 
 public class ProfilFragment extends BlankFragment

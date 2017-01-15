@@ -3,10 +3,9 @@ package com.dg.apptabletteandroid;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
-import com.dg.apptabletteandroid.fragments.ProfilFragment;
+import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 
 /**
  * Created by Remy on 14/12/2016.
