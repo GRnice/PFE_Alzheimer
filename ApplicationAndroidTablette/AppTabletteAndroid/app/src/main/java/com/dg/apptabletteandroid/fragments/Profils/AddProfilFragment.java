@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.dg.apptabletteandroid.Daemon.DataKeeper;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -51,6 +52,7 @@ public class AddProfilFragment extends BlankFragment {
         final EditText nom = (EditText) view.findViewById(R.id.editLastNameTextField);
         final Button buttonBarriere = (Button) view.findViewById(R.id.barriereButton);
         Button addButton = (Button) view.findViewById(R.id.buttonModifier);
+        Button cancelButton = (Button) view.findViewById(R.id.buttonAnnulerAjout);
 
         buttonBarriere.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +78,7 @@ public class AddProfilFragment extends BlankFragment {
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {  // traiter le cas du offline .. !! recheck Service Admin a la fin
                 String firstName = prenom.getText().toString();
                 String lastName = nom.getText().toString();
                 Log.d("New", nom + " " + prenom);
@@ -95,10 +97,17 @@ public class AddProfilFragment extends BlankFragment {
                 getActivity().sendBroadcast(intent);
 
                 onBackPressed();  // retourne au fragment list de tous les profil
-
-
             }
         });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+
 
 
         return view;

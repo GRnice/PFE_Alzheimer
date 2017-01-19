@@ -283,13 +283,22 @@ public class ServiceAdmin extends Service
             if(arg1.hasExtra("ADDPROFIL")) {
                 String newProfil = arg1.getStringExtra("ADDPROFIL");
                 Log.d("ADDPROFIL",newProfil);
-                comm.sendMessage("ADDPROFIL$" + newProfil);
+                try {
+                    comm.sendMessage("ADDPROFIL$" + newProfil);
+                }
+                catch (NullPointerException e) {  // Bancal, cas ou la tablette n'est pas connectée, A Definir plus bas !!
+                   // dataKeeper.subscrive(ServiceAdmin.this);
+                  //  dataKeeper.addData(arg1);
+                }
             }
 
             if(arg1.hasExtra("SUPPRPROFIL")) {
                 String rmProfils =  arg1.getStringExtra("SUPPRPROFIL");
                 Log.d("SUPPRPROFIL", rmProfils);
-                comm.sendMessage("SUPPRPROFIL$" + rmProfils);
+                try {
+                    comm.sendMessage("SUPPRPROFIL$" + rmProfils);
+                }
+                catch (NullPointerException e) {} // Bancal
             }
 
             if(arg1.hasExtra("MODIFPROFIL")) {

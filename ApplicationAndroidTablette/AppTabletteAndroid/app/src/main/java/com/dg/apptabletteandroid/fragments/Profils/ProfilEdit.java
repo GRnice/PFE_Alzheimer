@@ -56,6 +56,7 @@ public class ProfilEdit extends BlankFragment {
         final EditText nom = (EditText) view.findViewById(R.id.editLastNameTextField);
         final Button buttonBarriere = (Button) view.findViewById(R.id.barriereButton);
         Button modifButton = (Button) view.findViewById(R.id.buttonModifier);
+        Button cancelModifButton = (Button) view.findViewById(R.id.buttonAnuulerModif);
 
         prenom.setText(this.profilSelected.getPrenom());
         nom.setText(this.profilSelected.getNom());
@@ -109,10 +110,15 @@ public class ProfilEdit extends BlankFragment {
 
                 onBackPressed();  // retourn au fragment précedent (list des profil)
 
-
             }
         });
 
+        cancelModifButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
 
 
