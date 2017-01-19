@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.dg.apptabletteandroid.Main2Activity;
@@ -91,20 +92,35 @@ public class MapFragment_ extends BlankFragment
         final AdapterListingMap customAdapter = new AdapterListingMap(getActivity()
                 ,R.layout.item_profil_en_promenade
                 ,new ArrayList<>(profilsAffiches.keySet()));
+
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                View view1 = customAdapter.views.get(i);
-                if(view1.getVisibility() == View.VISIBLE)
+                View lesDetails = customAdapter.detailsList.get(i);
+                View icons = customAdapter.iconsList.get(i) ;
+                if(lesDetails.getVisibility() == View.GONE)
                 {
-                    customAdapter.views.get(i).setVisibility(View.GONE);
+                    lesDetails.setVisibility(View.VISIBLE);
+                    icons.setVisibility(View.GONE);
+                }else {
+                    lesDetails.setVisibility(View.GONE);
+                    icons.setVisibility(View.VISIBLE);
                 }
-                else
-                {
-                    customAdapter.views.get(i).setVisibility(View.VISIBLE);
+
+                for(View v : customAdapter.detailsList){
+                    if(!v.equals(lesDetails)){
+                        v.setVisibility(View.GONE);
+                    }
                 }
+                for (View v : customAdapter.iconsList){
+                    if(!v.equals(icons)){
+                        v.setVisibility(View.VISIBLE);
+                    }
+                }
+
+
             }
 
         });
@@ -241,6 +257,7 @@ public class MapFragment_ extends BlankFragment
     // ajout ou mise à jour du marker d'un profil
     public void update(Profil profil)
     {
+
         LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
         if ((profilsAffiches.get(profil) == null)){
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
@@ -264,6 +281,8 @@ public class MapFragment_ extends BlankFragment
         }
 
     }
+
+
 
 
 

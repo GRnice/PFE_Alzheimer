@@ -10,14 +10,16 @@
     <ImageView
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    android:maxHeight="60dp"
-    android:maxWidth="60dp"
-    android:layout_marginLeft="5dp"
+    android:maxHeight="50dp"
+    android:maxWidth="50dp"
+        android:layout_marginTop="5dp"
+    android:layout_marginLeft="1dp"
     android:src="@drawable/wifi"
     android:adjustViewBounds="true"
     />
 
     <TextView
+        android:layout_marginTop="12dp"
     android:layout_column="4"
     android:text="Connecté"
     android:layout_marginRight="15dp" />
@@ -33,13 +35,14 @@
             android:layout_column="0"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:maxHeight="60dp"
-            android:maxWidth="60dp"
-            android:layout_marginLeft="5dp"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp"
+            android:layout_marginLeft="0dp"
             android:src="@drawable/clock"
             android:adjustViewBounds="true"
             />
         <TextView
+            android:layout_marginTop="12dp"
             android:layout_column="4"
             android:text="5 minutes"
             android:layout_marginRight="15dp">
@@ -50,9 +53,29 @@
         <ImageView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:maxHeight="60dp"
-            android:maxWidth="60dp"
-            android:layout_marginLeft="15dp"
+            android:maxHeight="40dp"
+            android:maxWidth="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="1dp"
+            android:src="@drawable/pulse"
+            android:adjustViewBounds="true"
+            />
+
+        <TextView
+            android:layout_column="4"
+            android:text="100%"
+            android:padding="15dp"
+            android:layout_marginTop="0dp"
+            />
+    </TableRow>
+    <TableRow>
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:maxHeight="40dp"
+            android:maxWidth="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="1dp"
             android:src="@drawable/full"
             android:adjustViewBounds="true"
             />
@@ -61,8 +84,8 @@
             android:layout_column="4"
             android:text="100%"
             android:padding="15dp"
+            android:layout_marginTop="0dp"
             />
     </TableRow>
-
 
     </TableLayout>
