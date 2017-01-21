@@ -30,6 +30,10 @@ import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
 
@@ -192,14 +196,40 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         unregisterReceiver(serviceReceiver);
     }
 
-    public void addProfilFollowed(Profil p)
+    public void followProfil(Profil p)
     {
+        String idTel = profilsManager.findIdTelByProfil(p);
+        if (idTel != null)
+        {
+            Intent intent = new Intent();
+            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+            intent.putExtra("FOLLOW_SESSION","");
+            intent.putExtra("IDTEL",idTel);
+            sendBroadcast(intent);
+        }
+        else
+        {
+            throw new RuntimeException("profil: "+p.makeSignature()+" has not a idTel");
+        }
+
 
     }
 
-    public void removeProfilFollowed(Profil p)
+    public void unfollowProfil(Profil p)
     {
-
+        String idTel = profilsManager.findIdTelByProfil(p);
+        if (idTel != null)
+        {
+            Intent intent = new Intent();
+            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+            intent.putExtra("UNFOLLOW_SESSION","");
+            intent.putExtra("IDTEL",idTel);
+            sendBroadcast(intent);
+        }
+        else
+        {
+            throw new RuntimeException("profil: "+p.makeSignature()+" has not a idTel");
+        }
     }
 
     public void drawMarkers()
@@ -269,12 +299,18 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 double longitude = Double.parseDouble(parametres[1]);
                 double latitude = Double.parseDouble(parametres[2]);
                 Profil profil = profilsManager.getProfilOnPromenade().get(idTel);
+                if (profil == null)
+                {
+                    return; // si un update d'un profil est recu avant une synchro, ne pas en tenir compte sinon NullPtrException.
+                }
+
                 Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));
                 profil.setLongitude(longitude);
                 profil.setLatitude(latitude);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
+                    Log.e(String.valueOf(profil == null),"CC");
                     mapFragment_.update(profil);
                 }
 
@@ -327,7 +363,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
             }
 
-            else if(arg1.hasExtra("RMPROFIL")) { // nom*prenom
+            else if(arg1.hasExtra("RMPROFIL"))
+            { // nom*prenom
                 String[] params = arg1.getStringArrayExtra("RMPROFIL");
                 String nom = params[0];
                 String prenom = params[1];

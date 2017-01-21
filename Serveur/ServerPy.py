@@ -15,6 +15,9 @@ lockMap = RLock()
 
 class Tracker: ## Classe representant un tracker
     def __init__(self):
+        self.reset()
+
+    def reset(self):
         self.id = None
         self.nom = None
         self.prenom = None
@@ -27,16 +30,60 @@ class Tracker: ## Classe representant un tracker
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
 
+    def startPromenade(self,nom,prenom):
+        if self.etat == 1:
+            self.etat = 2
+            self.nom = nom
+            self.prenom = prenom
+            return True
 
-    def reset(self):
-        self.id = None
-        self.nom = None
-        self.prenom = None
-        self.position = tuple()
-        self.etat = 0
-        self.lastEmit = None
-        self.nbFollower = 0
+        if self.etat == 0:
+            raise PermissionError("startPromenade appelé, mais le tracker est anonyme")
 
+        if self.etat == 2:
+            raise PermissionError("startPromenade appelé, mais le tracker est deja suivi")
+
+    def stopPromenade(self):
+        if self.etat == 2:
+            self.etat = 0
+            self.reset()
+            return True
+
+        if self.etat == 1:
+            raise PermissionError("stopPromenade appelé, mais une demande de suivi a été envoyée et attend une réponse")
+
+        if self.etat == 0:
+            raise PermissionError("stopPromenade appelé, mais le tracker est anonyme")
+
+    def startSuiviCalled(self,idTel,lastemit):
+        if self.etat == 0:
+            self.etat = 1
+            self.id = idTel
+            self.lastEmit = lastemit
+            return True
+
+        if self.etat == 1:
+            raise PermissionError("startSuiviCalled appelé , mais le tracker a deja émit une demande de suivi et attend une réponse")
+
+        if self.etat == 2:
+            raise PermissionError("startSuiviCalled appelé , mais le tracker est en cours de promenade")
+    
+
+    def startSuiviAborted(self):
+        if self.etat == 1:
+            self.etat = 0
+            return True
+
+        if self.etat == 0:
+            raise PermissionError("startSuiviAborted appelé , mais aucune demande de suivi n'a été formulée pour ce tracker")
+
+        if self.etat == 2:
+            raise PermissionError("startSuiviAborted appelé , mais le tracker en cours de promenade")
+
+    def updatePosition(self,position,timeupdate):
+        self.position = position
+        self.lastEmit = timeupdate
+        
 
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
@@ -52,13 +99,13 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def addTracker(self,socket):
         with lockMap:
             #print("add tracker")
-            print(socket)
             self.dictSocketPatient[socket] = Tracker()
 
     def delTracker(self,socket):
         with lockMap:
             if socket in self.dictSocketPatient.keys():
                 del self.dictSocketPatient[socket]
+                
 
     def getTracker(self,socket):
         with lockMap:
@@ -97,6 +144,9 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             else:
                 self.dictAssistance[socketAssistant] = [socketPatient]
 
+            tracker = self.getTracker(socketPatient)
+            tracker.nbFollower += 1
+
     def detachAssistant(self,socketPatient,socketAssistant):
         with lockMap:
             if socketAssistant in self.dictAssistance.keys():
@@ -104,7 +154,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 if socketPatient in listeSpatient:
                     index = listeSpatient.index(socketPatient)
                     listeSpatient.pop(index)
-                    self.dictAssistance[socketAssistant] = listeSpatient
+                    tracker = self.getTracker(socketPatient)
+                    tracker.nbFollower -= 1
 
     def addAssistant(self,assistantSock):
         with lockMap:
@@ -128,17 +179,17 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
     def removePatient(self,sockPatient):
         with lockMap:
+            tracker = self.getTracker(sockPatient)
             allAssistants = list(self.getSocketsAssistant())
             for assistantSock in allAssistants:
                 listeSock = self.dictAssistance[assistantSock]
                 if (sockPatient in listeSock):
-                    idTel = self.getTracker(sockPatient).id
                     index = listeSock.index(sockPatient)
                     listeSock.pop(index)
-                    self.dictAssistance[assistantSock] = listeSock
-
-            idTel = self.getTracker(sockPatient).id
-            self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(idTel)+"\r\n")
+                    #self.dictAssistance[assistantSock] = listeSock
+            
+            del self.mapIdSock[tracker.id]
+            self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
 
                     
     def apply(self,commande):
@@ -151,18 +202,16 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         ## STARTSUIVI*IDSMARTPHONE -> associer le socket à l'id smartphone
         ## STOPSUIVI -> indiquer au smartphone d'arreter le suivi
         socket = commande[0]
-        requete = commande[1].rstrip()
+        requete = commande[1]
         requeteArray = requete.split("*")
         entete = requeteArray[0]
 
         if (entete == "STARTSUIVI"):
             idTel = requeteArray[1]
             tracker = self.getTracker(socket)
-            tracker.etat = 1
-            tracker.id = idTel
-            tracker.lastEmit = time.time()
-            self.dictSocketPatient[socket] = tracker
+            tracker.startSuiviCalled(idTel,time.time())
             self.mapIdSock[idTel] = socket
+            
             #print("Demarrage du suivi pour le tel à l'id : ",idTel)
             self.serverAssistant.event("STARTSUIVI",socket,tracker)
             #socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
@@ -172,14 +221,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             longitude = float(requeteArray[1])
             latitude = float(requeteArray[2])
             tracker = self.getTracker(socket)
-            if (tracker == None):
-                # print("Erreur, tracker inconnu")
-                return
-
+            tracker.updatePosition((longitude,latitude),time.time())
             print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
-            tracker.position = (longitude,latitude)
-            tracker.lastEmit = time.time()
-            self.dictSocketPatient[socket] = tracker
             self.serverAssistant.event("POSITION",socket,tracker)
 
             if (not self.watchman.positionIsGood(longitude,latitude)):
@@ -188,7 +231,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
             self.removePatient(socket)
-            tracker.reset()
+            tracker.stopPromenade()
             #print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
@@ -306,7 +349,7 @@ class PatientServer(Thread):
                     try:
                         #In Windows, sometimes when a TCP program closes abruptly,
                         # a "Connection reset by peer" exception will be thrown
-                        data = sock.recv(self.RECV_BUFFER)
+                        data = sock.recv(self.RECV_BUFFER).rstrip()
 
                         if len(data) > 0:
                             with lockPool:
@@ -317,23 +360,36 @@ class PatientServer(Thread):
                             sock.close()
                             with lockMap:
                                 tracker = self.mapper.getTracker(sock)
-                                if (tracker.etat != 2):
+                                if tracker == None:
+                                    pass
+                                
+                                elif (tracker == 2 or tracker == 1):
+                                    print("Socket d'un patient perdu !")
+                                    
+                                if (tracker != None and tracker.etat != 2):
                                     self.mapper.delTracker(sock)
+
+                                
 
          
                      
                     # client disconnected, so remove from socket list
-                    except:
+                    except Exception as err:
+                        print(err)
                         #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                         print("Client (%s) is offline" % sock)
                         sock.close()
                         with lockMap:
                             tracker = self.mapper.getTracker(sock)
-                            if (tracker.etat != 2):
-                                print("suppression d'un socket, il n'est pas à l'etat 2")
+                            if tracker == None:
+                                pass
+                            elif (tracker == 2 or tracker == 1):
+                                    print("Except Socket d'un patient perdu !")
+                                    
+                            if (tracker != None and tracker.etat != 2):
+                                print("Except suppression d'un socket, il n'est pas à l'etat 2")
                                 self.mapper.delTracker(sock)
 
-             
         server_socket.close()
         print("=============SERVEUR OFFLINE=============")
 

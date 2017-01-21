@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 
@@ -24,10 +25,10 @@ import java.util.List;
 public class AdapterListingMap extends ArrayAdapter {
     public static List<View> detailsList = new ArrayList<>();
     public static List<View> iconsList = new ArrayList<>();
-    private Activity act;
+    private Main2Activity act;
     public ArrayList<Profil> profils;
 
-    public AdapterListingMap(Activity context, int resource, ArrayList<Profil> objects) {
+    public AdapterListingMap(Main2Activity context, int resource, ArrayList<Profil> objects) {
         super(context, resource, objects);
         act = context;
         profils=objects;
@@ -51,7 +52,8 @@ public class AdapterListingMap extends ArrayAdapter {
         if(!detailsList.contains(detailView)){
             detailsList.add(detailView);
         }
-        Profil profil = profils.get(position);
+        final Profil profil = profils.get(position);
+        final int positionFinalProfil = position;
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
         ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
@@ -59,11 +61,14 @@ public class AdapterListingMap extends ArrayAdapter {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(v.getTag().equals(false)){
-                    ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.suivre));
+                if(v.getTag().equals(false)) // si on ne suit pas
+                {
+                    act.followProfil(profils.get(positionFinalProfil));
+                    ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre));
                 }
                 else{
-                    ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre));
+                    act.unfollowProfil(profils.get(positionFinalProfil));
+                    ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.suivre));
                 }
                 v.setTag(!(boolean)v.getTag());
             }
