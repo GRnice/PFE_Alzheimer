@@ -39,13 +39,12 @@ public class AdapterListingMap extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) super.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.item_profil_en_promenade, parent, false);
 
-        /*View rowView = convertView;
+        View rowView = convertView;
         if(rowView == null)
         {
             rowView = inflater.inflate(R.layout.item_profil_en_promenade, parent, false);
-        }*/
+        }
 
         View detailView = rowView.findViewById(R.id.details);
         View iconView = rowView.findViewById(R.id.icons);
