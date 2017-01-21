@@ -50,6 +50,8 @@ class AssistanceServer(Thread):
             if (assistant != socketAssistant):
                 assistant.send(messageString.encode("utf-8"))
 
+
+
     # traite les evenements venants de server.py
     def event(self, evt, socket, tracker):
         if (evt == "STARTSUIVI"):
@@ -60,6 +62,10 @@ class AssistanceServer(Thread):
             print("(update) TRANSMISSION DE LA POSITION DE ",tracker.id)
             self.broadcast("UPDATE$"+str(tracker.id) + "*" + str(tracker.position[0]) + "*" +
                                        str(tracker.position[1])+"\r\n")
+
+        elif (evt == "ALERT-POSITION"):
+            print("(alerte) HORS ZONE",tracker.id)
+            self.broadcast("ALERT$HORSZONE_"+tracker.id+"\r\n")
 
     # ajout d'un assistant
     def addAssistant(self,sockAssistant):

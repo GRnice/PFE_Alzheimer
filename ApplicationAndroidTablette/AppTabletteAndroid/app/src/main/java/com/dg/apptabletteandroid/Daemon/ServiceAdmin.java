@@ -80,6 +80,7 @@ public class ServiceAdmin extends Service {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(serverReceiver);
         unregisterReceiver(activityReceiver);
         unregisterReceiver(networkReceiver);
@@ -126,6 +127,26 @@ public class ServiceAdmin extends Service {
                     }
 
                     break;
+                }
+
+                case "ALERT":
+                {
+                    String[] dataParams = content.split("\\_");
+                    String typeAlert = dataParams[0];
+                    String idTel = dataParams[1];
+                    if (! alertManager.listen(idTel))
+                    {
+                        break;
+                    }
+                    Log.e("ARGSALERT",typeAlert);
+
+                    switch (typeAlert)
+                    {
+                        case "HORSZONE":
+                        {
+                            alertManager.notifHorsZone(getBaseContext(),idTel);
+                        }
+                    }
                 }
 
                 case "SYNCH": {
@@ -345,7 +366,8 @@ public class ServiceAdmin extends Service {
                         intentForActivity.setAction(Main2Activity.ACTION_FROM_SERVICE);
                         intentForActivity.putExtra("TABNOTCO", "TABNOTCO");
 
-                        if (activity_is_on_background) {
+                        if (activity_is_on_background)
+                        {
                             dataKeeper.addData(intentForActivity);
                         } else {
                             sendBroadcast(intentForActivity);  // A TEST
@@ -358,7 +380,8 @@ public class ServiceAdmin extends Service {
                 } else if (status == NetworkUtil.NETWORK_STATUS_MOBILE || status == NetworkUtil.NETWORK_STATUS_WIFI) {
                     Log.e("ABAB", "connected");
                     connected = true;
-                    if (connected) {
+                    if (connected)
+                    {
                         Toast ts = Toast.makeText(context, "Connecté à Internet", Toast.LENGTH_SHORT);
                         ts.show();
                         // relancer le socket

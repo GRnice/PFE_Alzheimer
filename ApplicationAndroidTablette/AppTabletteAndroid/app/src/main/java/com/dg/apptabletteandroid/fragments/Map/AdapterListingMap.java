@@ -37,7 +37,8 @@ public class AdapterListingMap extends ArrayAdapter {
     }
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         LayoutInflater inflater = (LayoutInflater) super.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View rowView = convertView;
@@ -58,16 +59,24 @@ public class AdapterListingMap extends ArrayAdapter {
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
         ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
+        if (profil.estSuiviParMoi())
+        {
+            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
+        }
+        else
+        {
+            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
+        }
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(profil.estSuiviParMoi()) // si je le suis
                 {
-                    act.unfollowProfil(profil);
+                    act.unfollowProfil(profil); // alors j'afficherai suivre puisque à cet instant je ne suis pas
                     ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.suivre));
                 }
                 else{
-                    act.followProfil(profil);
+                    act.followProfil(profil); // et inversement
                     ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre));
                 }
                 profil.setEstSuiviParMoi(!profil.estSuiviParMoi());

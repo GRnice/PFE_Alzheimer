@@ -227,6 +227,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
             if (not self.watchman.positionIsGood(longitude,latitude)):
                 print("WARNING HORS ZONE /!\/!\\")
+                self.serverAssistant.event("ALERT-POSITION",socket,tracker)
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)

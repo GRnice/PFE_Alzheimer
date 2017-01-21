@@ -47,6 +47,11 @@ public class AlertManager
         }
     }
 
+    public boolean listen(String idTel)
+    {
+        return (listOfIdTelOnListening.contains(idTel));
+    }
+
     public void notifNewSession(Context context,String idTel)
     {
         Intent intent = new Intent(context,Main2Activity.class);
@@ -76,4 +81,31 @@ public class AlertManager
     }
 
 
+    public void notifHorsZone(Context context,String idTel)
+    {
+        Intent intent = new Intent(context,Main2Activity.class);
+        intent.putExtra("WAKE_UP","ALERTE");
+        intent.putExtra("IDTEL",idTel);
+
+        PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
+        NotificationCompat.Builder mBuild =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_report_problem_white)
+                        .setContentTitle("ALERTE - HORS ZONE")
+                        .setContentIntent(pintent)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setContentText("Hors zone detecté ! cliquez pour désactiver l'alerte");
+
+        Notification notif = mBuild.build();
+
+        notif.flags |= Notification.FLAG_AUTO_CANCEL;
+
+
+        // Sets an ID for the notification
+        int mNotificationId = 1;
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, notif);
+    }
 }

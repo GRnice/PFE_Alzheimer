@@ -339,6 +339,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String prenom = params[2];
                 Log.e("synch",nom+" "+prenom);
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
+                profilSelected.setEstSuiviParMoi(false);
                 profilsManager.addProfilOnPromenade(idTel,profilSelected);
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
