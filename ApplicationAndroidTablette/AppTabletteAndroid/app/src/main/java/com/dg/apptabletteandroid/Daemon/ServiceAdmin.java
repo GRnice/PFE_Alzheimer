@@ -3,17 +3,24 @@ package com.dg.apptabletteandroid.Daemon;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.AlertManager;
 import com.dg.apptabletteandroid.Communication.CommunicationServer;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.NetworkUtil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
+import com.dg.apptabletteandroid.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,11 +29,11 @@ import java.util.Queue;
 /**
  * Ce service recoit tous les messages provenants du serveur
  */
-public class ServiceAdmin extends Service
-{
+public class ServiceAdmin extends Service {
     CommunicationServer comm; // le thread qui lancera un socket dédié à l'écoute du serveur
     ServerReceiver serverReceiver; // ce receiver attrapera tous les messages provenants du serveur
     ActivityReceiver activityReceiver; // ce receiver recevra tous les messages provenants de l'activité
+    NetworkChangeReceiver networkReceiver; // ce receiver recevra l'etat de la connection de la tablette
     AlertManager alertManager; // le manager des alertes
     DataKeeper dataKeeper; // stocke tous les messages recus en attendant que l'activite revienne en premier plan
 
@@ -35,12 +42,11 @@ public class ServiceAdmin extends Service
     public static String ACTION_FROM_SERVER = "action.from.server";
     public static String ACTION_FROM_ACTIVITY = "action.from.activity";
 
-    public ServiceAdmin()
-    {
+    public ServiceAdmin() {
     }
 
     @Override
-    public int onStartCommand(Intent intent,int flags,int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (comm == null) {
             comm = new CommunicationServer();
@@ -61,23 +67,27 @@ public class ServiceAdmin extends Service
         activityReceiver = new ActivityReceiver();
         intentFilter = new IntentFilter();
         intentFilter.addAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-        registerReceiver(activityReceiver,intentFilter);
+        registerReceiver(activityReceiver, intentFilter);
 
-        Log.e("CHECK SERVICE","RUN");
+        networkReceiver = new NetworkChangeReceiver();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkReceiver, intentFilter);
+
+        Log.e("CHECK SERVICE", "RUN");
         return START_NOT_STICKY;
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         unregisterReceiver(serverReceiver);
         unregisterReceiver(activityReceiver);
+        unregisterReceiver(networkReceiver);
         comm.interrupt(); // arret du socket
     }
 
     @Override
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -88,12 +98,10 @@ public class ServiceAdmin extends Service
      * NEWSESSION
      * UPDATE
      */
-    private class ServerReceiver extends BroadcastReceiver
-    {
+    private class ServerReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context arg0, Intent arg1)
-        {
+        public void onReceive(Context arg0, Intent arg1) {
             /**
              * Parsing du message provenant du serveur
              */
@@ -102,38 +110,32 @@ public class ServiceAdmin extends Service
 
             String[] tabMessage = message.split("\\$"); // syntaxe d'un message -> "Entete$contenu"
             String header = tabMessage[0]; // l'entete
-            Log.e("HEADER",header);
-            Log.e("ALL",message);
+            Log.e("HEADER", header);
+            Log.e("ALL", message);
             String content = tabMessage[1];
-            switch(header)
-            {
-                case "PROFILES":
-                {
-                    Log.e("ALL_PROFILES",content);
+            switch (header) {
+                case "PROFILES": {
+                    Log.e("ALL_PROFILES", content);
                     Intent intent = new Intent();
                     intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                    intent.putExtra("ALL_PROFILES",content);
-                    if (activity_is_on_background)
-                    {
+                    intent.putExtra("ALL_PROFILES", content);
+                    if (activity_is_on_background) {
                         dataKeeper.addData(intent);
-                    }
-                    else
-                    {
+                    } else {
                         sendBroadcast(intent);
                     }
 
                     break;
                 }
 
-                case "SYNCH":
-                {
+                case "SYNCH": {
 
                     String[] dataParams = content.split("\\_");
                     String typeSynch = dataParams[0];
 
-                    Log.e("ARGSSYNCH",dataParams[1]);
+                    Log.e("ARGSSYNCH", dataParams[1]);
 
-                    switch(typeSynch) {
+                    switch (typeSynch) {
                         // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
                         case "NWPROMENADE": {
                             String[] args = dataParams[1].split("\\*");
@@ -192,19 +194,15 @@ public class ServiceAdmin extends Service
                         }
 
                         // SYNCH syntaxe -> SYNCH$STOPPROMENADE_idTel
-                        case "STOPPROMENADE":
-                        {
+                        case "STOPPROMENADE": {
                             alertManager.removeListening(dataParams[1]); // params est idTel ici
-                            Log.e("STOP PROMENADE",dataParams[1]); // idtel
+                            Log.e("STOP PROMENADE", dataParams[1]); // idtel
                             Intent intent = new Intent();
                             intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("STOPPROMENADE",dataParams[1]);
-                            if (activity_is_on_background)
-                            {
+                            intent.putExtra("STOPPROMENADE", dataParams[1]);
+                            if (activity_is_on_background) {
                                 dataKeeper.addData(intent);
-                            }
-                            else
-                            {
+                            } else {
                                 sendBroadcast(intent);
                             }
                             break;
@@ -214,13 +212,11 @@ public class ServiceAdmin extends Service
                     break;
                 }
 
-                case "UPDATE":
-                {
+                case "UPDATE": {
                     // METTRE A JOUR UN PROFIL SUIVI
                     // UPDATE$idTel*longitude*latitude
-                    Log.e("UPDATE",content);
-                    if (! activity_is_on_background)
-                    {
+                    Log.e("UPDATE", content);
+                    if (!activity_is_on_background) {
                         Intent intent = new Intent();
                         intent.putExtra("UPDATE", content);
                         intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
@@ -233,11 +229,10 @@ public class ServiceAdmin extends Service
                     break;
                 }
 
-                case "NEWSESSION":
-                {
+                case "NEWSESSION": {
                     // SELECTIONNER UN PROFIL
-                    Log.e("NEWSESSION",content);
-                    alertManager.notifNewSession(getBaseContext(),content);
+                    Log.e("NEWSESSION", content);
+                    alertManager.notifNewSession(getBaseContext(), content);
                     break;
                 }
             }
@@ -248,60 +243,61 @@ public class ServiceAdmin extends Service
     /**
      * ActivityReceiver, recoit les messages venants de l'activite
      */
-    private class ActivityReceiver extends BroadcastReceiver
-    {
+    private class ActivityReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context arg0,Intent arg1)
-        {
+        public void onReceive(Context arg0, Intent arg1) {
 
-            if (arg1.hasExtra("ACTIVITY_BACKGROUND"))
-            {
+            if (arg1.hasExtra("ACTIVITY_BACKGROUND")) {
 
                 activity_is_on_background = arg1.getStringExtra("ACTIVITY_BACKGROUND").equals("BACKGROUND");
 
-                if (activity_is_on_background)
-                {
+                if (activity_is_on_background) {
                     dataKeeper.subscrive(ServiceAdmin.this);
 
-                }
-                else
-                {
+                } else {
                     dataKeeper.publish(ServiceAdmin.this);
                 }
             }
 
-            if (arg1.hasExtra("FOLLOW_NEW_SESSION"))
-            {
+            if (arg1.hasExtra("FOLLOW_NEW_SESSION")) {
                 String idTel = arg1.getStringExtra("IDTEL");
                 String prenom = arg1.getStringExtra("PRENOM");
                 String nom = arg1.getStringExtra("NOM");
-                Log.e("FOLLOW_NEW_SESSION",idTel);
-                comm.sendMessage("FOLLOW$"+idTel+"*"+prenom+"*"+nom);
+                Log.e("FOLLOW_NEW_SESSION", idTel);
+                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom);
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 
-            if(arg1.hasExtra("ADDPROFIL")) {
+            if (arg1.hasExtra("ADDPROFIL")) {
+
+                /*if(networkReceiver != null && networkReceiver.connected) {
+                    String newProfil = arg1.getStringExtra("ADDPROFIL");
+                    Log.d("ADDPROFIL", newProfil);
+                    comm.sendMessage("ADDPROFIL$" + newProfil);
+                } else {
+                } */
+
                 String newProfil = arg1.getStringExtra("ADDPROFIL");
-                Log.d("ADDPROFIL",newProfil);
+                Log.d("ADDPROFIL", newProfil);
                 try {
                     comm.sendMessage("ADDPROFIL$" + newProfil);
-                }
-                catch (NullPointerException e) {  // Bancal, cas ou la tablette n'est pas connectée, A Definir plus bas !!
-                   // dataKeeper.subscrive(ServiceAdmin.this);
-                  //  dataKeeper.addData(arg1);
+                } catch (NullPointerException e) {  // Bancal, cas ou la tablette n'est pas connectée, A Definir plus bas !!
+                   // Log.e("connected ", dataKeeper.)
+                    // dataKeeper.subscrive(ServiceAdmin.this);
+                    //  dataKeeper.addData(arg1);
                 }
             }
 
-            if(arg1.hasExtra("SUPPRPROFIL")) {
-                String rmProfils =  arg1.getStringExtra("SUPPRPROFIL");
+            if (arg1.hasExtra("SUPPRPROFIL")) {
+                String rmProfils = arg1.getStringExtra("SUPPRPROFIL");
                 Log.d("SUPPRPROFIL", rmProfils);
                 try {
                     comm.sendMessage("SUPPRPROFIL$" + rmProfils);
-                }
-                catch (NullPointerException e) {} // Bancal
+                } catch (NullPointerException e) {
+                } // Bancal
             }
 
-            if(arg1.hasExtra("MODIFPROFIL")) {
+            if (arg1.hasExtra("MODIFPROFIL")) {
                 String modifiedProfil = arg1.getStringExtra("MODIFPROFIL");  // ancienProfil*nouveauProfil
                 Log.d("MODIFPROFIL", modifiedProfil);
                 comm.sendMessage("MODIFPROFIL$" + modifiedProfil);
@@ -317,29 +313,47 @@ public class ServiceAdmin extends Service
     public class NetworkChangeReceiver extends BroadcastReceiver {
 
         public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
-        private boolean connected = true;
+        public boolean connected = true;
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
             int status = NetworkUtil.getConnectivityStatusString(context);
-            if (CONNECTIVITY_CHANGED.equals(intent.getAction()))
-            {
-                if(status==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED)
-                {
-                    if (connected)
-                    {
+            if (CONNECTIVITY_CHANGED.equals(intent.getAction())) {
+                if (status == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                    Log.e("ABAB", "not connected");
+                    connected = false;
+                    if (!connected) {
                         // couper le socket
+
+
+                        // notify activity
+                        Intent intentForActivity = new Intent();
+                        intentForActivity.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                        intentForActivity.putExtra("TABNOTCO", "TABNOTCO");
+
+                        if (activity_is_on_background) {
+                            dataKeeper.addData(intentForActivity);
+                        } else {
+                            sendBroadcast(intentForActivity);  // A TEST
+                        }
+
+                     //   Toast ts = Toast.makeText(context, "DéConnecté", Toast.LENGTH_SHORT);
+                    //    ts.show();
                     }
 
-                }
-                else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status== NetworkUtil.NETWORK_STATUS_WIFI)
-                {
-                    if(!connected)
-                    {
+                } else if (status == NetworkUtil.NETWORK_STATUS_MOBILE || status == NetworkUtil.NETWORK_STATUS_WIFI) {
+                    Log.e("ABAB", "connected");
+                    connected = true;
+                    if (connected) {
+                        Toast ts = Toast.makeText(context, "Connecté à Internet", Toast.LENGTH_SHORT);
+                        ts.show();
                         // relancer le socket
                     }
                 }
             }
         }
     }
+
+
 }
+

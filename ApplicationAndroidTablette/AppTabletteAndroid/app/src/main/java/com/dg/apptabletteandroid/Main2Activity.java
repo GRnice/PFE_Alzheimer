@@ -1,13 +1,17 @@
 package com.dg.apptabletteandroid;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -212,6 +216,32 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         fragmentManager.pushFragment(frag,Main2Activity.this);
     }
 
+    public void displayDialogAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Main2Activity.this);
+        builder.setMessage("Vous n'êtes pas connecté à Internet\n" +
+                "Connectez vous !");
+        builder.setCancelable(true);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //dialog.dismiss();
+                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                startActivity(intent);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog  alert = builder.create();
+        alert.show();
+        alert.getWindow().setLayout(350, 170);
+    }
+
     /**
      * ServiceReceiver -> recoit les messages du service
      */
@@ -274,6 +304,12 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
                 profilsManager.addProfilOnPromenade(idTel,profilSelected);
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
+            }
+
+            // notif recu du service si la tablette est pas connecté a Internet
+            else if(arg1.hasExtra("TABNOTCO")) {
+                Log.e("ABAB", "Activity received signal");
+                displayDialogAlert();
             }
 
             else if(arg1.hasExtra("NWPROFIL")) {  //NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
