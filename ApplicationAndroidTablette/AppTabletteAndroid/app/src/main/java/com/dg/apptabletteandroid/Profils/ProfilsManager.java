@@ -1,7 +1,11 @@
 package com.dg.apptabletteandroid.Profils;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +53,6 @@ public class ProfilsManager
         editor.putStringSet("profils",ensembleProfils);
         editor.commit();
     }
-
 
 
 
@@ -122,6 +125,24 @@ public class ProfilsManager
         editor.remove("profils");
         editor.putStringSet("profils",newEnsembleProfils);
         editor.commit();
+    }
+
+    @Nullable
+    public String findIdTelByProfil(Profil p)
+    {
+        HashMap<String,Profil> allProfils = this.getProfilOnPromenade();
+        Set<String> allIdTel = allProfils.keySet();
+        Iterator<String> allIdTelIter = allIdTel.iterator();
+        while (allIdTelIter.hasNext())
+        {
+            String idTel = allIdTelIter.next();
+            if (allProfils.get(idTel).equals(p))
+            {
+                // si p == allProfils.get(idTel), si le profil p à suivre est egal au profil, alors idTel est sa clé
+                return idTel;
+            }
+        }
+        return null;
     }
 
     public HashMap<String, Profil> getProfilOnPromenade() {

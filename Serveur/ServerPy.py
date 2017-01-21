@@ -33,6 +33,8 @@ class Tracker: ## Classe representant un tracker
     def startPromenade(self,nom,prenom):
         if self.etat == 1:
             self.etat = 2
+            self.nom = nom
+            self.prenom = prenom
             return True
 
         if self.etat == 0:
@@ -152,8 +154,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 if socketPatient in listeSpatient:
                     index = listeSpatient.index(socketPatient)
                     listeSpatient.pop(index)
-                    self.dictAssistance[socketAssistant] = listeSpatient
-                    tracker = self.mapper.getTracker(socketPatient)
+                    tracker = self.getTracker(socketPatient)
                     tracker.nbFollower -= 1
 
     def addAssistant(self,assistantSock):

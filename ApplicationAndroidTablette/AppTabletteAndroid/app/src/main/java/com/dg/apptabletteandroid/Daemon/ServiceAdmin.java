@@ -280,6 +280,22 @@ public class ServiceAdmin extends Service
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 
+            if (arg1.hasExtra("FOLLOW_SESSION"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Log.e("FOLLOW_SESSION",idTel);
+                comm.sendMessage("FOLLOW$"+idTel);
+                alertManager.addListening(idTel);
+            }
+
+            if (arg1.hasExtra("UNFOLLOW_SESSION"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Log.e("UNFOLLOW_SESSION",idTel);
+                comm.sendMessage("UNFOLLOW$"+idTel);
+                alertManager.removeListening(idTel);
+            }
+
             if(arg1.hasExtra("ADDPROFIL")) {
                 String newProfil = arg1.getStringExtra("ADDPROFIL");
                 Log.d("ADDPROFIL",newProfil);

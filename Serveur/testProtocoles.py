@@ -226,6 +226,100 @@ class TestProtocoleServeurPatient(unittest.TestCase):
 ##        newSocket.close()
 ##        assistant1.close()
 ##        print("END SCENARIO 4")
+
+
+    def testFOLLOWandUNFOLLOW(self):
+        #
+        #   deux patients se connectent
+        #   un assistant se connecte et configure les deux promenades
+        #   un assistant se connecte et FOLLOW sock1
+        #   puis il UNFOLLOW
+        #   puis on termine toutes les sessions.
+        
+        print("TEST FOLLOW ET UNFOLLOW")
+
+        sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock1.connect((hote, port))
+
+        sock2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock2.connect((hote, port))
+        time.sleep(1)
+        
+        assistant1 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        assistant1.connect((hote,portAssistance))
+        allprofils = assistant1.recv(4096).rstrip()
+ 
+        sock1.send("STARTSUIVI*123456789\r\n".encode("utf-8"))       
+        sock2.send("STARTSUIVI*789555622\r\n".encode("utf-8"))
+        time.sleep(1)
+        messageStartSuivi1 = assistant1.recv(4096).rstrip().decode("utf-8")
+        
+        self.assertEqual(messageStartSuivi1,"NEWSESSION$123456789\r\nNEWSESSION$789555622")
+        assistant1.send("FOLLOW$123456789*remy*giangrasso\r\n".encode("utf-8"))
+        time.sleep(0.5)
+        assistant1.send("FOLLOW$789555622*nicolas*giangrasso\r\n".encode("utf-8"))
+        
+        messageServeur1 = (sock1.recv(4096)).rstrip()
+        messageServeur2 = (sock2.recv(4096)).rstrip()
+        self.assertEqual(messageServeur1.decode("utf-8"),"OKPROMENADE")
+        self.assertEqual(messageServeur2.decode("utf-8"),"OKPROMENADE")
+
+        
+        assistant2 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        assistant2.connect((hote,portAssistance))
+        allprofils = assistant2.recv(4096).decode('utf-8').rstrip()
+        time.sleep(1)
+        synchPromenades = assistant2.recv(4096).decode('utf-8').rstrip()
+
+        assistant2.send("FOLLOW$123456789\r\n".encode("utf-8"))
+
+        allSocketAssistantCoteServeur = list(self.serveAssistant.mapper.dictAssistance.keys())
+        sockPatients1 = self.serveAssistant.mapper.dictAssistance[allSocketAssistantCoteServeur[0]]
+        sockPatients2 = self.serveAssistant.mapper.dictAssistance[allSocketAssistantCoteServeur[1]]
+        time.sleep(1)
+        print("YEP",len(sockPatients1),len(sockPatients2))
+        if ( (len(sockPatients1) == 2 and len(sockPatients2) == 1) or (len(sockPatients1) == 1 and len(sockPatients2) == 2) ):
+            print("GOOD")
+            self.assertTrue(True)
+        else:
+            self.assertTrue(False)
+            
+        assistant2.send("UNFOLLOW$123456789\r\n".encode("utf-8"))
+
+        time.sleep(2)
+        allSocketAssistantCoteServeur = list(self.serveAssistant.mapper.dictAssistance.keys())
+        sockPatients1 = self.serveAssistant.mapper.dictAssistance[allSocketAssistantCoteServeur[0]]
+        sockPatients2 = self.serveAssistant.mapper.dictAssistance[allSocketAssistantCoteServeur[1]]
+        print("YEP",len(sockPatients1),len(sockPatients2))
+        if ( (len(sockPatients1) == 2 and len(sockPatients2) == 0) or (len(sockPatients1) == 0 and len(sockPatients2) == 2) ):
+            print("GOOD")
+            self.assertTrue(True)
+        else:
+            self.assertTrue(False)
+        
+        sock1.send("STOPSUIVI\r\n".encode("utf-8"))
+        messageStopSuivi = assistant1.recv(4096).rstrip().decode("utf-8")
+        self.assertTrue(messageStopSuivi == "SYNCH$STOPPROMENADE_123456789")
+        sock1.recv(4096)
+        
+        sock2.send("STOPSUIVI\r\n".encode("utf-8"))
+        messageStopSuivi = assistant1.recv(4096).decode("utf-8").rstrip()
+        self.assertEqual(messageStopSuivi,"SYNCH$STOPPROMENADE_789555622")
+        sock2.recv(4096)
+        
+        sock1.close()
+        sock2.close()
+        
+        time.sleep(1)
+        self.assertEqual(0,len(self.servePatient.mapper.dictSocketPatient))
+        self.assertEqual(0,len(self.servePatient.mapper.mapIdSock))
+        self.assertEqual(0,len(self.servePatient.mapper.dictAssistance[list(self.servePatient.mapper.dictAssistance.keys())[0]]))
+        
+        assistant1.close()
+        time.sleep(1)
+        assistant2.close()
+        time.sleep(1)
+        print("END SCENARIO FOLLOW ET UNFOLLOW")
         
     
         

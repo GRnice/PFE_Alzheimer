@@ -26,6 +26,10 @@ import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
 
@@ -188,14 +192,40 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         unregisterReceiver(serviceReceiver);
     }
 
-    public void addProfilFollowed(Profil p)
+    public void followProfil(Profil p)
     {
+        String idTel = profilsManager.findIdTelByProfil(p);
+        if (idTel != null)
+        {
+            Intent intent = new Intent();
+            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+            intent.putExtra("FOLLOW_SESSION","");
+            intent.putExtra("IDTEL",idTel);
+            sendBroadcast(intent);
+        }
+        else
+        {
+            throw new RuntimeException("profil: "+p.makeSignature()+" has not a idTel");
+        }
+
 
     }
 
-    public void removeProfilFollowed(Profil p)
+    public void unfollowProfil(Profil p)
     {
-
+        String idTel = profilsManager.findIdTelByProfil(p);
+        if (idTel != null)
+        {
+            Intent intent = new Intent();
+            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+            intent.putExtra("UNFOLLOW_SESSION","");
+            intent.putExtra("IDTEL",idTel);
+            sendBroadcast(intent);
+        }
+        else
+        {
+            throw new RuntimeException("profil: "+p.makeSignature()+" has not a idTel");
+        }
     }
 
     public void drawMarkers()
@@ -241,7 +271,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profil = profilsManager.getProfilOnPromenade().get(idTel);
                 if (profil == null)
                 {
-                    return;
+                    return; // si un update d'un profil est recu avant une synchro, ne pas en tenir compte sinon NullPtrException.
                 }
 
                 Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));

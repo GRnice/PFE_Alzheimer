@@ -89,7 +89,7 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
         //list
-        final AdapterListingMap customAdapter = new AdapterListingMap(getActivity()
+        final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
                 ,R.layout.item_profil_en_promenade
                 ,new ArrayList<>(profilsAffiches.keySet()));
 
@@ -110,7 +110,8 @@ public class MapFragment_ extends BlankFragment
                 }
 
                 for(View v : customAdapter.detailsList){
-                    if(!v.equals(lesDetails)){
+                    if(!v.equals(lesDetails))
+                    {
                         v.setVisibility(View.GONE);
                     }
                 }
@@ -218,7 +219,7 @@ public class MapFragment_ extends BlankFragment
     // mise à jour de la listeView
     public void refreshListe()
     {
-        final AdapterListingMap customAdapter = new AdapterListingMap(getActivity()
+        final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity)getActivity()
                 ,R.layout.item_profil_en_promenade
                 ,new ArrayList<>(profilsAffiches.keySet()));
         listView.setAdapter(customAdapter);

@@ -71,7 +71,6 @@ class AssistanceServer(Thread):
             tracker = self.mapper.getTracker(sockPatient)
             if tracker.etat == 2: # si le tracker courant a recu un OKPROMENADE
                 message = "SYNCH$NWPROMENADE_"+tracker.id+"*"+tracker.nom+"*"+tracker.prenom+"\r\n"
-                print("addAssistant, message --> ",message)
                 sockAssistant.send(message.encode('utf-8'))
                 
     # retrait d'un assistant
@@ -80,19 +79,20 @@ class AssistanceServer(Thread):
 
     # arret du suivi d'un assistant(sockAssistant) à un patient ayant comme id (idTel)
     def unfollow(self,sockAssistant,idTelPatient):
-        socketPatient = self.mapper.getSocketpatientById(idTelPatient)
-        self.mapper.detachAssistant(sockAssistant,socketPatient)
+        socketPatient = self.mapper.getSocketPatientById(idTelPatient)
+        self.mapper.detachAssistant(socketPatient,sockAssistant)
 
     # abonnement d'un assistant à un la promenade d'un patient
     # data contient soit idTel -> ce qui implique que l'assistant s'abonne à une promenade deja configurée
     # soit idTel*prenom*nom -> configuration d'une promenade, cet assistant s'abonne egalement au suivi de ce patient
     def follow(self,sockAssistant,data):
-        print(self.mapper.getSocketPatient())
         data = data.split("*")
+        
         if (len(data) == 1):
             # si FOLLOW$idTel
             idTel = data[0]
-            self.mapper.attachAssistant(sockPatient,sockAssistant)
+            socketPatient = self.mapper.getSocketPatientById(idTel)
+            self.mapper.attachAssistant(socketPatient,sockAssistant)
 
         elif (len(data) == 3):
             # si FOLLOW$idTel*prenom*nom
@@ -137,16 +137,15 @@ class AssistanceServer(Thread):
             liste = list(self.mapper.getSocketsAssistant()) # les sockets des assistants
             liste.extend(self.CONNECTION_LIST)
             socketsClients = list(self.mapper.getSocketsAssistant())
-
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
             
             for sock in read_sockets:
                 #New connection
                 if sock == server_socket:
                     sockfd, addr = server_socket.accept()
-                    self.addAssistant(sockfd)
                     message = "PROFILES$"+str(self.managerProfils)+"\r\n"
                     sockfd.send(message.encode('utf-8'))
+                    self.addAssistant(sockfd)
                     print("Assistant (%s, %s) connected" % addr)
                     
                 else:
