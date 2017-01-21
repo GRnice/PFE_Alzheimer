@@ -239,12 +239,18 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 double longitude = Double.parseDouble(parametres[1]);
                 double latitude = Double.parseDouble(parametres[2]);
                 Profil profil = profilsManager.getProfilOnPromenade().get(idTel);
+                if (profil == null)
+                {
+                    return;
+                }
+
                 Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));
                 profil.setLongitude(longitude);
                 profil.setLatitude(latitude);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
+                    Log.e(String.valueOf(profil == null),"CC");
                     mapFragment_.update(profil);
                 }
 
@@ -291,7 +297,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
             }
 
-            else if(arg1.hasExtra("RMPROFIL")) { // nom*prenom
+            else if(arg1.hasExtra("RMPROFIL"))
+            { // nom*prenom
                 String[] params = arg1.getStringArrayExtra("RMPROFIL");
                 String nom = params[0];
                 String prenom = params[1];
