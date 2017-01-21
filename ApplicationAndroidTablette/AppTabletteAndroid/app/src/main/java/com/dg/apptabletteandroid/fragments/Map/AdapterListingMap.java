@@ -53,24 +53,22 @@ public class AdapterListingMap extends ArrayAdapter {
             detailsList.add(detailView);
         }
         final Profil profil = profils.get(position);
-        final int positionFinalProfil = position;
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
         ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
-        imageView.setTag(false);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(v.getTag().equals(false)) // si on ne suit pas
+                if(profil.estSuiviParMoi()) // si je le suis
                 {
-                    act.followProfil(profils.get(positionFinalProfil));
-                    ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre));
-                }
-                else{
-                    act.unfollowProfil(profils.get(positionFinalProfil));
+                    act.unfollowProfil(profil);
                     ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.suivre));
                 }
-                v.setTag(!(boolean)v.getTag());
+                else{
+                    act.followProfil(profil);
+                    ((ImageView) v).setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre));
+                }
+                profil.setEstSuiviParMoi(!profil.estSuivi());
             }
         });
 

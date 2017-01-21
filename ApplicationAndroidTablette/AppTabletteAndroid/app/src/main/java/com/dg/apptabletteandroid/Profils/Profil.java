@@ -69,6 +69,11 @@ public class Profil
         return suiviParTabletteCourante;
     }
 
+    public void setEstSuiviParMoi(boolean etat)
+    {
+        suiviParTabletteCourante = etat;
+    }
+
     public void setPrenom(String prenom)
     {
         this.prenom = prenom;

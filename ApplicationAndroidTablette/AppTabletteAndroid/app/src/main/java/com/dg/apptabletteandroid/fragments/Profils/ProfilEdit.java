@@ -165,9 +165,9 @@ public class ProfilEdit extends BlankFragment {
      * @return if event is consumed, it will return true.
      */
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         Log.d("AAA", "BACKPressed ProfileEdit");
-
         Fragment fragProfils = ProfilFragment.newInstance(((Main2Activity)getActivity()).getProfilsManager());
         ((Main2Activity) getActivity()).pushFragmentFromActivity(fragProfils);
     }

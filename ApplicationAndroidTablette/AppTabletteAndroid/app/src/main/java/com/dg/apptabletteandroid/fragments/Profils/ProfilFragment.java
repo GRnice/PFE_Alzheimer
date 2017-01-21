@@ -97,6 +97,7 @@ public class ProfilFragment extends BlankFragment
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
+                    profilselected.setEstSuiviParMoi(true);
                     profilsManager.addProfilOnPromenade(idTel,profilselected);
                     Log.d("SIZE", String.valueOf(profilsManager.getProfilOnPromenade().size()));
                     Intent intent = new Intent();

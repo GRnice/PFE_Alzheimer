@@ -323,6 +323,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     Profil profilStopped = profilsManager.getProfilOnPromenade().get(idTel);
+                    profilStopped.setEstSuiviParMoi(false);
                     ((MapFragment_) fragmentManager.getCurrentFragment()).removeProfil(profilStopped);
                 }
                 profilsManager.removeProfilOnPromenade(idTel);
