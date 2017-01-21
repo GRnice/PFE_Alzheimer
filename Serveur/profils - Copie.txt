@@ -1,0 +1,4 @@
+dib,dominique,BarrierAlerte
+giangrasso,remy,BarriereAlerte
+Hossam,eslam,BarriereNormal
+Chebanne,Meriem,BarriereAlerte
