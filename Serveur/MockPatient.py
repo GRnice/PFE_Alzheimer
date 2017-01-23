@@ -1,7 +1,7 @@
 import socket
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-sock.connect(("192.168.1.13",3000))
+sock.connect(("172.20.10.4",3000))
 sock.send("STARTSUIVI*123444\r\n".encode())
 #19
 sock.recv(4096) # attente du OKPROMENADE

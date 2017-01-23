@@ -5,10 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.renderscript.RenderScript;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -107,5 +110,17 @@ public class AlertManager
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notif);
+        RingtoneManager mRing = new RingtoneManager(context);
+        int mNumberOfRingtones = mRing.getCursor().getCount();
+        Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(context, mRingToneUri);
+            mediaPlayer.prepare();
+            mediaPlayer.start(); // no need to call prepare(); create() does that for you
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

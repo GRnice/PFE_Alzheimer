@@ -51,7 +51,6 @@ public class MapFragment_ extends BlankFragment
 
     public List<Profil> listProfilsEnProm = new ArrayList<>();
 
-
     public MapFragment_()
     {
         // Required empty public constructor
@@ -72,7 +71,8 @@ public class MapFragment_ extends BlankFragment
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
         HashMap<String, Profil> profilsOnPromenade = profilsManager.getProfilOnPromenade();
-        for(Map.Entry<String, Profil> entry : profilsOnPromenade.entrySet()){
+        for(Map.Entry<String, Profil> entry : profilsOnPromenade.entrySet())
+        {
             listProfilsEnProm.add(entry.getValue());
         }
     }
@@ -88,10 +88,11 @@ public class MapFragment_ extends BlankFragment
         mMapView = (MapView) view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
+
         //list
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
                 ,R.layout.item_profil_en_promenade
-                ,new ArrayList<>(profilsAffiches.keySet()));
+                ,new ArrayList<>(listProfilsEnProm));
 
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
@@ -235,8 +236,7 @@ public class MapFragment_ extends BlankFragment
         {
             if (! allProfilsOnPromenade.contains(profil))
             {
-                profilsAffiches.get(profil).remove();
-                profilsAffiches.remove(profil);
+                removeProfil(profil);
             }
         }
 
@@ -274,6 +274,11 @@ public class MapFragment_ extends BlankFragment
     // suppression d'un profil a afficher
     public void removeProfil(Profil profilStopped)
     {
+        if (listProfilsEnProm.contains(profilStopped))
+        {
+            listProfilsEnProm.remove(profilStopped);
+            this.refreshListe();
+        }
         if (profilsAffiches.containsKey(profilStopped))
         {
             profilsAffiches.get(profilStopped).remove();
