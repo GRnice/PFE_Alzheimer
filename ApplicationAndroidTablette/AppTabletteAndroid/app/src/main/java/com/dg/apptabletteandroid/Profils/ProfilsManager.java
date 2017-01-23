@@ -71,7 +71,6 @@ public class ProfilsManager
         }
     }
 
-
     public void removeProfilOnPromenade(String idTel)
     {
         Log.e("ProfilManager",""+idTel+" is removed");

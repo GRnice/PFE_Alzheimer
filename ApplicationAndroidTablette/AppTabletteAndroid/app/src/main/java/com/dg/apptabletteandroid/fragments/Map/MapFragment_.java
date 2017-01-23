@@ -71,6 +71,7 @@ public class MapFragment_ extends BlankFragment
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
         HashMap<String, Profil> profilsOnPromenade = profilsManager.getProfilOnPromenade();
+
         for(Map.Entry<String, Profil> entry : profilsOnPromenade.entrySet())
         {
             listProfilsEnProm.add(entry.getValue());
@@ -220,9 +221,12 @@ public class MapFragment_ extends BlankFragment
     // mise à jour de la listeView
     public void refreshListe()
     {
+        profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
+        HashMap<String, Profil> profilsOnPromenade = profilsManager.getProfilOnPromenade();
+
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity)getActivity()
                 ,R.layout.item_profil_en_promenade
-                ,new ArrayList<>(profilsAffiches.keySet()));
+                ,new ArrayList<>(profilsOnPromenade.values()));
         listView.setAdapter(customAdapter);
     }
 
@@ -274,18 +278,13 @@ public class MapFragment_ extends BlankFragment
     // suppression d'un profil a afficher
     public void removeProfil(Profil profilStopped)
     {
-        if (listProfilsEnProm.contains(profilStopped))
-        {
-            listProfilsEnProm.remove(profilStopped);
-            this.refreshListe();
-        }
         if (profilsAffiches.containsKey(profilStopped))
         {
             profilsAffiches.get(profilStopped).remove();
             profilsAffiches.remove(profilStopped);
             this.refreshMap();
+            this.refreshListe();
         }
-
     }
 
 

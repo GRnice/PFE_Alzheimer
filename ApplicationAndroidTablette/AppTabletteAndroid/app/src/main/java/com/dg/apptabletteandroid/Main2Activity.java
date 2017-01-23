@@ -320,13 +320,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             else if (arg1.hasExtra("STOPPROMENADE"))
             {
                 String idTel = arg1.getStringExtra("STOPPROMENADE");
+                Profil profilStopped = profilsManager.getProfilOnPromenade().get(idTel);
+                profilStopped.setEstSuiviParMoi(false);
+                profilsManager.removeProfilOnPromenade(idTel);
+
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
-                    Profil profilStopped = profilsManager.getProfilOnPromenade().get(idTel);
-                    profilStopped.setEstSuiviParMoi(false);
                     ((MapFragment_) fragmentManager.getCurrentFragment()).removeProfil(profilStopped);
                 }
-                profilsManager.removeProfilOnPromenade(idTel);
+
                 // synchronisation des tablettes (nouvelle promenade, nouveau profil)
             }
 
@@ -341,6 +343,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
                 profilSelected.setEstSuiviParMoi(false);
                 profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                if (fragmentManager.getCurrentFragment() instanceof  MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refreshListe();
+                }
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
 
