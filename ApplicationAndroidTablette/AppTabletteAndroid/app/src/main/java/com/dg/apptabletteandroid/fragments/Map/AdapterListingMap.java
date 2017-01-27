@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,18 @@ public class AdapterListingMap extends ArrayAdapter {
 
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
+        TextView batteryTextView = (TextView) rowView.findViewById(R.id.details).findViewById(R.id.batteryDetails);
+        batteryTextView.setText(String.valueOf(profil.getBattery()) + "%");
+        ImageView batteryIcons = (ImageView) rowView.findViewById(R.id.batteryIcons);
+        ImageView batteryIcon = (ImageView) rowView.findViewById(R.id.batteryIcon);
+        if(profil.getBattery() < 21){
+            batteryTextView.setTextColor(Color.RED);
+            batteryIcon.setImageResource(R.drawable.low);
+            batteryIcons.setImageResource(R.drawable.low);
+        }else if(profil.getBattery() < 51){
+            batteryIcon.setImageResource(R.drawable.medium);
+            batteryIcons.setImageResource(R.drawable.medium);
+        }
         ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
         if (profil.estSuiviParMoi())
         {

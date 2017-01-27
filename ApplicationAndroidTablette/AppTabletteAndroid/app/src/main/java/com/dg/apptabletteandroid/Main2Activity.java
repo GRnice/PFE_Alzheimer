@@ -298,8 +298,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
                 double longitude = Double.parseDouble(parametres[1]);
                 double latitude = Double.parseDouble(parametres[2]);
+                int level = Integer.parseInt(parametres[3]);
                 Log.d("Size", String.valueOf(profilsManager.getAllProfilsOnPromenade().size()));
                 profil.setLatLong(latitude,longitude);
+                profil.setBattery(level);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).update(profil);

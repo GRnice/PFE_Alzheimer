@@ -33,6 +33,7 @@ public class Profil
     private double longitude;
     private double latitude;
     private Marker marker;
+    private int battery;
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
     {
@@ -142,4 +143,11 @@ public class Profil
         return latitude;
     }
 
+    public int getBattery() {
+        return battery;
+    }
+
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
 }

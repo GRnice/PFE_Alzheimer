@@ -169,6 +169,12 @@ public class ServiceAdmin extends Service
                             break;
                         }
 
+                        case "BATTERY":
+                        {
+                            alertManager.notifBattery(getBaseContext(), idTel);
+                            break;
+                        }
+
                     }
                 }
 
