@@ -11,12 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
-import com.dg.apptabletteandroid.Profils.ProfilsManager;
+import com.dg.apptabletteandroid.Profils.ProfilOnPromenadeManager;
 import com.dg.apptabletteandroid.R;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,26 +29,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class MapFragment_ extends BlankFragment
 {
     MapView mMapView;
     private GoogleMap googleMap;
-    private static HashMap<Profil, Marker> profilsAffiches = new HashMap<>();
+
     private static Bitmap bitmap;
     private ListView listView;
-    private ProfilsManager profilsManager;
-
-//list
-
-    public List<Profil> listProfilsEnProm = new ArrayList<>();
+    private ProfilOnPromenadeManager profilsManager;
 
     public MapFragment_()
     {
@@ -70,12 +61,6 @@ public class MapFragment_ extends BlankFragment
         super.onCreate(savedInstanceState);
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
-        HashMap<String, Profil> profilsOnPromenade = profilsManager.getProfilOnPromenade();
-
-        for(Map.Entry<String, Profil> entry : profilsOnPromenade.entrySet())
-        {
-            listProfilsEnProm.add(entry.getValue());
-        }
     }
 
 
@@ -90,10 +75,10 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
-        //list
+
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
                 ,R.layout.item_profil_en_promenade
-                ,new ArrayList<>(listProfilsEnProm));
+                ,new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values()));
 
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
@@ -132,43 +117,28 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
-                Set<Profil> allProfilsAffiches = profilsAffiches.keySet();
-                Collection<Profil> allProfilsOnPromenade = profilsManager.getProfilOnPromenade().values();
-                for (Profil profil : allProfilsAffiches)
-                {
-                    if (! allProfilsOnPromenade.contains(profil))
-                    {
-                        profilsAffiches.get(profil).remove();
-                        profilsAffiches.remove(profil);
-                    }
-                }
-
+                HashMap<String,Profil> allProfilsOnPromenade = profilsManager.getAllProfilsOnPromenade();
 
                 int res = getActivity().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
                 // For showing a move to my location button
                 googleMap.setMyLocationEnabled(false);
                 LatLng sophia = new LatLng(43.6155793,7.0696861);
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(10).build();
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(12).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                Log.d("Map", String.valueOf(profilsAffiches.size()));
-                for(Map.Entry<Profil, Marker> entry : profilsAffiches.entrySet()){
-                    Profil profil = entry.getKey();
-                    Marker marker = entry.getValue();
-                    profilsAffiches.put(profil, googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
+
+                for(String idTel : allProfilsOnPromenade.keySet()){
+                    Profil profil = allProfilsOnPromenade.get(idTel);
+                    Marker marker = profil.getMarker();
+                    if (marker != null)
+                    {
+                        googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                    }
+
                 }
                 if (res != PackageManager.PERMISSION_GRANTED)
                 {
                     return;
                 }
-
-
-                /* For dropping a marker at a point on the Map
-                googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
-                */
-
-                /* For zooming automatically to the location of the marker
-
-                */
             }
         });
         return view;
@@ -218,42 +188,36 @@ public class MapFragment_ extends BlankFragment
         Log.d("AAA", "BACKPressed Map");
     }
 
+
+    public void refresh()
+    {
+        refreshMap();
+        refreshListe();
+    }
+
     // mise à jour de la listeView
-    public void refreshListe()
+    private void refreshListe()
     {
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
-        HashMap<String, Profil> profilsOnPromenade = profilsManager.getProfilOnPromenade();
+        ArrayList<Profil> profilsOnPromenade = new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values());
 
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity)getActivity()
                 ,R.layout.item_profil_en_promenade
-                ,new ArrayList<>(profilsOnPromenade.values()));
+                ,profilsOnPromenade);
         listView.setAdapter(customAdapter);
     }
 
     // Met à jour la map
-    public void refreshMap()
+    private void refreshMap()
     {
-        ProfilsManager profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
-        Set<Profil> allProfilsAffiches = profilsAffiches.keySet();
-        Collection<Profil> allProfilsOnPromenade = profilsManager.getProfilOnPromenade().values();
-        for (Profil profil : allProfilsAffiches)
-        {
-            if (! allProfilsOnPromenade.contains(profil))
-            {
-                removeProfil(profil);
-            }
-        }
-
         googleMap.clear();
 
-        Iterator<Profil> profilsPromenade = profilsAffiches.keySet().iterator();
+        Iterator<Profil> profilsPromenade = profilsManager.getAllProfilsOnPromenade().values().iterator();
         while(profilsPromenade.hasNext())
         {
             Profil profil = profilsPromenade.next();
-            profilsAffiches.get(profil).remove();
             LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-            profilsAffiches.put(profil,marker);
         }
 
         refreshListe();
@@ -262,33 +226,17 @@ public class MapFragment_ extends BlankFragment
     // ajout ou mise à jour du marker d'un profil
     public void update(Profil profil)
     {
-
         LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
-        if ((profilsAffiches.get(profil) == null)){
+        if (profil.getMarker() == null){
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-            profilsAffiches.put(profil, marker);
-            refreshListe();
-        }else{
-            Marker marker = profilsAffiches.get(profil);
-            marker.setPosition(latLng);
+            profil.setMarker(marker);
         }
-
-    }
-
-    // suppression d'un profil a afficher
-    public void removeProfil(Profil profilStopped)
-    {
-        if (profilsAffiches.containsKey(profilStopped))
+        else
         {
-            profilsAffiches.get(profilStopped).remove();
-            profilsAffiches.remove(profilStopped);
-            this.refreshMap();
-            this.refreshListe();
+            Marker marker = profil.getMarker();
+            marker.setPosition(latLng);
+            profil.setMarker(marker);
         }
     }
-
-
-
-
 
 }

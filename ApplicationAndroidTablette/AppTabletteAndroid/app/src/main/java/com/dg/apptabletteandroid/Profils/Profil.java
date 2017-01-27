@@ -1,5 +1,9 @@
 package com.dg.apptabletteandroid.Profils;
 
+import android.support.annotation.Nullable;
+
+import com.google.android.gms.maps.model.Marker;
+
 /**
  * Created by Remy on 08/12/2016.
  */
@@ -27,12 +31,14 @@ public class Profil
     private boolean susceptibleDeFranchirLaBarriere = false;
     private double longitude;
     private double latitude;
+    private Marker marker;
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
     {
         this.nom = nom;
         this.prenom = prenom;
         this.susceptibleDeFranchirLaBarriere = susceptibleDeFranchirLaBarriere;
+        this.marker = null;
     }
 
     public Profil()
@@ -57,6 +63,12 @@ public class Profil
     public String getNom()
     {
         return nom;
+    }
+
+    @Nullable
+    public Marker getMarker()
+    {
+        return marker;
     }
 
     public boolean estSuivi()
@@ -100,19 +112,23 @@ public class Profil
         return sb.toString();
     }
 
-    public double getLongitude() {
-        return longitude;
+    public void setLatLong(double lat,double longitude)
+    {
+        latitude = lat;
+        this.longitude = longitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setMarker(Marker markerP)
+    {
+        marker = markerP;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
 }

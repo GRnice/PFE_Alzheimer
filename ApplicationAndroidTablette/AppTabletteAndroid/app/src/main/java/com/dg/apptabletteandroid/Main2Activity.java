@@ -1,6 +1,5 @@
 package com.dg.apptabletteandroid;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
@@ -27,12 +26,9 @@ import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
+import com.dg.apptabletteandroid.fragments.Parametres.ParameterFragment;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -147,24 +143,24 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         if (id == R.id.nav_profils)
         {
             Fragment fragProfils = ProfilFragment.newInstance(profilsManager);
-            fragmentManager.pushFragment(fragProfils,Main2Activity.this);
+            fragmentManager.pushFragment(fragProfils,this);
             // Handle the camera action
         }
         else if (id == R.id.nav_carte)
         {
             Fragment fragmap = MapFragment_.newInstance();
-            fragmentManager.pushFragment(fragmap,Main2Activity.this);
+            fragmentManager.pushFragment(fragmap,this);
         }
-        else if (id == R.id.nav_slideshow)
+        else if (id == R.id.nav_parameter)
+        {
+            Fragment fragParam = ParameterFragment.newInstance();
+            fragmentManager.pushFragment(fragParam,this);
+        }
+        else if (id == R.id.nav_exit)
         {
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
+        // else if (id == R.id.nav_share) {} else if (id == R.id.nav_send) {}
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -242,7 +238,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
     }
     
-    public void pushFragmentFromActivity(Fragment frag) {
+    public void pushFragmentFromActivity(Fragment frag)
+    {
         fragmentManager.pushFragment(frag,Main2Activity.this);
     }
 
@@ -286,7 +283,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             {
                 String allProfiles = arg1.getStringExtra("ALL_PROFILES");
                 Log.e("ALL_PROFILES",allProfiles);
-                profilsManager.setAllProfils(getPreferences(Context.MODE_PRIVATE),allProfiles);
+                profilsManager.saveAllProfils(getPreferences(Context.MODE_PRIVATE),allProfiles);
             }
 
             // indique que un patient a changé de positions
@@ -296,37 +293,28 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String message = arg1.getStringExtra("UPDATE");
                 String[] parametres = message.split("\\*");
                 String idTel = parametres[0];
+                Profil profil = profilsManager.getProfilOnPromenade(idTel);
+                if (profil == null) return;
+
                 double longitude = Double.parseDouble(parametres[1]);
                 double latitude = Double.parseDouble(parametres[2]);
-                Profil profil = profilsManager.getProfilOnPromenade().get(idTel);
-                if (profil == null)
-                {
-                    return; // si un update d'un profil est recu avant une synchro, ne pas en tenir compte sinon NullPtrException.
-                }
-
-                Log.d("Size", String.valueOf(profilsManager.getProfilOnPromenade().size()));
-                profil.setLongitude(longitude);
-                profil.setLatitude(latitude);
+                Log.d("Size", String.valueOf(profilsManager.getAllProfilsOnPromenade().size()));
+                profil.setLatLong(latitude,longitude);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
-                    MapFragment_ mapFragment_ = (MapFragment_) fragmentManager.getCurrentFragment();
-                    Log.e(String.valueOf(profil == null),"CC");
-                    mapFragment_.update(profil);
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).update(profil);
                 }
-
             }
 
             // indique que une promenade se termine pour cet idTel
             else if (arg1.hasExtra("STOPPROMENADE"))
             {
                 String idTel = arg1.getStringExtra("STOPPROMENADE");
-                Profil profilStopped = profilsManager.getProfilOnPromenade().get(idTel);
-                profilStopped.setEstSuiviParMoi(false);
                 profilsManager.removeProfilOnPromenade(idTel);
 
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
-                    ((MapFragment_) fragmentManager.getCurrentFragment()).removeProfil(profilStopped);
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
 
                 // synchronisation des tablettes (nouvelle promenade, nouveau profil)
@@ -343,9 +331,9 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
                 profilSelected.setEstSuiviParMoi(false);
                 profilsManager.addProfilOnPromenade(idTel,profilSelected);
-                if (fragmentManager.getCurrentFragment() instanceof  MapFragment_)
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
-                    ((MapFragment_) fragmentManager.getCurrentFragment()).refreshListe();
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
@@ -377,7 +365,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String nom = params[0];
                 String prenom = params[1];
                 Log.e("SUPR", prenom + " " + nom);
-                profilsManager.removeProfile(prenom,nom);
+                profilsManager.removeProfil(prenom,nom);
 
             }
 
@@ -390,7 +378,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String newPrenom = params[1].split(",")[1];
                 String barriere = params[1].split(",")[2];
 
-                profilsManager.removeProfile(oldPrenom, oldNom);
+                profilsManager.removeProfil(oldPrenom, oldNom);
                 Boolean barriereBool;
                 if(barriere.equals("BarriereNormal")) {
                     barriereBool = false;

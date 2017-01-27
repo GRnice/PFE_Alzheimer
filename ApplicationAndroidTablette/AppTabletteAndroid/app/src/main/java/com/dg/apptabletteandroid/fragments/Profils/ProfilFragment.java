@@ -99,7 +99,7 @@ public class ProfilFragment extends BlankFragment
                     Profil profilselected = adapterListing.getItem(i);
                     profilselected.setEstSuiviParMoi(true);
                     profilsManager.addProfilOnPromenade(idTel,profilselected);
-                    Log.d("SIZE", String.valueOf(profilsManager.getProfilOnPromenade().size()));
+
                     Intent intent = new Intent();
                     intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
                     intent.putExtra("FOLLOW_NEW_SESSION","");

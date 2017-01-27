@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +21,7 @@ import java.util.Set;
  * Le manager des profils, ils sont stockés dans les préferences de l'application
  * Acces aux profils via l'objet SharedPreferences.
  */
-public class ProfilsManager
+public class ProfilsManager implements ProfilOnPromenadeManager
 {
     private ArrayList<Profil> profilArrayList;
     private HashMap<String,Profil> profilOnPromenade;
@@ -34,7 +32,33 @@ public class ProfilsManager
         "nom,prenom,BarriereNormal" si non susceptible de franchir la barriere
      */
 
-    public void setAllProfils(SharedPreferences sharedPreferences,String allSignaturesProfils)
+    // CONSTRUCTEUR
+    public ProfilsManager(SharedPreferences sharedPreferences)
+    {
+        this.profilArrayList = new ArrayList<>(); // contiendra tous les profils
+        this.profilOnPromenade = new HashMap<>();
+        Set<String> allProfils = sharedPreferences.getStringSet("profils",null);
+        if (allProfils != null)
+        {
+            Iterator<String> iterProfil = allProfils.iterator();
+
+            while(iterProfil.hasNext())
+            {
+                String profilsign = iterProfil.next();
+                Log.e("unProfil-profilmanager",profilsign);
+                profilArrayList.add(Profil.buildProfilFromSignature(profilsign));
+            }
+        }
+    }
+
+    /////////////////////// SETTER ///////////////////////
+
+    /**
+     * Sauvegarde en memoire les profils
+     * @param sharedPreferences
+     * @param allSignaturesProfils
+     */
+    public void saveAllProfils(SharedPreferences sharedPreferences, String allSignaturesProfils)
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         HashSet<String> ensembleProfils = new HashSet<>();
@@ -54,16 +78,51 @@ public class ProfilsManager
         editor.commit();
     }
 
-
-
+    /**
+     * Ajoute un profil à la liste des profils en promenade
+     * @param idTel
+     * @param prof
+     */
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
         Log.d("idTel", idTel);
     }
 
-    public void removeProfile(String prenom, String nom) {
-        for(int i = 0; i < profilArrayList.size(); i++) {
+    /**
+     * Retire un profil à la liste des profils en promenade
+     * @param idTel
+     */
+    public void removeProfilOnPromenade(String idTel)
+    {
+        Log.e("ProfilManager",""+idTel+" is removed");
+        if (this.profilOnPromenade.containsKey(idTel))
+        {
+            this.profilOnPromenade.get(idTel).setMarker(null);
+            this.profilOnPromenade.get(idTel).setEstSuiviParMoi(false);
+            this.profilOnPromenade.remove(idTel);
+        }
+
+    }
+
+    /**
+     * Retourne une ArrayList contenant tous les profils en promenade
+     * @return ArrayList<Profil>
+     */
+    public HashMap<String,Profil> getAllProfilsOnPromenade()
+    {
+        return this.profilOnPromenade;
+    }
+
+    /**
+     * Retire un profil de la liste des profils
+     * @param prenom
+     * @param nom
+     */
+    public void removeProfil(String prenom, String nom)
+    {
+        for(int i = 0; i < profilArrayList.size(); i++)
+        {
             if(profilArrayList.get(i).getPrenom().equals(prenom) && profilArrayList.get(i).getNom().equals(nom)) {
                 profilArrayList.remove(profilArrayList.get(i));
                 return;
@@ -71,12 +130,13 @@ public class ProfilsManager
         }
     }
 
-    public void removeProfilOnPromenade(String idTel)
-    {
-        Log.e("ProfilManager",""+idTel+" is removed");
-        this.profilOnPromenade.remove(idTel);
-    }
+    //////////////////////////////// GETTER ////////////////////////////////
 
+
+    /**
+     * Retourne la liste de tous les profils
+     * @return ArrayList<Profil>
+     */
     public ArrayList<Profil> getAllProfils()
     {
         return this.profilArrayList;
@@ -95,24 +155,26 @@ public class ProfilsManager
         return null;
     }
 
-    public ProfilsManager(SharedPreferences sharedPreferences)
+    /**
+     * Retourne un profil en promenade ayant comme identifiant idTel
+     * @param idTel
+     * @return Profil
+     */
+    @Nullable
+    public Profil getProfilOnPromenade(String idTel)
     {
-        this.profilArrayList = new ArrayList<>(); // contiendra tous les profils
-        this.profilOnPromenade = new HashMap<>();
-        Set<String> allProfils = sharedPreferences.getStringSet("profils",null);
-        if (allProfils != null)
+        if (profilOnPromenade.containsKey(idTel))
         {
-            Iterator<String> iterProfil = allProfils.iterator();
-
-            while(iterProfil.hasNext())
-            {
-                String profilsign = iterProfil.next();
-                Log.e("unProfil-profilmanager",profilsign);
-                profilArrayList.add(Profil.buildProfilFromSignature(profilsign));
-            }
+            return profilOnPromenade.get(idTel);
         }
+        return null;
     }
 
+    /**
+     *
+     * @param sharedPreferences
+     * @param listProfils
+     */
     public void updateList(SharedPreferences sharedPreferences, ArrayList<Profil> listProfils) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         HashSet<String> newEnsembleProfils = new HashSet<>();
@@ -126,26 +188,27 @@ public class ProfilsManager
         editor.commit();
     }
 
+    /**
+     * Retourne l'identifiant d'un profil en promenade
+     * @param profil
+     * @return String, peut etre null
+     */
     @Nullable
-    public String findIdTelByProfil(Profil p)
+    public String findIdTelByProfil(Profil profil)
     {
-        HashMap<String,Profil> allProfils = this.getProfilOnPromenade();
-        Set<String> allIdTel = allProfils.keySet();
+        Set<String> allIdTel = profilOnPromenade.keySet();
         Iterator<String> allIdTelIter = allIdTel.iterator();
         while (allIdTelIter.hasNext())
         {
             String idTel = allIdTelIter.next();
-            if (allProfils.get(idTel).equals(p))
+            if (profilOnPromenade.get(idTel).equals(profil)) // Entry.getKey()
             {
-                // si p == allProfils.get(idTel), si le profil p à suivre est egal au profil, alors idTel est sa clé
+                // si le profil p à suivre est egal au profil, alors idTel est sa clé
                 return idTel;
             }
         }
         return null;
     }
 
-    public HashMap<String, Profil> getProfilOnPromenade() {
-        return profilOnPromenade;
-    }
 
 }

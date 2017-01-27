@@ -12,13 +12,13 @@
             android:icon="@drawable/ic_earth"
             android:title="Carte" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_parameter"
             android:icon="@drawable/ic_menu_manage"
             android:title="Parametres" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/ic_close"
+            android:title="Quitter" />
     </group>
 
     <item android:title="Communicate">

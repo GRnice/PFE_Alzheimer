@@ -4,14 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DataKeeper
 {
-    private ArrayList<Intent> tampon;
     private ArrayList<Intent> informations;
     private AtomicBoolean onPublish;
     private ActivityReceiverChecking activityReceiverChecking;
@@ -30,7 +24,6 @@ public class DataKeeper
     {
         onPublish = new AtomicBoolean();
         onPublish.set(false);
-        this.tampon = new ArrayList<>();
         this.informations = new ArrayList<>();
     }
 
@@ -39,7 +32,6 @@ public class DataKeeper
         Log.e("addData","dataaa");
         this.informations.add(message);
     }
-
 
 
     public void subscrive(Context ctx)
