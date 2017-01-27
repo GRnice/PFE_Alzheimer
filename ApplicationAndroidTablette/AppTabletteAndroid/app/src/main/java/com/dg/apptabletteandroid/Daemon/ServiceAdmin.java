@@ -146,6 +146,11 @@ public class ServiceAdmin extends Service {
                         {
                             alertManager.notifHorsZone(getBaseContext(),idTel);
                         }
+                        case "BATTERY":
+                        {
+                            alertManager.notifBattery(getBaseContext(), idTel);
+                        }
+
                     }
                 }
 

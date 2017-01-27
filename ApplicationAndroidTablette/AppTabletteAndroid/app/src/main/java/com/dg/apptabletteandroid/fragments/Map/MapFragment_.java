@@ -237,6 +237,7 @@ public class MapFragment_ extends BlankFragment
             marker.setPosition(latLng);
             profil.setMarker(marker);
         }
+        refreshListe();
     }
 
 }

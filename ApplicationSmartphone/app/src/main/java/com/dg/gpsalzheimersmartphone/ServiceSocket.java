@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class ServiceSocket extends Service implements LocationListener
     private ClientReceiver clientReceiver;
     private ServerReceiver serverReceiver;
     private NetworkChangeReceiver networkChangeReceiver;
+    private BatteryChangeReceiver batteryChangeReceiver;
     private boolean onPromenade;
 
     public ServiceSocket()
@@ -56,6 +58,7 @@ public class ServiceSocket extends Service implements LocationListener
         clientReceiver = new ClientReceiver();
         serverReceiver = new ServerReceiver();
         networkChangeReceiver = new NetworkChangeReceiver();
+        batteryChangeReceiver = new BatteryChangeReceiver();
 
 
         IntentFilter intentFilter = new IntentFilter();
@@ -69,6 +72,9 @@ public class ServiceSocket extends Service implements LocationListener
         intentFilter = new IntentFilter();
         intentFilter.addAction(NetworkChangeReceiver.CONNECTIVITY_CHANGED);
         registerReceiver(networkChangeReceiver, intentFilter);
+
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryChangeReceiver, ifilter);
 
         super.onStartCommand(intent,flags,startId);
         return START_STICKY;
@@ -88,6 +94,7 @@ public class ServiceSocket extends Service implements LocationListener
         unregisterReceiver(clientReceiver);
         unregisterReceiver(serverReceiver);
         unregisterReceiver(networkChangeReceiver);
+        unregisterReceiver(batteryChangeReceiver);
         super.onDestroy();
     }
 
@@ -102,7 +109,7 @@ public class ServiceSocket extends Service implements LocationListener
     {
         comm.sendMessage(POSITION + SEPARATOR + String.valueOf(location.getLongitude()) +
                 SEPARATOR +
-                String.valueOf(location.getLatitude()));
+                String.valueOf(location.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
     }
 
     @Override
@@ -248,5 +255,16 @@ public class ServiceSocket extends Service implements LocationListener
             }
         }
     }
+
+    public class BatteryChangeReceiver extends BroadcastReceiver {
+        public int level;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        }
+    }
+
+
+
 
 }

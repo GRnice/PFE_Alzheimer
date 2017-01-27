@@ -22,6 +22,7 @@ class Tracker: ## Classe representant un tracker
         self.nom = None
         self.prenom = None
         self.position = tuple() # (longitude, latitude)
+        self.battery = 0
         self.etat = 0
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
@@ -67,7 +68,7 @@ class Tracker: ## Classe representant un tracker
 
         if self.etat == 2:
             raise PermissionError("startSuiviCalled appelé , mais le tracker est en cours de promenade")
-    
+
 
     def startSuiviAborted(self):
         if self.etat == 1:
@@ -80,10 +81,11 @@ class Tracker: ## Classe representant un tracker
         if self.etat == 2:
             raise PermissionError("startSuiviAborted appelé , mais le tracker en cours de promenade")
 
-    def updatePosition(self,position,timeupdate):
+    def updatePosition(self,position,timeupdate, battery):
         self.position = position
         self.lastEmit = timeupdate
-        
+        self.battery = battery
+
 
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def __init__(self,serverAssistant):
@@ -91,7 +93,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         self.dictSocketPatient = dict() # <sockPatient,Tracker>
         self.watchman = WatchMan()
         self.dictAssistance = dict() # HashMap<sockAssistant,sockPatient>
-        
+
         self.serverAssistant = serverAssistant
         self.serverAssistant.setMapper(self)
         print("Mapper ready [ok]")
@@ -105,7 +107,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         with lockMap:
             if socket in self.dictSocketPatient.keys():
                 del self.dictSocketPatient[socket]
-                
+
 
     def getTracker(self,socket):
         with lockMap:
@@ -133,7 +135,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
     def getSocketsAssistant(self):
         return self.dictAssistance.keys()
 
-    
+
     def attachAssistant(self,socketPatient,socketAssistant):
         #print(socketPatient,"attach with",socketAssistant)
         with lockMap:
@@ -162,7 +164,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             if assistantSock not in self.dictAssistance.keys():
                 self.dictAssistance[assistantSock] = []
 
-                
+
     def removeAssistant(self,sockAssistant):
         with lockMap:
             if sockAssistant in self.dictAssistance.keys():
@@ -187,11 +189,11 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     index = listeSock.index(sockPatient)
                     listeSock.pop(index)
                     #self.dictAssistance[assistantSock] = listeSock
-            
+
             del self.mapIdSock[tracker.id]
             self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
 
-                    
+
     def apply(self,commande):
         ## parse la commande et applique la commande
         # commande contient un tuple (socket , commande)
@@ -211,7 +213,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker = self.getTracker(socket)
             tracker.startSuiviCalled(idTel,time.time())
             self.mapIdSock[idTel] = socket
-            
+
             #print("Demarrage du suivi pour le tel à l'id : ",idTel)
             self.serverAssistant.event("STARTSUIVI",socket,tracker)
             #socket.send("OKPROMENADE\r\n".encode("utf-8")) # Pour l'instant on valide de suite
@@ -220,14 +222,17 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         elif (entete == "POSITION"):
             longitude = float(requeteArray[1])
             latitude = float(requeteArray[2])
+            battery = int(requeteArray[3])
             tracker = self.getTracker(socket)
-            tracker.updatePosition((longitude,latitude),time.time())
-            print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
+            tracker.updatePosition((longitude,latitude),time.time(),battery)
+            print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,"), battery = ", battery)
             self.serverAssistant.event("POSITION",socket,tracker)
 
             if (not self.watchman.positionIsGood(longitude,latitude)):
                 print("WARNING HORS ZONE /!\/!\\")
                 self.serverAssistant.event("ALERT-POSITION",socket,tracker)
+            if(battery < 21):
+                self.serverAssistant.event("ALERT-BATTERY", socket, tracker)
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
@@ -241,13 +246,13 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             idTel = requeteArray[1]
             nwTracker = self.getTracker(socket)
             oldSocket = self.mapIdSock[idTel]
-        
+
             alltrackers = list(self.dictSocketPatient.values())
     #                self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
    #     self.dictSocketPatient = dict() # <sockPatient,Tracker>
   #      self.watchman = WatchMan()
  #       self.dictAssistance = dict() # HashMap<sockAssistant,sockPatient>
- 
+
             for tracker in alltrackers:
                 if tracker != nwTracker and tracker.id == idTel:
                     print("JE TRAITE CONTINUE")
@@ -257,16 +262,16 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     nwTracker.etat = oldTracker.etat
                     nwTracker.lastEmit = time.time()
                     nwTracker.nbFollower = oldTracker.nbFollower
-                    
+
                     del self.dictSocketPatient[oldSocket]
                     self.mapIdSock[idTel] = socket
                     self.dictSocketPatient[socket] = nwTracker
                     self.updateSocketPatient(oldSocket,socket)
                     socket.send("OKPROMENADE\r\n".encode('utf-8'))
                     break
-            
-                
-            
+
+
+
 
 class Pool(Thread):
     def __init__(self,mapper):
@@ -286,7 +291,7 @@ class Pool(Thread):
                 self.mapper.apply(commande)
 
             commande = None
-    
+
 
 
 
@@ -303,7 +308,7 @@ class PatientServer(Thread):
     def __init__(self,portPatient,sizeBuffer,maxClientSocket,mapper):
         Thread.__init__(self)
         self.PORT = portPatient
-        
+
         self.RECV_BUFFER = sizeBuffer
         self.maxClientSocket = maxClientSocket
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
@@ -315,23 +320,23 @@ class PatientServer(Thread):
 
     def stopServer(self):
         self.serverOnline = False
-    
+
     def run(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('', self.PORT))
         server_socket.listen(self.maxClientSocket)
         # Add server socket to the list of readable connections
         self.CONNECTION_LIST.append(server_socket)
-        
+
         pool = Pool(self.mapper)
         pool.start()
         print("Chat server started on port " + str(self.PORT) + " [ok]")
         print("=============SERVEUR ONLINE=============")
         while self.serverOnline:
         # Get the list sockets which are ready to be read through select
-            
+
             liste = list(self.mapper.getSocketPatient()) # les sockets
-                
+
             liste.extend(self.CONNECTION_LIST)
             socketsClients = list(self.mapper.getSocketPatient())
             print("====== ALL TRACKERS ========")
@@ -344,7 +349,7 @@ class PatientServer(Thread):
                     with lockMap:
                         self.mapper.addTracker(sockfd)
                     print("Client (%s, %s) connected" % addr)
-                     
+
                 else:
                     # Data recieved from client, process it
                     try:
@@ -363,17 +368,17 @@ class PatientServer(Thread):
                                 tracker = self.mapper.getTracker(sock)
                                 if tracker == None:
                                     pass
-                                
+
                                 elif (tracker == 2 or tracker == 1):
                                     print("Socket d'un patient perdu !")
-                                    
+
                                 if (tracker != None and tracker.etat != 2):
                                     self.mapper.delTracker(sock)
 
-                                
 
-         
-                     
+
+
+
                     # client disconnected, so remove from socket list
                     except Exception as err:
                         print(err)
@@ -386,7 +391,7 @@ class PatientServer(Thread):
                                 pass
                             elif (tracker == 2 or tracker == 1):
                                     print("Except Socket d'un patient perdu !")
-                                    
+
                             if (tracker != None and tracker.etat != 2):
                                 print("Except suppression d'un socket, il n'est pas à l'etat 2")
                                 self.mapper.delTracker(sock)
