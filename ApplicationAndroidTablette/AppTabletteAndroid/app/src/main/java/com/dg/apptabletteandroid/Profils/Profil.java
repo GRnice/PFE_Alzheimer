@@ -26,6 +26,7 @@ public class Profil
 
     private String nom = null;
     private String prenom = null;
+    private boolean horsZone = false;
     private boolean suivi = false; // si ce profil est suivi par au moins une personne
     private boolean suiviParTabletteCourante = false; // si la tablette courante suis ce profil
     private boolean susceptibleDeFranchirLaBarriere = false;
@@ -96,6 +97,16 @@ public class Profil
     public void setNom(String nom)
     {
         this.nom = nom;
+    }
+
+    public void setHorsZone(boolean state)
+    {
+        horsZone = state;
+    }
+
+    public boolean isHorsZone()
+    {
+        return horsZone;
     }
 
     public String makeSignature()

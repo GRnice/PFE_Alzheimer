@@ -58,6 +58,15 @@ public class AdapterListingMap extends ArrayAdapter {
             detailsList.add(detailView);
         }
         final Profil profil = profils.get(position);
+        if (profil.isHorsZone())
+        {
+            rowView.setBackgroundColor(Color.argb(128,255,80,41));
+        }
+        else
+        {
+            rowView.setBackgroundColor(Color.WHITE);
+        }
+
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
         TextView batteryTextView = (TextView) rowView.findViewById(R.id.details).findViewById(R.id.batteryDetails);

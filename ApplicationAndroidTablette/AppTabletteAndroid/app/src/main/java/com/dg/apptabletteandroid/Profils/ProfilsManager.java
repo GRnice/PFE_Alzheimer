@@ -2,6 +2,7 @@ package com.dg.apptabletteandroid.Profils;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -100,6 +101,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
         {
             this.profilOnPromenade.get(idTel).setMarker(null);
             this.profilOnPromenade.get(idTel).setEstSuiviParMoi(false);
+            this.profilOnPromenade.get(idTel).setHorsZone(false);
             this.profilOnPromenade.get(idTel).setImmobile(false);
             this.profilOnPromenade.remove(idTel);
         }

@@ -63,9 +63,13 @@ class AssistanceServer(Thread):
             self.broadcast("UPDATE$"+str(tracker.id) + "*" + str(tracker.position[0]) + "*" +
                                        str(tracker.position[1])+ "*" +  str(tracker.battery) + "\r\n")
 
-        elif (evt == "ALERT-POSITION"):
+        elif (evt == "ALERT-POSITION_START"):
             print("(alerte) HORS ZONE",tracker.id)
-            self.broadcast("ALERT$HORSZONE_"+tracker.id+"\r\n")
+            self.broadcast("ALERT$STARTHORSZONE_"+tracker.id+"\r\n")
+
+        elif (evt == "ALERT-POSITION_STOP"):
+            print("STOP HORS ZONE",tracker.id)
+            self.broadcast("ALERT$STOPHORSZONE_"+tracker.id+"\r\n")
 
         elif(evt == "ALERT-BATTERY"):
             print("(alerte) BATTERY FAIBLE", tracker.id)
