@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DataKeeper
 {
     private ArrayList<Intent> informations;
+    private HashMap<String,Intent> mapLastUpdate;
     private AtomicBoolean onPublish;
     private ActivityReceiverChecking activityReceiverChecking;
 
@@ -25,6 +27,7 @@ public class DataKeeper
         onPublish = new AtomicBoolean();
         onPublish.set(false);
         this.informations = new ArrayList<>();
+        this.mapLastUpdate = new HashMap<>();
     }
 
     public void addData(Intent message)
@@ -53,10 +56,16 @@ public class DataKeeper
 
     public void publish(Context ctx)
     {
+        informations.addAll(mapLastUpdate.values());
         activityReceiverChecking = new ActivityReceiverChecking(ctx,informations.iterator());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.checkingActivity");
         ctx.registerReceiver(activityReceiverChecking,intentFilter);
+    }
+
+    public void addPosition(String idTel, Intent intent)
+    {
+        mapLastUpdate.put(idTel,intent);
     }
 
     private class ActivityReceiverChecking extends BroadcastReceiver

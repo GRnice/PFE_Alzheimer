@@ -388,6 +388,19 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 profilsManager.getAllProfils().add(new Profil(newNom, newPrenom, barriereBool));
             }
 
+            else if (arg1.hasExtra("HORSZONE"))
+            {
+                // Un appel HORSZONE indique qu'il y a hors zone, un deuxieme dit le contraire
+                String idTelHorsZone = arg1.getStringExtra("IDTEL");
+                Profil profilHorsZone = profilsManager.getAllProfilsOnPromenade().get(idTelHorsZone);
+                profilHorsZone.setHorsZone(! profilHorsZone.isHorsZone());
+
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
+
             // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan
             if (arg1.hasExtra("SYNCH_ACTIVITY"))
             {

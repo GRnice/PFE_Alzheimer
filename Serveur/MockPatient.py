@@ -16,7 +16,10 @@ if messageOuiOuNon == "y":
     sock.send("POSITION*7.071489*43.614939\r\n".encode())
     time.sleep(0.5)
     #sock.send("POSITION*7.071489*43.614939\r\n".encode())
-    
+
+input("envoyer derniere position")
+sock.send("POSITION*7.08*43.7\r\n".encode())
+
 input("envoyer stop suivi et fermer le socket")
 sock.send("STOPSUIVI\r\n".encode())
 sock.recv(4096) # attente du STOPSUIVI

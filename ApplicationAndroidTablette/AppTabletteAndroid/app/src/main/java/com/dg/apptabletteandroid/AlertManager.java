@@ -57,6 +57,7 @@ public class AlertManager
 
     public void notifNewSession(Context context,String idTel)
     {
+
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","NEWSESSION");
         intent.putExtra("IDTEL",idTel);
@@ -64,10 +65,11 @@ public class AlertManager
         PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
         NotificationCompat.Builder mBuild =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_report_problem)
-                        .setContentTitle("My notification")
+                        .setSmallIcon(R.drawable.ic_report_problem_white)
+                        .setContentTitle("Demande d'un suivi")
                         .setContentIntent(pintent)
                         .setPriority(Notification.PRIORITY_HIGH)
+                        .setAutoCancel(true)
                         .setContentText("Nouvelle promenade, configurer ?");
 
         Notification notif = mBuild.build();
@@ -76,7 +78,7 @@ public class AlertManager
 
 
         // Sets an ID for the notification
-        int mNotificationId = 1;
+        int mNotificationId = (int) System.currentTimeMillis();
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
@@ -86,6 +88,7 @@ public class AlertManager
 
     public void notifHorsZone(Context context,String idTel)
     {
+        if (!listen(idTel)) return;
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","ALERTE");
         intent.putExtra("IDTEL",idTel);
@@ -96,6 +99,7 @@ public class AlertManager
                         .setSmallIcon(R.drawable.ic_report_problem_white)
                         .setContentTitle("ALERTE - HORS ZONE")
                         .setContentIntent(pintent)
+                        .setAutoCancel(true)
                         .setPriority(Notification.PRIORITY_MAX)
                         .setContentText("Hors zone detecté ! cliquez pour désactiver l'alerte");
 
@@ -105,7 +109,7 @@ public class AlertManager
 
 
         // Sets an ID for the notification
-        int mNotificationId = 1;
+        int mNotificationId = (int) System.currentTimeMillis();
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.

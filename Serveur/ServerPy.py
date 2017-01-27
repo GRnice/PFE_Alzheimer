@@ -23,6 +23,7 @@ class Tracker: ## Classe representant un tracker
         self.prenom = None
         self.position = tuple() # (longitude, latitude)
         self.etat = 0
+        self.isHorsZone = False
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
         # 2 -> connecté et suivi
@@ -225,9 +226,15 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,")")
             self.serverAssistant.event("POSITION",socket,tracker)
 
-            if (not self.watchman.positionIsGood(longitude,latitude)):
-                print("WARNING HORS ZONE /!\/!\\")
-                self.serverAssistant.event("ALERT-POSITION",socket,tracker)
+            if (not self.watchman.positionIsGood(longitude,latitude)): # si mauvaise position
+                if (not tracker.isHorsZone): # si le tracker n'a pas taggé isHorsZone à True
+                    print("WARNING HORS ZONE /!\/!\\")
+                    tracker.isHorsZone = True
+                    self.serverAssistant.event("ALERT-POSITION_START",socket,tracker)
+                
+            elif (tracker.isHorsZone): # si la position est bonne et si le tracker a isHorsZone taggé à True
+                tracker.isHorsZone = False
+                self.serverAssistant.event("ALERT-POSITION_STOP",socket,tracker) # un deuxieme envoi de l'alerte la desactive
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
@@ -384,6 +391,7 @@ class PatientServer(Thread):
                             tracker = self.mapper.getTracker(sock)
                             if tracker == None:
                                 pass
+                            
                             elif (tracker == 2 or tracker == 1):
                                     print("Except Socket d'un patient perdu !")
                                     
