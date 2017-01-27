@@ -115,6 +115,7 @@ public class MapFragment_ extends BlankFragment
             }
 
         });
+        
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override

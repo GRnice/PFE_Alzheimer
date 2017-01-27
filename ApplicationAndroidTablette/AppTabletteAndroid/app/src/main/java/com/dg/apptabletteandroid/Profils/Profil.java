@@ -27,6 +27,7 @@ public class Profil
 
     private String nom = null;
     private String prenom = null;
+    private boolean horsZone = false;
     private boolean suivi = false; // si ce profil est suivi par au moins une personne
     private boolean suiviParTabletteCourante = false; // si la tablette courante suis ce profil
     private boolean susceptibleDeFranchirLaBarriere = false;
@@ -36,6 +37,8 @@ public class Profil
     private double latitudeExtrem;
     private double rayon;
     private Marker marker;
+    private int battery;
+    private boolean immobile = false;
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
     {
@@ -100,6 +103,16 @@ public class Profil
         this.nom = nom;
     }
 
+    public void setHorsZone(boolean state)
+    {
+        horsZone = state;
+    }
+
+    public boolean isHorsZone()
+    {
+        return horsZone;
+    }
+
     public String makeSignature()
     {
         StringBuilder sb = new StringBuilder(this.nom+","+this.prenom+",");
@@ -135,6 +148,7 @@ public class Profil
         return latitude;
     }
 
+
     public double getLatitudeExtrem() {
         return latitudeExtrem;
     }
@@ -152,6 +166,22 @@ public class Profil
     }
     public double getRayon() {
         return rayon;
+    }
+
+    public int getBattery() {
+        return battery;
+    }
+
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
+
+    public boolean isImmobile() {
+        return immobile;
+    }
+
+    public void setImmobile(boolean immobile) {
+        this.immobile = immobile;
     }
 
 }

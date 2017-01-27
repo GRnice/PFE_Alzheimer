@@ -47,6 +47,7 @@
         android:src="@drawable/full"
         android:adjustViewBounds="true"
         android:layout_marginRight="5dp"
+        android:id="@+id/batteryIcons"
         />
 
 

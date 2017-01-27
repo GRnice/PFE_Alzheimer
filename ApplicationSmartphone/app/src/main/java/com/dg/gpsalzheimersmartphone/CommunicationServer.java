@@ -25,7 +25,7 @@ import java.net.Socket;
 public class CommunicationServer extends Thread implements Runnable
 {
 
-    public static final String SOCKET_ADDR = "192.168.1.13";
+    public static final String SOCKET_ADDR = "10.212.103.233";
 
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";

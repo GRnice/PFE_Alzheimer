@@ -19,7 +19,7 @@ class AssistanceServer(Thread):
     def __init__(self,portAssistant,sizeBuffer,maxClientSocket):
         Thread.__init__(self)
         self.PORT = portAssistant
-        
+
         self.RECV_BUFFER = sizeBuffer
         self.maxClientSocket = maxClientSocket
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
@@ -42,7 +42,7 @@ class AssistanceServer(Thread):
             assistant.send(messageString.encode("utf-8"))
 
     # emet un message à tous les assistants sauf à l'assistant socketAssistant
-    
+
     def broadcastFilter(self,messageString,socketAssistant):
         # broadcast le message sauf a socketAssistant
         allAssistants = self.mapper.getSocketsAssistant()
@@ -61,24 +61,36 @@ class AssistanceServer(Thread):
         elif (evt == "POSITION"):
             print("(update) TRANSMISSION DE LA POSITION DE ",tracker.id)
             self.broadcast("UPDATE$"+str(tracker.id) + "*" + str(tracker.position[0]) + "*" +
-                                       str(tracker.position[1])+"\r\n")
+                                       str(tracker.position[1])+ "*" +  str(tracker.battery) + "\r\n")
 
-        elif (evt == "ALERT-POSITION"):
+        elif (evt == "ALERT-POSITION_START"):
             print("(alerte) HORS ZONE",tracker.id)
-            self.broadcast("ALERT$HORSZONE_"+tracker.id+"\r\n")
+            self.broadcast("ALERT$STARTHORSZONE_"+tracker.id+"\r\n")
 
+        elif (evt == "ALERT-POSITION_STOP"):
+            print("STOP HORS ZONE",tracker.id)
+            self.broadcast("ALERT$STOPHORSZONE_"+tracker.id+"\r\n")
+
+        elif(evt == "ALERT-BATTERY"):
+            print("(alerte) BATTERY FAIBLE", tracker.id)
+            self.broadcast("ALERT$BATTERY_"+tracker.id+"\r\n")
+			
+        elif(evt == "ALERT-IMMOBILE"):
+            print("(alerte) IMMOBILE", tracker.id)
+            self.broadcast("ALERT$IMMOBILE_"+tracker.id+"\r\n")
+			
     # ajout d'un assistant
     def addAssistant(self,sockAssistant):
         self.mapper.addAssistant(sockAssistant)
         # lui transmettre tous les promenés.
         listOfSocketPatient = list(self.mapper.getSocketPatient())
-        
+
         for sockPatient in listOfSocketPatient:
             tracker = self.mapper.getTracker(sockPatient)
             if tracker.etat == 2: # si le tracker courant a recu un OKPROMENADE
                 message = "SYNCH$NWPROMENADE_"+tracker.id+"*"+tracker.nom+"*"+tracker.prenom+"\r\n"
                 sockAssistant.send(message.encode('utf-8'))
-                
+
     # retrait d'un assistant
     def removeAssistant(self,sid):
         self.mapper.removeAssistant(sid)
@@ -93,7 +105,7 @@ class AssistanceServer(Thread):
     # soit idTel*prenom*nom -> configuration d'une promenade, cet assistant s'abonne egalement au suivi de ce patient
     def follow(self,sockAssistant,data):
         data = data.split("*")
-        
+
         if (len(data) == 1):
             # si FOLLOW$idTel
             idTel = data[0]
@@ -103,7 +115,7 @@ class AssistanceServer(Thread):
         elif (len(data) == 3):
             # si FOLLOW$idTel*prenom*nom
             idTel = data[0] ; prenom = data[1] ; nom = data[2]
-            
+
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
 
@@ -112,10 +124,10 @@ class AssistanceServer(Thread):
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
                 self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)
-            
+
             self.mapper.attachAssistant(sockPatient,sockAssistant)
 
-    
+
     def stopPromenade(self,sockAssistant,data):
         data = data.split("*")
         idTel = data[0]
@@ -126,7 +138,7 @@ class AssistanceServer(Thread):
 
     def stopServer(self):
         self.serverOnline = False
-    
+
     def run(self):
         self.serverOnline = True
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -139,12 +151,12 @@ class AssistanceServer(Thread):
         print("=============SERVEUR ONLINE=============")
         while self.serverOnline:
         # Get the list sockets which are ready to be read through select
-            
+
             liste = list(self.mapper.getSocketsAssistant()) # les sockets des assistants
             liste.extend(self.CONNECTION_LIST)
             socketsClients = list(self.mapper.getSocketsAssistant())
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
-            
+
             for sock in read_sockets:
                 #New connection
                 if sock == server_socket:
@@ -153,16 +165,16 @@ class AssistanceServer(Thread):
                     sockfd.send(message.encode('utf-8'))
                     self.addAssistant(sockfd)
                     print("Assistant (%s, %s) connected" % addr)
-                    
+
                 else:
                     # Data received from client, process it
                     try:
                         #In Windows, sometimes when a TCP program closes abruptly,
                         # a "Connection reset by peer" exception will be thrown
                         data = sock.recv(self.RECV_BUFFER)
-                        
+
                         if len(data) > 0:
-                            
+
                             message = (data.decode('utf-8')).rstrip().split("$")
                             # Si c'est un follow
                             if message[0] == "FOLLOW":
@@ -204,14 +216,14 @@ class AssistanceServer(Thread):
                                 print("send du synch modif")
                                 print("SYNCH$MODIFPROFIL_"+message[1])
                                 self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
-                                
+
                         else:
                             print("Assistant (%s) is offline" % sock)
                             sock.close()
                             self.removeAssistant(sock)
 
-         
-                     
+
+
                     # client disconnected, so remove from socket list
                     except Exception as err:
                         #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
@@ -220,6 +232,6 @@ class AssistanceServer(Thread):
                         sock.close()
                         self.removeAssistant(sock)
 
-             
+
         server_socket.close()
         print("=============SERVEUR OFFLINE=============")

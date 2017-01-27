@@ -5,8 +5,25 @@
     tools:context="com.dg.apptabletteandroid.fragments.Profils.ProfilFragment">
 
 
-    <ListView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/listingprofils" />
+        android:layout_height="match_parent">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="0.10"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/editTextForSearchingProfil"
+            android:hint="@string/edit_text_searching_profil" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="0.90"
+            android:id="@+id/listingprofils" />
+    </LinearLayout>
+
 </FrameLayout>
