@@ -131,7 +131,8 @@ public class MapFragment_ extends BlankFragment
                     Marker marker = profil.getMarker();
                     if (marker != null)
                     {
-                        googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        profil.setMarker(marker);
                     }
 
                 }
@@ -184,7 +185,8 @@ public class MapFragment_ extends BlankFragment
      * @return if event is consumed, it will return true.
      */
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         Log.d("AAA", "BACKPressed Map");
     }
 
@@ -218,9 +220,9 @@ public class MapFragment_ extends BlankFragment
             Profil profil = profilsPromenade.next();
             LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+            profil.setMarker(marker);
         }
 
-        refreshListe();
     }
 
     // ajout ou mise à jour du marker d'un profil
@@ -237,6 +239,7 @@ public class MapFragment_ extends BlankFragment
             marker.setPosition(latLng);
             profil.setMarker(marker);
         }
+        refresh();
     }
 
 }
