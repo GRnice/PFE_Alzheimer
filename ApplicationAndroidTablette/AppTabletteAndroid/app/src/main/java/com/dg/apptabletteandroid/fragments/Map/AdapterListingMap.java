@@ -64,6 +64,9 @@ public class AdapterListingMap extends ArrayAdapter {
         batteryTextView.setText(String.valueOf(profil.getBattery()) + "%");
         ImageView batteryIcons = (ImageView) rowView.findViewById(R.id.batteryIcons);
         ImageView batteryIcon = (ImageView) rowView.findViewById(R.id.batteryIcon);
+        if(profil.isImmobile()){
+            rowView.setBackgroundColor(Color.YELLOW);
+        }
         if(profil.getBattery() < 21){
             batteryTextView.setTextColor(Color.RED);
             batteryIcon.setImageResource(R.drawable.low);

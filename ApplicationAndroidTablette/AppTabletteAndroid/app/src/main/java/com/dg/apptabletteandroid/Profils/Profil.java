@@ -33,6 +33,7 @@ public class Profil
     private double latitude;
     private Marker marker;
     private int battery;
+    private boolean immobile = false;
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
     {
@@ -138,5 +139,13 @@ public class Profil
 
     public void setBattery(int battery) {
         this.battery = battery;
+    }
+
+    public boolean isImmobile() {
+        return immobile;
+    }
+
+    public void setImmobile(boolean immobile) {
+        this.immobile = immobile;
     }
 }

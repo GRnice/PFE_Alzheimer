@@ -6,6 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,12 +23,13 @@ import java.io.IOException;
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 import static com.dg.gpsalzheimersmartphone.MainActivity.android_id;
 
-public class ServiceSocket extends Service implements LocationListener
+public class ServiceSocket extends Service implements LocationListener, SensorEventListener
 {
     public static final String STARTSUIVI = "STARTSUIVI";
     public static final String CONTINUE = "CONTINUE";
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String POSITION = "POSITION";
+    public static final String IMMOBILE = "IMMOBILE";
     public static final String SEPARATOR = "*";
 
     final public static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
@@ -37,6 +42,13 @@ public class ServiceSocket extends Service implements LocationListener
     private NetworkChangeReceiver networkChangeReceiver;
     private BatteryChangeReceiver batteryChangeReceiver;
     private boolean onPromenade;
+
+    private static final String TAG = "Nombre Pas";
+    private SensorManager mSensorManagerCountStep;
+    private Sensor mSensor;
+    private float valeurCompteur = 0;
+    private long lastUpdate = 0;
+    private float lastValeurCompteur;
 
     public ServiceSocket()
     {
@@ -76,10 +88,49 @@ public class ServiceSocket extends Service implements LocationListener
         IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryChangeReceiver, ifilter);
 
+        //accelerometre
+
+        mSensorManagerCountStep = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManagerCountStep.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManagerCountStep.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         super.onStartCommand(intent,flags,startId);
         return START_STICKY;
     }
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if(onPromenade){
+            Sensor mySensor = sensorEvent.sensor;
 
+            if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                float x =  Math.abs(sensorEvent.values[0]);
+                float y =  Math.abs(sensorEvent.values[1]);
+                float z =  Math.abs(sensorEvent.values[2]);
+                long curTime = System.currentTimeMillis();
+                float ompteur = (((x*x) + (y*y) + (z*z)) / (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH));
+                if (ompteur >= 1.34) {
+                    valeurCompteur += 1;
+                }
+                if ((curTime - lastUpdate) > 20000) {
+                    if(lastValeurCompteur != 0){
+                        if((valeurCompteur - lastValeurCompteur) <5) {
+                            //Alerte Immobile
+                            comm.sendMessage(IMMOBILE);
+                        }
+                    }
+                    lastUpdate = curTime;
+                    lastValeurCompteur = valeurCompteur;
+                }
+                Log.d(TAG,Float.toString(valeurCompteur));
+            }
+        }
+    }
+
+
+    @Override
+    public void onAccuracyChanged(Sensor mSensor, int accuracy) {
+
+    }
     @Override
     public void onDestroy()
     {
@@ -91,6 +142,7 @@ public class ServiceSocket extends Service implements LocationListener
             checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
             lm.removeUpdates(this);
         }
+        mSensorManagerCountStep.unregisterListener(this);
         unregisterReceiver(clientReceiver);
         unregisterReceiver(serverReceiver);
         unregisterReceiver(networkChangeReceiver);
@@ -210,6 +262,7 @@ public class ServiceSocket extends Service implements LocationListener
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
                 lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,0,ServiceSocket.this);
+
             }
             else if (!startGps)
             {

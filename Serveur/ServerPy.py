@@ -269,7 +269,11 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     self.updateSocketPatient(oldSocket,socket)
                     socket.send("OKPROMENADE\r\n".encode('utf-8'))
                     break
-
+                    
+        elif (entete == "IMMOBILE"):
+            print("Alerte immobile")
+            tracker = self.getTracker(socket)
+            self.serverAssistant.event("ALERT-IMMOBILE",socket,tracker)
 
 
 

@@ -70,7 +70,11 @@ class AssistanceServer(Thread):
         elif(evt == "ALERT-BATTERY"):
             print("(alerte) BATTERY FAIBLE", tracker.id)
             self.broadcast("ALERT$BATTERY_"+tracker.id+"\r\n")
-
+			
+        elif(evt == "ALERT-IMMOBILE"):
+            print("(alerte) IMMOBILE", tracker.id)
+            self.broadcast("ALERT$IMMOBILE_"+tracker.id+"\r\n")
+			
     # ajout d'un assistant
     def addAssistant(self,sockAssistant):
         self.mapper.addAssistant(sockAssistant)

@@ -150,7 +150,10 @@ public class ServiceAdmin extends Service {
                         {
                             alertManager.notifBattery(getBaseContext(), idTel);
                         }
-
+                        case "IMMOBILE":
+                        {
+                            alertManager.notifImmobile(getBaseContext(), idTel);
+                        }
                     }
                 }
 
