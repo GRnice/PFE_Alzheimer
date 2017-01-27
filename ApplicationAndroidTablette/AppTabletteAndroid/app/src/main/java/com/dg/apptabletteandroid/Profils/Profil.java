@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.Marker;
 
+
 /**
  * Created by Remy on 08/12/2016.
  */
@@ -31,9 +32,13 @@ public class Profil
     private boolean suiviParTabletteCourante = false; // si la tablette courante suis ce profil
     private boolean susceptibleDeFranchirLaBarriere = false;
     private double longitude;
+    private double longitudeExtrem;  // les set en fct de long lat
     private double latitude;
+    private double latitudeExtrem;
+    private double rayon;
     private Marker marker;
     private int battery;
+    private boolean immobile = false;
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
     {
@@ -143,6 +148,26 @@ public class Profil
         return latitude;
     }
 
+
+    public double getLatitudeExtrem() {
+        return latitudeExtrem;
+    }
+
+    public double getLongitudeExtrem() {
+        return longitudeExtrem;
+    }
+
+    public double generateRaduis() {
+        longitudeExtrem = longitude + 0.0001;
+        latitudeExtrem = latitude + 0.0001;
+
+        rayon = Math.sqrt( Math.pow(longitudeExtrem - longitude, 2.0) + Math.pow(latitudeExtrem - latitude, 2.0) );
+        return rayon;
+    }
+    public double getRayon() {
+        return rayon;
+    }
+
     public int getBattery() {
         return battery;
     }
@@ -150,4 +175,13 @@ public class Profil
     public void setBattery(int battery) {
         this.battery = battery;
     }
+
+    public boolean isImmobile() {
+        return immobile;
+    }
+
+    public void setImmobile(boolean immobile) {
+        this.immobile = immobile;
+    }
+
 }

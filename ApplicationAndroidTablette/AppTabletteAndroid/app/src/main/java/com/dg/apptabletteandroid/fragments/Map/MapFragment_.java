@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class MapFragment_ extends BlankFragment
@@ -41,6 +42,7 @@ public class MapFragment_ extends BlankFragment
     private static Bitmap bitmap;
     private ListView listView;
     private ProfilOnPromenadeManager profilsManager;
+    private ProfilGroupManager profilsGroupManager;
 
     public MapFragment_()
     {
@@ -50,6 +52,7 @@ public class MapFragment_ extends BlankFragment
     public static MapFragment_ newInstance()
     {
         MapFragment_ fragment = new MapFragment_();
+        fragment.profilsGroupManager = ProfilGroupManager.newInstance();
         return fragment;
     }
 
@@ -78,7 +81,7 @@ public class MapFragment_ extends BlankFragment
 
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
                 ,R.layout.item_profil_en_promenade
-                ,new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values()));
+                ,new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values()));  // que les profils
 
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
@@ -112,6 +115,7 @@ public class MapFragment_ extends BlankFragment
             }
 
         });
+        
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -127,15 +131,24 @@ public class MapFragment_ extends BlankFragment
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 for(String idTel : allProfilsOnPromenade.keySet()){
+
                     Profil profil = allProfilsOnPromenade.get(idTel);
                     Marker marker = profil.getMarker();
+
+                    /*  if (profilsGroupManager.getHashProfilMarker().containsKey(profil)) {  // si il est deja dans un group
+                        marker = profilsGroupManager.getHashProfilMarker().get(profil);
+                        marker.setPosition(new LatLng(profil.getLatitude(), profil.getLongitude()));
+                        int nbPersonnesParGroupe = profilsGroupManager.getHashMarkerGroupProfil().get(profil).size();
+                        marker.setTitle(String.valueOf(nbPersonnesParGroupe));
+                    }*/
                     if (marker != null)
                     {
                         marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-                        profil.setMarker(marker);
+                        profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
                     }
 
                 }
+
                 if (res != PackageManager.PERMISSION_GRANTED)
                 {
                     return;
@@ -229,17 +242,37 @@ public class MapFragment_ extends BlankFragment
     public void update(Profil profil)
     {
         LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
-        if (profil.getMarker() == null){
-            Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+        Marker marker;
+
+        if (profil.getMarker() == null)
+        {
+            marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
             profil.setMarker(marker);
         }
+
         else
         {
-            Marker marker = profil.getMarker();
-            marker.setPosition(latLng);
-            profil.setMarker(marker);
+
+           /* profilsGroupManager.onUpdate(profil, profilsManager.getAllProfilsOnPromenade());
+            if (profilsGroupManager.getHashProfilMarker().containsKey(profil))
+            {
+                Log.e("AAAA", "BBB");
+                marker = profilsGroupManager.getHashProfilMarker().get(profil);
+                marker.setPosition(latLng);
+
+                int nbPersonnesParGroupe = profilsGroupManager.getHashMarkerGroupProfil().get(profil).size();
+                marker.setTitle(String.valueOf(nbPersonnesParGroupe));
+            }*/
+           // else
+           // {
+                Log.e("AAAA", "CCC");
+                marker = profil.getMarker();
+                marker.setPosition(latLng);
+         //   }
+
         }
         refresh();
     }
+
 
 }

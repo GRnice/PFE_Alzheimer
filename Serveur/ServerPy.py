@@ -251,6 +251,11 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             #print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
+        elif (entete == "IMMOBILE"):
+            print("Alerte immobilite")
+            tracker = self.getTracker(socket)
+            self.serverAssistant.event("ALERT-IMMOBILE",socket,tracker)
+
         elif (entete == "CONTINUE"):
             print("CONTINUE RECEIVE")
             idTel = requeteArray[1]
@@ -279,6 +284,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     self.updateSocketPatient(oldSocket,socket)
                     socket.send("OKPROMENADE\r\n".encode('utf-8'))
                     break
+                    
 
 
 

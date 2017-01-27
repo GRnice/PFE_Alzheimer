@@ -102,8 +102,10 @@ public class ProfilsManager implements ProfilOnPromenadeManager
             this.profilOnPromenade.get(idTel).setMarker(null);
             this.profilOnPromenade.get(idTel).setEstSuiviParMoi(false);
             this.profilOnPromenade.get(idTel).setHorsZone(false);
+            this.profilOnPromenade.get(idTel).setImmobile(false);
             this.profilOnPromenade.remove(idTel);
         }
+
     }
 
     /**
@@ -155,7 +157,6 @@ public class ProfilsManager implements ProfilOnPromenadeManager
 
         return null;
     }
-
 
     /**
      * Retourne un profil en promenade ayant comme identifiant idTel

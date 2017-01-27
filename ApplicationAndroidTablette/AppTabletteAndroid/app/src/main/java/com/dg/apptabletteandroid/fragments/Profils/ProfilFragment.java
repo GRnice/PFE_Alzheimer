@@ -74,7 +74,6 @@ public class ProfilFragment extends BlankFragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -124,6 +123,7 @@ public class ProfilFragment extends BlankFragment
         }
 
         EditText inputProfilSearch = (EditText) view.findViewById(R.id.editTextForSearchingProfil);
+
         inputProfilSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after)
@@ -149,6 +149,7 @@ public class ProfilFragment extends BlankFragment
                 worker.execute();
             }
         });
+        inputProfilSearch.clearFocus();
 
         return view;
     }
