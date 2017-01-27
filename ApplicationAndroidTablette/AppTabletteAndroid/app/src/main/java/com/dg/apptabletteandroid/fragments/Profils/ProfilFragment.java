@@ -3,14 +3,18 @@ package com.dg.apptabletteandroid.fragments.Profils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
@@ -21,6 +25,9 @@ import com.dg.apptabletteandroid.R;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 
 public class ProfilFragment extends BlankFragment
 {
@@ -28,6 +35,7 @@ public class ProfilFragment extends BlankFragment
     private ProfilsManager profilsManager;
     private String idTel;
     private boolean selectionProfilNewSession;
+    private WorkerListingProfil worker;
 
     public ProfilFragment()
     {
@@ -77,7 +85,9 @@ public class ProfilFragment extends BlankFragment
         View view = inflater.inflate(R.layout.fragment_profil, container, false);
         this.listView = (ListView) view.findViewById(R.id.listingprofils);
         Log.e("sizeallprofilarray",String.valueOf(profilsManager.getAllProfils().size()));
-        AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,profilsManager.getAllProfils());
+        ArrayList<Profil> listprofilFilter = new ArrayList<>(profilsManager.getAllProfils());
+        listprofilFilter.removeAll(profilsManager.getAllProfilsOnPromenade().values());
+        AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter);
         this.listView.setAdapter(adapterListing);
 
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
@@ -113,7 +123,42 @@ public class ProfilFragment extends BlankFragment
             });
         }
 
+        EditText inputProfilSearch = (EditText) view.findViewById(R.id.editTextForSearchingProfil);
+        inputProfilSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                if (worker != null)
+                {
+                    worker.cancel(true);
+                }
+                worker = new WorkerListingProfil();
+                worker.setText(s.toString());
+                worker.execute();
+            }
+        });
+
         return view;
+    }
+
+    public void updateListing(AdapterListing adapterListingBoutiques)
+    {
+        if (listView !=  null)
+        {
+            listView.setAdapter(adapterListingBoutiques);
+        }
     }
 
     @Override
@@ -140,6 +185,40 @@ public class ProfilFragment extends BlankFragment
         ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
     }
 
+
+    private class WorkerListingProfil extends AsyncTask
+    {
+        ArrayList<Profil> listProfilSelected;
+        String text;
+
+        public void setText(String text)
+        {
+            this.text = text;
+        }
+
+        @Override
+        protected Object doInBackground(Object[] words)
+        {
+            listProfilSelected = new ArrayList<>();
+
+            for(Profil b : profilsManager.getAllProfils())
+            {
+                if (b.getNom().contains(this.text) || b.getPrenom().contains(this.text))
+                {
+                    listProfilSelected.add(b);
+                }
+            }
+            return null;
+
+        }
+
+        protected void onPostExecute(Object result)
+        {
+            final AdapterListing listingBoutiques = new AdapterListing(
+                    getActivity(),R.layout.item_adapter_profil_listing,listProfilSelected );
+            updateListing(listingBoutiques);
+        }
+    }
 
 
 }
