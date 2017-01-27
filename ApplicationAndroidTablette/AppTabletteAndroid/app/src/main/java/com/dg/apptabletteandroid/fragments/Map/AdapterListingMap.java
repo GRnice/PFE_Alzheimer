@@ -61,7 +61,7 @@ public class AdapterListingMap extends ArrayAdapter {
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
         TextView batteryTextView = (TextView) rowView.findViewById(R.id.details).findViewById(R.id.batteryDetails);
-        batteryTextView.setText(String.valueOf(profil.getBattery()));
+        batteryTextView.setText(String.valueOf(profil.getBattery()) + "%");
         ImageView batteryIcons = (ImageView) rowView.findViewById(R.id.batteryIcons);
         ImageView batteryIcon = (ImageView) rowView.findViewById(R.id.batteryIcon);
         if(profil.getBattery() < 21){
