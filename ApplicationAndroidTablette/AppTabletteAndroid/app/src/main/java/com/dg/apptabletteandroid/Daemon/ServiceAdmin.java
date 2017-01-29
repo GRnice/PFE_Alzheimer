@@ -324,6 +324,12 @@ public class ServiceAdmin extends Service
                 stopSelf();
             }
 
+            if (arg1.hasExtra("STOP_SOUND"))
+            {
+                Log.e("yoo","stopSOUND");
+                alertManager.stopAudio();
+            }
+
             if (arg1.hasExtra("FOLLOW_NEW_SESSION")) {
                 String idTel = arg1.getStringExtra("IDTEL");
                 String prenom = arg1.getStringExtra("PRENOM");

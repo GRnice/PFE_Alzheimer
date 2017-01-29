@@ -30,8 +30,11 @@ import java.util.ArrayList;
  * ArrayAdapter pour personnaliser chaque item de la listview du fragment ProfilFragment
  */
 public class AdapterListing extends ArrayAdapter<Profil> {
-    public AdapterListing(Context context, int resource, ArrayList<Profil> objects) {
+    private boolean selectionProfilPourPromenade;
+
+    public AdapterListing(Context context, int resource, ArrayList<Profil> objects,boolean selectionProfilPourPromenade) {
         super(context, resource, objects);
+        this.selectionProfilPourPromenade = selectionProfilPourPromenade;
     }
 
     @Override
@@ -46,6 +49,11 @@ public class AdapterListing extends ArrayAdapter<Profil> {
         Button editButton = (Button) rowView.findViewById(R.id.buttonEdit);
         Button supprButton = (Button) rowView.findViewById(R.id.buttonSuppr);
 
+        if (selectionProfilPourPromenade)
+        {
+            editButton.setVisibility(View.INVISIBLE);
+            supprButton.setVisibility(View.INVISIBLE);
+        }
 
         final Profil profil = getItem(position);
         Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), profil.getIdRessourcesAvatar());

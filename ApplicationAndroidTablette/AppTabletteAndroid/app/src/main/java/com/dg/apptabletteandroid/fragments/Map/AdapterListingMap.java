@@ -2,6 +2,8 @@ package com.dg.apptabletteandroid.fragments.Map;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
@@ -49,7 +51,10 @@ public class AdapterListingMap extends ArrayAdapter {
             rowView = inflater.inflate(R.layout.item_profil_en_promenade, parent, false);
         }
 
+        ImageView imageProfil = (ImageView) rowView.findViewById(R.id.itemOnPromenadeAvatar);
+
         View detailView = rowView.findViewById(R.id.details);
+
         View iconView = rowView.findViewById(R.id.icons);
         if(!iconsList.contains(iconView)){
             iconsList.add(iconView);
@@ -58,6 +63,9 @@ public class AdapterListingMap extends ArrayAdapter {
             detailsList.add(detailView);
         }
         final Profil profil = profils.get(position);
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), profil.getIdRessourcesAvatar());
+        imageProfil.setImageBitmap(bitmap);
+
         if (profil.isHorsZone())
         {
             rowView.setBackgroundColor(Color.argb(128,255,80,41));

@@ -27,10 +27,12 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class AlertManager
 {
     private ArrayList<String> listOfIdTelOnListening; // liste des idTels a écouter
+    private MediaPlayer mediaPlayer;
 
     public AlertManager()
     {
         this.listOfIdTelOnListening = new ArrayList<>();
+        mediaPlayer = new MediaPlayer();
     }
 
     /**
@@ -54,6 +56,11 @@ public class AlertManager
         }
     }
 
+    public void stopAudio()
+    {
+        mediaPlayer.stop();
+    }
+
     public boolean listen(String idTel)
     {
         return (listOfIdTelOnListening.contains(idTel));
@@ -65,8 +72,10 @@ public class AlertManager
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","NEWSESSION");
         intent.putExtra("IDTEL",idTel);
+        int idNotif = (int)System.currentTimeMillis();
+        intent.putExtra("IDNOTIF",idNotif);
 
-        PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
+        PendingIntent pintent = PendingIntent.getActivity(context,idNotif,intent,0);
         NotificationCompat.Builder mBuild =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_report_problem_white)
@@ -80,9 +89,8 @@ public class AlertManager
 
         notif.flags |= Notification.FLAG_AUTO_CANCEL;
 
-
         // Sets an ID for the notification
-        int mNotificationId = (int) System.currentTimeMillis();
+        int mNotificationId = idNotif;
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
@@ -99,8 +107,10 @@ public class AlertManager
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","ALERTE");
         intent.putExtra("IDTEL",idTel);
+        int idNotif = (int)System.currentTimeMillis();
+        intent.putExtra("IDNOTIF",idNotif);
 
-        PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
+        PendingIntent pintent = PendingIntent.getActivity(context,idNotif,intent,0);
         NotificationCompat.Builder mBuild =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_report_problem_white)
@@ -116,7 +126,7 @@ public class AlertManager
 
 
         // Sets an ID for the notification
-        int mNotificationId = (int) System.currentTimeMillis();
+        int mNotificationId = idNotif;
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
@@ -124,8 +134,10 @@ public class AlertManager
         RingtoneManager mRing = new RingtoneManager(context);
         int mNumberOfRingtones = mRing.getCursor().getCount();
         Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
-        MediaPlayer mediaPlayer = new MediaPlayer();
+
         try {
+            mediaPlayer.stop();
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(context, mRingToneUri);
             mediaPlayer.prepare();
             mediaPlayer.start(); // no need to call prepare(); create() does that for you
@@ -137,13 +149,16 @@ public class AlertManager
         vibrator.vibrate(2000);
 
     }
+
     public void notifBattery(Context context, String idTel) {
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","ALERTE");
         intent.putExtra("IDTEL",idTel);
+        int idNotif = (int)System.currentTimeMillis();
+        intent.putExtra("IDNOTIF",idNotif);
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
 
-        PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
+        PendingIntent pintent = PendingIntent.getActivity(context,idNotif,intent,0);
         NotificationCompat.Builder mBuild =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_battery_alert)
@@ -158,7 +173,7 @@ public class AlertManager
 
 
         // Sets an ID for the notification
-        int mNotificationId = 1;
+        int mNotificationId = idNotif;
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
@@ -166,8 +181,10 @@ public class AlertManager
         RingtoneManager mRing = new RingtoneManager(context);
         int mNumberOfRingtones = mRing.getCursor().getCount();
         Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
-        MediaPlayer mediaPlayer = new MediaPlayer();
+
         try {
+            mediaPlayer.stop();
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(context, mRingToneUri);
             mediaPlayer.prepare();
             mediaPlayer.start(); // no need to call prepare(); create() does that for you
@@ -183,9 +200,12 @@ public class AlertManager
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","ALERTE");
         intent.putExtra("IDTEL",idTel);
+        int idNotif = (int)System.currentTimeMillis();
+        intent.putExtra("IDNOTIF",idNotif);
+
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         profil.setImmobile(true);
-        PendingIntent pintent = PendingIntent.getActivity(context,(int) System.currentTimeMillis(),intent,0);
+        PendingIntent pintent = PendingIntent.getActivity(context,idNotif,intent,0);
         NotificationCompat.Builder mBuild =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_directions_walk)
@@ -200,7 +220,7 @@ public class AlertManager
 
 
         // Sets an ID for the notification
-        int mNotificationId = 1;
+        int mNotificationId = idNotif;
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
@@ -208,8 +228,10 @@ public class AlertManager
         RingtoneManager mRing = new RingtoneManager(context);
         int mNumberOfRingtones = mRing.getCursor().getCount();
         Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
-        MediaPlayer mediaPlayer = new MediaPlayer();
+
         try {
+            mediaPlayer.stop();
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(context, mRingToneUri);
             mediaPlayer.prepare();
             mediaPlayer.start(); // no need to call prepare(); create() does that for you

@@ -89,8 +89,7 @@ public class ProfilFragment extends BlankFragment
         Log.e("sizeallprofilarray",String.valueOf(profilsManager.getAllProfils().size()));
         ArrayList<Profil> listprofilFilter = new ArrayList<>(profilsManager.getAllProfils());
         listprofilFilter.removeAll(profilsManager.getAllProfilsOnPromenade().values());
-        AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter);
-        this.listView.setAdapter(adapterListing);
+
 
         buttonAddProfil = (Button) view.findViewById(R.id.buttonAddProfil);
         buttonAddProfil.setOnClickListener(new View.OnClickListener() {
@@ -103,9 +102,13 @@ public class ProfilFragment extends BlankFragment
 
         if (this.selectionProfilNewSession)
         {
+            AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,true);
+            this.listView.setAdapter(adapterListing);
+
             this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
                     profilselected.setEstSuiviParMoi(true);
@@ -122,6 +125,10 @@ public class ProfilFragment extends BlankFragment
                     ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
                 }
             });
+        }
+        else
+        {
+            AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,false);
         }
 
         EditText inputProfilSearch = (EditText) view.findViewById(R.id.editTextForSearchingProfil);
@@ -218,7 +225,7 @@ public class ProfilFragment extends BlankFragment
         protected void onPostExecute(Object result)
         {
             final AdapterListing listingBoutiques = new AdapterListing(
-                    getActivity(),R.layout.item_adapter_profil_listing,listProfilSelected );
+                    getActivity(),R.layout.item_adapter_profil_listing,listProfilSelected,selectionProfilNewSession);
             updateListing(listingBoutiques);
         }
     }

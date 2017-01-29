@@ -2,6 +2,7 @@ package com.dg.apptabletteandroid;
 
 import android.app.ActivityManager;
 import android.app.Fragment;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -82,12 +83,22 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     @Override
     public void onNewIntent(Intent intent)
     {
+        NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notifManager.cancel(intent.getIntExtra("IDNOTIF",0));
+
+        Intent intentStopSound = new Intent();
+        intentStopSound.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+        intentStopSound.putExtra("STOP_SOUND","");
+        sendBroadcast(intentStopSound);
+
         if (intent.getStringExtra("WAKE_UP") != null && intent.getStringExtra("WAKE_UP").equals("NEWSESSION"))
         {
             String idTel = intent.getStringExtra("IDTEL");
             Fragment profilFragment = ProfilFragment.newInstance(profilsManager,true,idTel);
             fragmentManager.pushFragment(profilFragment,this);
         }
+
+
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
