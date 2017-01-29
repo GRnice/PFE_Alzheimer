@@ -1,4 +1,4 @@
-Tallarida,Laurie,BarriereNormal
-Veng,Laure,BarriereNormal
-Art,Christophe,BarriereAlerte
-Hankier,julian,BarriereNormal
+Tallarida,Laurie,2130837588,BarriereNormal
+Veng,Laure,2130837589,BarriereNormal
+Art,Christophe,2130837587,BarriereAlerte
+hanquier,julian,2130837588,BarriereAlerte

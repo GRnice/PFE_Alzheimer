@@ -48,12 +48,5 @@ public class FragmentManager
         ft2.commit();
         fragmentCourant = frag;
 
-        FloatingActionButton fab = (FloatingActionButton) act.findViewById(R.id.fab);
-        if(fragmentCourant instanceof ProfilFragment) {
-            fab.show();
-        }
-        else {
-            fab.hide();
-        }
     }
 }

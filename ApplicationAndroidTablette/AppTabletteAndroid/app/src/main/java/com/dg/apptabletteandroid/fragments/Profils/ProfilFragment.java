@@ -14,8 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -36,6 +38,7 @@ public class ProfilFragment extends BlankFragment
     private String idTel;
     private boolean selectionProfilNewSession;
     private WorkerListingProfil worker;
+    private Button buttonAddProfil;
 
     public ProfilFragment()
     {
@@ -89,15 +92,14 @@ public class ProfilFragment extends BlankFragment
         AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter);
         this.listView.setAdapter(adapterListing);
 
-        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        buttonAddProfil = (Button) view.findViewById(R.id.buttonAddProfil);
+        buttonAddProfil.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Fragment fragmentAdd = AddProfilFragment.newInstance();
+            public void onClick(View view) {
+                Fragment fragmentAdd = AddProfilFragment.newInstance(null);
                 ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmentAdd);
             }
         });
-
 
         if (this.selectionProfilNewSession)
         {

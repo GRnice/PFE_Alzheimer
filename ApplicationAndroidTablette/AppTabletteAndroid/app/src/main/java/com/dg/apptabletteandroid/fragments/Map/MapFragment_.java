@@ -39,7 +39,6 @@ public class MapFragment_ extends BlankFragment
     MapView mMapView;
     private GoogleMap googleMap;
 
-    private static Bitmap bitmap;
     private ListView listView;
     private ProfilOnPromenadeManager profilsManager;
     private ProfilGroupManager profilsGroupManager;
@@ -62,7 +61,7 @@ public class MapFragment_ extends BlankFragment
 
       //map
         super.onCreate(savedInstanceState);
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
+
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
     }
 
@@ -143,7 +142,9 @@ public class MapFragment_ extends BlankFragment
                     }*/
                     if (marker != null)
                     {
+                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
                         marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        marker.showInfoWindow();
                         profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
                     }
 
@@ -232,7 +233,9 @@ public class MapFragment_ extends BlankFragment
         {
             Profil profil = profilsPromenade.next();
             LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
+            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
             Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+            marker.showInfoWindow();
             profil.setMarker(marker);
         }
 
@@ -246,7 +249,9 @@ public class MapFragment_ extends BlankFragment
 
         if (profil.getMarker() == null)
         {
+            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
             marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+            marker.showInfoWindow();
             profil.setMarker(marker);
         }
 
@@ -268,6 +273,7 @@ public class MapFragment_ extends BlankFragment
                 Log.e("AAAA", "CCC");
                 marker = profil.getMarker();
                 marker.setPosition(latLng);
+                marker.showInfoWindow();
          //   }
 
         }

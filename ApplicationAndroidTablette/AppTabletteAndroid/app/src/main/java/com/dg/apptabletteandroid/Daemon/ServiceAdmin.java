@@ -104,7 +104,7 @@ public class ServiceAdmin extends Service
              */
             String message = arg1.getStringExtra("MESSAGE");
             if (message == null) return;
-
+            Log.e("MESSAGERECEIVED",message);
             String[] tabMessage = message.split("\\$"); // syntaxe d'un message -> "Entete$contenu"
             String header = tabMessage[0]; // l'entete
             Log.e("HEADER", header);
@@ -319,6 +319,11 @@ public class ServiceAdmin extends Service
                 }
             }
 
+            if (arg1.hasExtra("QUIT"))
+            {
+                stopSelf();
+            }
+
             if (arg1.hasExtra("FOLLOW_NEW_SESSION")) {
                 String idTel = arg1.getStringExtra("IDTEL");
                 String prenom = arg1.getStringExtra("PRENOM");
@@ -396,7 +401,7 @@ public class ServiceAdmin extends Service
                 if (status == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
                     Log.e("ABAB", "not connected");
 
-                    if (connected)
+                    if (connected && comm != null)
                     {
                         // couper le socket
                         comm.interrupt();

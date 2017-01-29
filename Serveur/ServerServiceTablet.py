@@ -195,9 +195,9 @@ class AssistanceServer(Thread):
                             elif message[0] == "ADDPROFIL":
                                 print("ADDPROFIL",message[1])
                                 profilStr = message[1].split(',')
-                                nom = profilStr[0]; prenom = profilStr[1]; barriere = profilStr[2]
-                                self.managerProfils.addProfil(nom,prenom,barriere)
-                                self.broadcastFilter("SYNCH$NWPROFIL_"+nom+"*"+prenom+"*"+barriere+"\r\n",sock)
+                                nom = profilStr[0]; prenom = profilStr[1];idAvatar = profilStr[2]; barriere = profilStr[3]
+                                self.managerProfils.addProfil(nom,prenom,idAvatar,barriere)
+                                self.broadcastFilter("SYNCH$NWPROFIL_"+nom+"*"+prenom+"*"+idAvatar+"*"+barriere+"\r\n",sock)
 
                             elif message[0] == "SUPPRPROFIL":
                                 print('SUPPRPROFIL')

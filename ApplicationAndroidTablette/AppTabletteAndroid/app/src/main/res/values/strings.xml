@@ -12,4 +12,6 @@
 
     <string name="edit_text_searching_profil">Rechercher un profil</string>
 
+    <string name="edit_test_add_nom">Entrez un nom de famille</string>
+    <string name="edit_test_add_prenom">Entrez un prénom</string>
 </resources>

@@ -4,13 +4,17 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.dg.apptabletteandroid.Daemon.DataKeeper;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
@@ -19,6 +23,7 @@ import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -27,14 +32,20 @@ import java.util.ArrayList;
 
 public class AddProfilFragment extends BlankFragment {
 
+    private AdapterSpinnerAvatar adapterSpinnerAvatar;
+    private ArrayList<Integer> arrayAvatars;
+    private Profil profilModif;
+
     public AddProfilFragment() {}
 
 
-    public static AddProfilFragment newInstance()
+    public static AddProfilFragment newInstance(@Nullable Profil profilModifier)
     {
         AddProfilFragment fragment = new AddProfilFragment();
+        fragment.profilModif = profilModifier;
         return fragment;
     }
+
 
 
     @Override
@@ -51,8 +62,19 @@ public class AddProfilFragment extends BlankFragment {
         final EditText prenom = (EditText) view.findViewById(R.id.editNameTextField);
         final EditText nom = (EditText) view.findViewById(R.id.editLastNameTextField);
         final Button buttonBarriere = (Button) view.findViewById(R.id.barriereButton);
+        final Spinner spinnerSelectAvatar = (Spinner) view.findViewById(R.id.spinner_select_avatar);
         Button addButton = (Button) view.findViewById(R.id.buttonModifier);
         Button cancelButton = (Button) view.findViewById(R.id.buttonAnnulerAjout);
+
+        arrayAvatars = new ArrayList<>();
+        arrayAvatars.add(R.drawable.avatar);
+        arrayAvatars.add(R.drawable.avatar_rouge);
+        arrayAvatars.add(R.drawable.avatar_vert);
+
+        adapterSpinnerAvatar = new AdapterSpinnerAvatar(getActivity(),R.layout.item_adapter_avatar_listing,arrayAvatars);
+        adapterSpinnerAvatar.setDropDownViewResource(R.layout.item_adapter_avatar_listing);
+        spinnerSelectAvatar.setAdapter(adapterSpinnerAvatar);
+        spinnerSelectAvatar.getSelectedItemPosition();
 
         buttonBarriere.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +89,24 @@ public class AddProfilFragment extends BlankFragment {
             }
         });
 
+        if (profilModif != null)
+        {
+            nom.setText(profilModif.getNom());
+            prenom.setText(profilModif.getPrenom());
+            buttonBarriere.setText("Non");
+            if (profilModif.getSusceptibleDeFranchirLaBarriere())
+            {
+                buttonBarriere.setText("Oui");
+
+            }
+            addButton.setText("MODIFIER");
+            int spinnerPosition = arrayAvatars.indexOf(profilModif.getIdRessourcesAvatar());
+            spinnerSelectAvatar.setSelection(spinnerPosition);
+
+        }
+
         final boolean barriereBool;
+
         if(buttonBarriere.getText().toString().equals("Oui")) {
             barriereBool = true;
         }
@@ -75,28 +114,57 @@ public class AddProfilFragment extends BlankFragment {
             barriereBool = false;
         }
 
-
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {  // traiter le cas du offline .. !! recheck Service Admin a la fin
-                String firstName = prenom.getText().toString();
-                String lastName = nom.getText().toString();
+            public void onClick(View v)
+            {  // traiter le cas du offline .. !! recheck Service Admin a la fin
+
+                String newPrenom = prenom.getText().toString();
+                String newNom = nom.getText().toString();
                 Log.d("New", nom + " " + prenom);
-                Profil newProfile = new Profil(lastName, firstName, barriereBool);
-                ((Main2Activity)getActivity()).getProfilsManager().getAllProfils().add(newProfile);
+                int idAvatar = arrayAvatars.get(spinnerSelectAvatar.getSelectedItemPosition());
+                Log.e("idAvatar",String.valueOf(idAvatar));
 
-                // activity me donne le shared preference
-                SharedPreferences shared = ((Main2Activity)getActivity()).getPreferences(Context.MODE_PRIVATE);
-                ArrayList<Profil> listProfils = ((Main2Activity)getActivity()).getProfilsManager().getAllProfils();
-                ((Main2Activity)getActivity()).getProfilsManager().updateList(shared, listProfils);
 
-                // send au service
-                Intent intent = new Intent();
-                intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-                intent.putExtra("ADDPROFIL", newProfile.makeSignature()); // nom,prenom,BarriereNormal
-                getActivity().sendBroadcast(intent);
+                if (profilModif != null)
+                {
+                    Profil oldProfil = new Profil(profilModif.getNom(),
+                            profilModif.getPrenom(),
+                            profilModif.getSusceptibleDeFranchirLaBarriere(),
+                            profilModif.getIdRessourcesAvatar());
 
-                onBackPressed();  // retourne au fragment list de tous les profil
+                    profilModif.setPrenom(newPrenom);
+                    profilModif.setNom(newNom);
+                    profilModif.susceptibleDeFranchirLaBarriere(barriereBool);
+                    profilModif.setIdAvatar(idAvatar);
+
+                    // update sharedPreference
+                    SharedPreferences shared = ((Main2Activity) getActivity()).getPreferences(Context.MODE_PRIVATE);
+                    ArrayList<Profil> listProfils = ((Main2Activity)getActivity()).getProfilsManager().getAllProfils();
+                    ((Main2Activity)getActivity()).getProfilsManager().updateList(shared, listProfils);
+                    Intent intent = new Intent();
+                    intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+                    intent.putExtra("MODIFPROFIL", oldProfil.makeSignature()+ "*" + profilModif.makeSignature());
+                    getActivity().sendBroadcast(intent);
+
+                }
+                else
+                {
+                    Profil newProfile = new Profil(newNom,newPrenom,barriereBool,idAvatar);
+                    ((Main2Activity)getActivity()).getProfilsManager().getAllProfils().add(newProfile);
+                    // activity me donne le shared preference
+                    SharedPreferences shared = ((Main2Activity)getActivity()).getPreferences(Context.MODE_PRIVATE);
+                    ArrayList<Profil> listProfils = ((Main2Activity)getActivity()).getProfilsManager().getAllProfils();
+                    ((Main2Activity)getActivity()).getProfilsManager().updateList(shared, listProfils);
+                    // send au service
+                    Intent intent = new Intent();
+                    intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+                    intent.putExtra("ADDPROFIL", newProfile.makeSignature()); // nom,prenom,BarriereNormal
+                    getActivity().sendBroadcast(intent);
+                }
+
+                onBackPressed();  // retourn au fragment précedent (list des profil)
+
             }
         });
 
@@ -106,9 +174,6 @@ public class AddProfilFragment extends BlankFragment {
                 onBackPressed();
             }
         });
-
-
-
 
         return view;
     }

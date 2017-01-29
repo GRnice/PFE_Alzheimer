@@ -1,180 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.dg.apptabletteandroid.fragments.Profils.ProfilEdit"
-    android:weightSum="1">
-
-
-<LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_weight="0.8"
-    android:weightSum="1">
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.25"
-        android:weightSum="1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:weightSum="1">   
-
-            <TextView
-                android:text="Prénom"
-                android:layout_width="157dp"
-                android:layout_height="39dp"
-                android:id="@+id/nameTextView"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="25dp" />  
-        </LinearLayout>   
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5">
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:text="firstName"
-                android:id="@+id/editNameTextField"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="25dp" />
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.25"
-        android:weightSum="1" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:weightSum="1">   
-
-            <TextView
-                android:text="Nom"
-                android:layout_width="157dp"
-                android:layout_height="39dp"
-                android:id="@+id/textView2"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="25dp" />  
-        </LinearLayout>   
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5">
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:text="LastName"
-                android:id="@+id/editLastNameTextField"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="25dp" />
-        </LinearLayout>
-    </LinearLayout> 
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.25"
-        android:weightSum="1" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:weightSum="1">   
-
-            <TextView
-                android:text="Susceptible de franchir la barrière"
-                android:layout_width="157dp"
-                android:layout_height="39dp"
-                android:id="@+id/barriereTextView"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="25dp" />  
-        </LinearLayout>   
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="39dp"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="10dp"
-                android:text="Oui"
-                android:clickable="true"
-                android:id="@+id/barriereButton" />
-
-             
-        </LinearLayout>
-    </LinearLayout> 
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.25"
-        android:weightSum="1" >
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5">
-
-            <Button
-                android:text="Modifier"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/buttonModifier" />
-
-            </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5">
-
-            <Button
-                android:text="ANNULER"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/buttonAnuulerModif" />
-
-
-            </LinearLayout>
-
-        </LinearLayout> 
-</LinearLayout>
-
-</LinearLayout>
-
-
-
-

@@ -16,6 +16,8 @@
         android:name="android.support.v7.app.AppCompatDialogFragment"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout="@layout/fragment_blank"
         class="com.dg.apptabletteandroid.fragments.BlankFragment"
-        android:id="@+id/fragment" />
+        android:id="@+id/fragment"
+        tools:layout="@layout/fragment_blank" />
 </RelativeLayout>

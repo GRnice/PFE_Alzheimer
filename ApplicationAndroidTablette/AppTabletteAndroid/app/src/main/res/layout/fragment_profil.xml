@@ -10,20 +10,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="0.10"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/editTextForSearchingProfil"
-            android:hint="@string/edit_text_searching_profil" />
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:weightSum="1">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/editTextForSearchingProfil"
+                android:hint="@string/edit_text_searching_profil" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Ajouter un profil"
+                android:id="@+id/buttonAddProfil"/>
+        </LinearLayout>
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="0px"
             android:layout_weight="0.90"
             android:id="@+id/listingprofils" />
+
     </LinearLayout>
 
 </FrameLayout>

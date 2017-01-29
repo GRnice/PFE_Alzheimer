@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dg.apptabletteandroid.fragments.Profils.ProfilEdit"
+    tools:context="com.dg.apptabletteandroid.fragments.Profils.AddProfilFragment"
     android:weightSum="1">
 
 
@@ -19,39 +19,117 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.25"
+            android:layout_weight="0.15"
             android:weightSum="1">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5"
+                android:layout_weight="0.25"
                 android:weightSum="1">   
 
                 <TextView
                     android:text="Prénom"
-                    android:layout_width="157dp"
-                    android:layout_height="39dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:id="@+id/nameTextView"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginLeft="25dp" />  
+                    android:textStyle="normal|bold"
+                    android:gravity="fill_vertical|center_horizontal"
+                    android:background="@color/common_google_signin_btn_text_dark_disabled"
+                    android:textSize="18sp" />  
             </LinearLayout>   
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5">
+                android:layout_weight="0.75">
 
                 <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:inputType="textPersonName"
-                    android:text="firstName"
                     android:id="@+id/editNameTextField"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginLeft="25dp" />
+                    android:hint="@string/edit_test_add_prenom"
+                    android:textAlignment="center" />
             </LinearLayout>
 
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.15"
+            android:weightSum="1" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:weightSum="1">   
+
+                <TextView
+                    android:text="Nom"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/textView2"
+                    android:textStyle="normal|bold"
+                    android:gravity="fill_vertical|center_horizontal"
+                    android:background="@color/common_google_signin_btn_text_dark_disabled"
+                    android:textSize="18sp" />  
+            </LinearLayout>   
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.75">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textPersonName"
+                    android:id="@+id/editLastNameTextField"
+                    android:hint="@string/edit_test_add_nom"
+                    android:textAlignment="center" />
+            </LinearLayout>
+        </LinearLayout> 
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.15"
+            android:weightSum="1" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:weightSum="1">   
+
+                <TextView
+                    android:text="Avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/textViewSelectionAvatar"
+                    android:textStyle="normal|bold"
+                    android:gravity="fill_vertical|center_horizontal"
+                    android:background="@color/common_google_signin_btn_text_dark_disabled"
+                    android:textSize="18sp" />  
+            </LinearLayout>   
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.75">
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/spinner_select_avatar"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -69,51 +147,14 @@
                 android:weightSum="1">   
 
                 <TextView
-                    android:text="Nom"
-                    android:layout_width="157dp"
-                    android:layout_height="39dp"
-                    android:id="@+id/textView2"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginLeft="25dp" />  
-            </LinearLayout>   
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5">
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:text="LastName"
-                    android:id="@+id/editLastNameTextField"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginLeft="25dp" />
-            </LinearLayout>
-        </LinearLayout> 
-
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.25"
-            android:weightSum="1" >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5"
-                android:weightSum="1">   
-
-                <TextView
                     android:text="Susceptible de franchir la barrière"
-                    android:layout_width="157dp"
-                    android:layout_height="39dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:id="@+id/barriereTextView"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginLeft="25dp" />  
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textStyle="normal|bold"
+                    android:textSize="18sp"
+                    android:background="@color/common_google_signin_btn_text_dark_disabled" />  
             </LinearLayout>   
 
             <LinearLayout
@@ -122,13 +163,15 @@
                 android:layout_weight="0.5">
 
                 <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="39dp"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:text="Oui"
                     android:clickable="true"
-                    android:id="@+id/barriereButton" />
+                    android:id="@+id/barriereButton"
+                    android:layout_margin="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@android:color/holo_blue_dark"
+                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
                  
             </LinearLayout>
@@ -138,7 +181,14 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.25"
+            android:layout_weight="0.01"
+            android:background="@android:color/black"></LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.29"
             android:weightSum="1" >
 
             <LinearLayout
@@ -151,7 +201,8 @@
                     android:text="AJOUTER"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/buttonModifier" />
+                    android:id="@+id/buttonModifier"
+                    android:background="@android:color/holo_green_light" />
 
             </LinearLayout>
 
@@ -167,7 +218,8 @@
                     android:text="ANNULER"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/buttonAnnulerAjout" />
+                    android:id="@+id/buttonAnnulerAjout"
+                    android:background="@android:color/holo_red_light" />
 
             </LinearLayout>
 

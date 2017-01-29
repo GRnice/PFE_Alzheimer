@@ -1,6 +1,7 @@
 package com.dg.apptabletteandroid.Profils;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.Marker;
 
@@ -13,20 +14,22 @@ public class Profil
 {
     public static Profil buildProfilFromSignature(String signature)
     {
-        // "nom,prenom,BarrierAlerte" ou "nom,prenom,BarrierNormal"
+        // "nom,prenom,idRessourceAvatar,BarrierAlerte" ou "nom,prenom,idRessourceAvatar,BarrierNormal"
         Profil prof = new Profil();
         String[] tabProfil = signature.split(",");
 
-
+        Log.e(signature,"SIGNATURE");
         prof.setNom(tabProfil[0]);
         prof.setPrenom(tabProfil[1]);
-        prof.susceptibleDeFranchirLaBarriere(tabProfil[2].equals("BarriereAlerte"));
+        prof.idRessourcesAvatar = Integer.valueOf(tabProfil[2]);
+        prof.susceptibleDeFranchirLaBarriere(tabProfil[3].equals("BarriereAlerte"));
         return prof;
     }
 
 
     private String nom = null;
     private String prenom = null;
+    private int idRessourcesAvatar;
     private boolean horsZone = false;
     private boolean suivi = false; // si ce profil est suivi par au moins une personne
     private boolean suiviParTabletteCourante = false; // si la tablette courante suis ce profil
@@ -40,10 +43,11 @@ public class Profil
     private int battery;
     private boolean immobile = false;
 
-    public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere)
+    public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere,int idAvatar)
     {
         this.nom = nom;
         this.prenom = prenom;
+        this.idRessourcesAvatar = idAvatar;
         this.susceptibleDeFranchirLaBarriere = susceptibleDeFranchirLaBarriere;
         this.marker = null;
     }
@@ -70,6 +74,11 @@ public class Profil
     public String getNom()
     {
         return nom;
+    }
+
+    public int getIdRessourcesAvatar()
+    {
+        return idRessourcesAvatar;
     }
 
     @Nullable
@@ -115,7 +124,7 @@ public class Profil
 
     public String makeSignature()
     {
-        StringBuilder sb = new StringBuilder(this.nom+","+this.prenom+",");
+        StringBuilder sb = new StringBuilder(this.nom+","+this.prenom+","+String.valueOf(this.idRessourcesAvatar)+",");
 
         if (susceptibleDeFranchirLaBarriere)
         {
@@ -133,6 +142,11 @@ public class Profil
     {
         latitude = lat;
         this.longitude = longitude;
+    }
+
+    public void setIdAvatar(int id)
+    {
+        idRessourcesAvatar = id;
     }
 
     public void setMarker(Marker markerP)

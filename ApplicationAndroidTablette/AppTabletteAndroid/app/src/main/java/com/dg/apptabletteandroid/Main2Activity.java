@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -27,6 +29,7 @@ import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
 import com.dg.apptabletteandroid.fragments.Parametres.ParameterFragment;
+import com.dg.apptabletteandroid.fragments.Profils.AddProfilFragment;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
@@ -50,7 +53,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -60,20 +62,9 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         fragmentManager = new FragmentManager();
-
-        if (getIntent().getStringExtra("WAKE_UP") != null && getIntent().getStringExtra("WAKE_UP").equals("NEWSESSION"))
-        {
-            String idTel = getIntent().getStringExtra("IDTEL");
-            Fragment profilFragment = ProfilFragment.newInstance(profilsManager,true,idTel);
-            fragmentManager.pushFragment(profilFragment,this);
-        }
-        else
-        {
-            Fragment mapFragment = MapFragment_.newInstance();
-            fragmentManager.pushFragment(mapFragment,this);
-        }
+        Fragment mapFragment = MapFragment_.newInstance();
+        fragmentManager.pushFragment(mapFragment,this);
 
 
 
@@ -86,6 +77,17 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             wakeful.startWakefulService(this,intent);
         }
 
+    }
+
+    @Override
+    public void onNewIntent(Intent intent)
+    {
+        if (intent.getStringExtra("WAKE_UP") != null && intent.getStringExtra("WAKE_UP").equals("NEWSESSION"))
+        {
+            String idTel = intent.getStringExtra("IDTEL");
+            Fragment profilFragment = ProfilFragment.newInstance(profilsManager,true,idTel);
+            fragmentManager.pushFragment(profilFragment,this);
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -158,7 +160,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         }
         else if (id == R.id.nav_exit)
         {
-
+            Intent intent = new Intent();
+            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+            intent.putExtra("QUIT","");
+            sendBroadcast(intent);
+            finish();
         }
         // else if (id == R.id.nav_share) {} else if (id == R.id.nav_send) {}
 
@@ -350,14 +356,16 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String[] params = arg1.getStringArrayExtra("NWPROFIL");
                 String nom = params[0];
                 String prenom = params[1];
-                String barriere = params[2];
+                int idAvatar = Integer.valueOf(params[2]);
+                String barriere = params[3];
+
                 Boolean barriereBool;
                 if(barriere.equals("BarriereNormal")) {
                     barriereBool = false;
                 } else {
                     barriereBool = true;
                 }
-                profilsManager.getAllProfils().add(new Profil(nom, prenom, barriereBool));
+                profilsManager.getAllProfils().add(new Profil(nom, prenom, barriereBool,idAvatar));
 
             }
 
@@ -378,7 +386,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
                 String newNom = params[1].split(",")[0];
                 String newPrenom = params[1].split(",")[1];
-                String barriere = params[1].split(",")[2];
+                int idAvatar = Integer.valueOf(params[1].split(",")[2]);
+                String barriere = params[1].split(",")[3];
 
                 profilsManager.removeProfil(oldPrenom, oldNom);
                 Boolean barriereBool;
@@ -387,7 +396,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 } else {
                     barriereBool = true;
                 }
-                profilsManager.getAllProfils().add(new Profil(newNom, newPrenom, barriereBool));
+                profilsManager.getAllProfils().add(new Profil(newNom, newPrenom, barriereBool,idAvatar));
             }
 
             else if (arg1.hasExtra("HORSZONE"))
