@@ -165,13 +165,13 @@
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Oui"
                     android:clickable="true"
                     android:id="@+id/barriereButton"
                     android:layout_margin="20dp"
                     android:layout_marginRight="20dp"
                     android:background="@android:color/holo_blue_dark"
-                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
+                    android:textColor="@color/common_google_signin_btn_text_dark_default"
+                    android:text="Oui" />
 
                  
             </LinearLayout>

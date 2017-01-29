@@ -90,7 +90,7 @@ public class ProfilFragment extends BlankFragment
         ArrayList<Profil> listprofilFilter = new ArrayList<>(profilsManager.getAllProfils());
         listprofilFilter.removeAll(profilsManager.getAllProfilsOnPromenade().values());
 
-
+        getActivity().setTitle("Profils");
         buttonAddProfil = (Button) view.findViewById(R.id.buttonAddProfil);
         buttonAddProfil.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +109,7 @@ public class ProfilFragment extends BlankFragment
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                    getActivity().setTitle("Selectionner un profil");
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
                     profilselected.setEstSuiviParMoi(true);
@@ -129,6 +130,7 @@ public class ProfilFragment extends BlankFragment
         else
         {
             AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,false);
+            this.listView.setAdapter(adapterListing);
         }
 
         EditText inputProfilSearch = (EditText) view.findViewById(R.id.editTextForSearchingProfil);

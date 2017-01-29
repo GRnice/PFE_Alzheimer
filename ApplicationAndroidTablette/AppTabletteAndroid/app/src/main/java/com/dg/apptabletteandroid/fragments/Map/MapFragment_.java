@@ -77,7 +77,7 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
-
+        getActivity().setTitle("Carte");
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
                 ,R.layout.item_profil_en_promenade
                 ,new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values()));  // que les profils

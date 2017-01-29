@@ -80,23 +80,24 @@ public class AddProfilFragment extends BlankFragment {
             @Override
             public void onClick(View v) {
 
-                if(buttonBarriere.getText().toString().equals("Oui")) {
-                    buttonBarriere.setText("Non");
+                if(buttonBarriere.getText().toString().equals("OUI")) {
+                    buttonBarriere.setText("NON");
 
                 } else {
-                    buttonBarriere.setText("Oui");
+                    buttonBarriere.setText("OUI");
                 }
             }
         });
 
         if (profilModif != null)
         {
+            getActivity().setTitle("Modifier un profil");
             nom.setText(profilModif.getNom());
             prenom.setText(profilModif.getPrenom());
-            buttonBarriere.setText("Non");
+            buttonBarriere.setText("NON");
             if (profilModif.getSusceptibleDeFranchirLaBarriere())
             {
-                buttonBarriere.setText("Oui");
+                buttonBarriere.setText("OUI");
 
             }
             addButton.setText("MODIFIER");
@@ -104,15 +105,13 @@ public class AddProfilFragment extends BlankFragment {
             spinnerSelectAvatar.setSelection(spinnerPosition);
 
         }
-
-        final boolean barriereBool;
-
-        if(buttonBarriere.getText().toString().equals("Oui")) {
-            barriereBool = true;
+        else
+        {
+            getActivity().setTitle("Creer un profil");
         }
-        else {
-            barriereBool = false;
-        }
+
+
+
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,6 +123,14 @@ public class AddProfilFragment extends BlankFragment {
                 Log.d("New", nom + " " + prenom);
                 int idAvatar = arrayAvatars.get(spinnerSelectAvatar.getSelectedItemPosition());
                 Log.e("idAvatar",String.valueOf(idAvatar));
+                final boolean barriereBool;
+
+                if(buttonBarriere.getText().toString().equals("OUI")) {
+                    barriereBool = true;
+                }
+                else {
+                    barriereBool = false;
+                }
 
 
                 if (profilModif != null)

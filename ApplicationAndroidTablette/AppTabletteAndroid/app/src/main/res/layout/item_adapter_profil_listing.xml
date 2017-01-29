@@ -25,18 +25,8 @@
     android:text="Pseudo"
     />
 
-<TextView
-    android:id="@+id/status"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textColor="@android:color/black"
-    android:layout_alignLeft="@+id/prenomNomItem"
-    android:layout_below="@+id/prenomNomItem"
-    android:text="Status"
-    />
-
     <Button
-        android:text="Delete"
+        android:text="Supprimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -49,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/buttonEdit"
-        android:text="Edit"
+        android:text="Editer"
         android:layout_marginEnd="13dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
