@@ -151,6 +151,7 @@ public class AlertManager
     }
 
     public void notifBattery(Context context, String idTel) {
+        if (!listen(idTel)) return;
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","ALERTE");
         intent.putExtra("IDTEL",idTel);
@@ -197,6 +198,7 @@ public class AlertManager
 
     }
     public void notifImmobile(Context context, String idTel) {
+        if (!listen(idTel)) return;
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP","ALERTE");
         intent.putExtra("IDTEL",idTel);

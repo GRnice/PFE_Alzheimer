@@ -28,16 +28,6 @@
         />
 
     <ImageView
-        android:layout_height="32dp"
-        android:layout_width="38dp"
-        android:maxHeight="50dp"
-        android:maxWidth="50dp"
-        android:layout_marginLeft="7dp"
-        android:src="@drawable/pulse"
-        android:adjustViewBounds="true"
-        />
-
-    <ImageView
         android:layout_height="wrap_content"
         android:layout_width="36dp"
         android:maxHeight="50dp"

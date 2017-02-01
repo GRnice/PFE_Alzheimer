@@ -1,5 +1,6 @@
 package com.dg.apptabletteandroid.fragments.Map;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -7,18 +8,20 @@ import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.google.android.gms.maps.model.Marker;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Created by dominiquedib on 27/01/2017.
  */
 
-public class ProfilGroupManager {
-    private HashMap<Profil, Marker> hashProfilMarker;
-    private HashMap<Marker, ArrayList<Profil>> hashMarkerGroupProfil;
+public class ProfilGroupManager
+{
+
+    private HashSet<Group> setOfGroups;
 
     public ProfilGroupManager() {
-        hashMarkerGroupProfil = new HashMap<>();
-        hashProfilMarker = new HashMap<>();
+        setOfGroups = new HashSet<>();
     }
 
     public static ProfilGroupManager newInstance() {
@@ -26,61 +29,115 @@ public class ProfilGroupManager {
         return groupManager;
     }
 
-    public void onUpdate(Profil profile, HashMap<String, Profil> allProfilsOnPromenade){
-        if (allProfilsOnPromenade.values().size() == 0) {
-            return;
-        }
-
-        if(hashProfilMarker.containsKey(profile)) {  // si P est dans un Groupe
-            ArrayList<Profil> listProcheDeProfile = hashMarkerGroupProfil.get(hashProfilMarker.get(profile));
-
-            ArrayList<Profil> listNewProche = new ArrayList<>();
-            ArrayList<Profil> listFarToProfile = new ArrayList<>();
-
-            for(Profil profilProche : listProcheDeProfile) {
-                if(!profile.equals(profilProche)) {
-                    if(isInside(profile, profilProche)) {
-                        Log.e("AAAA", "isInside");
-                        listNewProche.add(profilProche);
-                    }
-                    else {
-                        listFarToProfile.add(profilProche);
-                    }
-                }
-            }
-
-            if(listNewProche.size() == listProcheDeProfile.size()) {  // si profile est proche de tous les profils qui etaient deja proche a lui
-                return;
-            }
-
-            else
+    /**
+     * Retourne un objet Group si le profil appartient à ce Group, sinon null
+     * @param p
+     * @return
+     */
+    @Nullable
+    public Group dansUnGroupe(Profil p)
+    {
+        Iterator<Group> iterGroupe = setOfGroups.iterator();
+        Group unGroupe;
+        while (iterGroupe.hasNext())
+        {
+            unGroupe = iterGroupe.next();
+            if (unGroupe.contains(p))
             {
-                // sinon ben je quitte le groupe.
-                    hashProfilMarker.remove(profile);  // je retire le profile des hash
-                    listProcheDeProfile.remove(profile);
+                return unGroupe;
             }
-
         }
+        return null;
+    }
 
-        else
-        {  // P n'est pas dans un groupe
-            for(Profil profilOthers : allProfilsOnPromenade.values()) {  // pr tous les profils != profile
-                if(!profilOthers.equals(profile)) {
-                    if(isInside(profile, profilOthers)) {  // profile est proche d'un group
-                        Log.e("AAAA", "else de inside");
-                        hashProfilMarker.put(profile, profilOthers.getMarker());
-                      //  profile.setMarker();
-                        hashMarkerGroupProfil.get(profile.getMarker()).add(profilOthers);
-                        break;
-                    }
+
+    /**
+     * Indique si le profil est voisin avec tous les membres du groupe.
+     * @return
+     */
+    private boolean voisinAvecToutLeGroupe(Profil leProfil,Group leGroupe)
+    {
+        return leGroupe.mayBeAdded(leProfil);
+    }
+
+    /**
+     * Retourne un profil voisin, null si pas de voisin
+     * @param profil
+     * @param profilsEnPromenade
+     * @return
+     */
+    @Nullable
+    private Profil aUnVoisin(Profil profil,ArrayList<Profil> profilsEnPromenade) {
+        for (Profil voisin : profilsEnPromenade) {
+            if (!voisin.equals(profil) && isInside(profil, voisin)) {
+                return voisin;
+            }
+        }
+        return null;
+    }
+
+    public void onRemoveProfil(Profil p)
+    {
+        Iterator<Group> iterGroupe = setOfGroups.iterator();
+        Group unGroupe;
+        while (iterGroupe.hasNext())
+        {
+            unGroupe = iterGroupe.next();
+            if (unGroupe.contains(p))
+            {
+                unGroupe.removeProfil(p);
+                if (unGroupe.getSize() == 1)
+                {
+                    iterGroupe.remove();
                 }
             }
         }
 
-}
+    }
+
+    public void onUpdate(Profil profile, ArrayList<Profil> allProfilsOnPromenade)
+    {
+        Group unGroupe;
+        Profil voisin;
+        Log.e("ONUPDATE","-----");
+        if ((unGroupe = dansUnGroupe(profile)) != null)
+        {
+            if (! voisinAvecToutLeGroupe(profile,unGroupe))
+            {
+                unGroupe.removeProfil(profile);
+                if (unGroupe.getSize() == 1)
+                {
+                    setOfGroups.remove(unGroupe);
+                }
+            }
+        }
+        else
+        {
+            if ((voisin = aUnVoisin(profile,allProfilsOnPromenade)) != null)
+            {
+                if ((unGroupe = dansUnGroupe(voisin)) != null)
+                {
+                    if (unGroupe.mayBeAdded(profile))
+                    {
+                        unGroupe.addProfil(profile);
+                    }
+                }
+                else
+                {
+                    Group nwGroup = new Group();
+                    nwGroup.addProfil(profile);
+                    nwGroup.addProfil(voisin);
+                    setOfGroups.add(nwGroup);
+                    Log.e("NWGROUPE","-----");
+                }
+            }
+        }
+
+    }
 
 
-    public boolean isInside(Profil selectedProfil, Profil otherProfil) {
+    public static boolean isInside(Profil selectedProfil, Profil otherProfil)
+    {
         selectedProfil.generateRaduis();
         double longitude = otherProfil.getLongitude() - selectedProfil.getLongitude();
         double latitude = otherProfil.getLatitude() - selectedProfil.getLatitude();
@@ -88,11 +145,4 @@ public class ProfilGroupManager {
         return res < selectedProfil.getRayon();
     }
 
-   public HashMap<Marker, ArrayList<Profil>> getHashMarkerGroupProfil() {
-       return hashMarkerGroupProfil;
-   }
-
-    public HashMap<Profil, Marker> getHashProfilMarker() {
-        return hashProfilMarker;
-    }
 }

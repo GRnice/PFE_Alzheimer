@@ -244,16 +244,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             throw new RuntimeException("profil: "+p.makeSignature()+" has not a idTel");
         }
     }
-
-    public void drawMarkers()
-    {
-
-    }
-
-    public void findProfilByMarker(Marker m)
-    {
-
-    }
     
     public void pushFragmentFromActivity(Fragment frag)
     {
@@ -329,10 +319,14 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             else if (arg1.hasExtra("STOPPROMENADE"))
             {
                 String idTel = arg1.getStringExtra("STOPPROMENADE");
+
+                Profil profil = profilsManager.getProfilOnPromenade(idTel);
                 profilsManager.removeProfilOnPromenade(idTel);
+
 
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).getProfilsGroupManager().onRemoveProfil(profil);
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
 

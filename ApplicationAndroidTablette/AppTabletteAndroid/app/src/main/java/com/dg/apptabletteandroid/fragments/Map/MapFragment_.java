@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 
 public class MapFragment_ extends BlankFragment
@@ -77,6 +78,7 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
+
         getActivity().setTitle("Carte");
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
                 ,R.layout.item_profil_en_promenade
@@ -120,6 +122,7 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+
                 HashMap<String,Profil> allProfilsOnPromenade = profilsManager.getAllProfilsOnPromenade();
 
                 int res = getActivity().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -129,10 +132,37 @@ public class MapFragment_ extends BlankFragment
                 CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(12).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                for(String idTel : allProfilsOnPromenade.keySet()){
-
+                // ce marqueur permet de savoir si le marker d'un groupe a deja ete posé ou non
+                int marqueurRecherche = new Random().nextInt();
+                for(String idTel : allProfilsOnPromenade.keySet())
+                {
                     Profil profil = allProfilsOnPromenade.get(idTel);
                     Marker marker = profil.getMarker();
+                    if (marker != null)
+                    {
+                        profilsGroupManager.onUpdate(profil,new ArrayList<>(allProfilsOnPromenade.values()));
+                        Group group = profilsGroupManager.dansUnGroupe(profil);
+                        if (group != null && group.getMarqueurRecherche() != marqueurRecherche)
+                        {
+                            group.setMarqueurRecherche(marqueurRecherche);
+                            profil = group.getAnyProfil();
+                            marker = profil.getMarker();
+                            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.mipmap.avatar_groupe);
+                            String messageMarker = group.stringifyForMarker();
+                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            marker.showInfoWindow();
+                            profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
+                        }
+                        else if (group == null)
+                        {
+                            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
+                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            marker.showInfoWindow();
+                            profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
+
+                        }
+                    }
+
 
                     /*  if (profilsGroupManager.getHashProfilMarker().containsKey(profil)) {  // si il est deja dans un group
                         marker = profilsGroupManager.getHashProfilMarker().get(profil);
@@ -140,13 +170,6 @@ public class MapFragment_ extends BlankFragment
                         int nbPersonnesParGroupe = profilsGroupManager.getHashMarkerGroupProfil().get(profil).size();
                         marker.setTitle(String.valueOf(nbPersonnesParGroupe));
                     }*/
-                    if (marker != null)
-                    {
-                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
-                        marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-                        marker.showInfoWindow();
-                        profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
-                    }
 
                 }
 
@@ -204,6 +227,10 @@ public class MapFragment_ extends BlankFragment
         Log.d("AAA", "BACKPressed Map");
     }
 
+    public ProfilGroupManager getProfilsGroupManager()
+    {
+        return profilsGroupManager;
+    }
 
     public void refresh()
     {
@@ -227,18 +254,37 @@ public class MapFragment_ extends BlankFragment
     private void refreshMap()
     {
         googleMap.clear();
-
         Iterator<Profil> profilsPromenade = profilsManager.getAllProfilsOnPromenade().values().iterator();
+        int marqueurRecherche = new Random().nextInt();
+
         while(profilsPromenade.hasNext())
         {
             Profil profil = profilsPromenade.next();
-            LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
-            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
-            Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-            marker.showInfoWindow();
-            profil.setMarker(marker);
-        }
+            if (profil.getMarker() == null) continue;
 
+            profilsGroupManager.onUpdate(profil,new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values()));
+
+            Group group = profilsGroupManager.dansUnGroupe(profil);
+            if (group != null && group.getMarqueurRecherche() != marqueurRecherche)
+            {
+                group.setMarqueurRecherche(marqueurRecherche);
+                profil = group.getAnyProfil();
+                LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
+                Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.mipmap.avatar_groupe);
+                String messageMarker = group.stringifyForMarker();
+                Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                marker.showInfoWindow();
+                profil.setMarker(marker);
+            }
+            else if (group == null)
+            {
+                LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
+                Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
+                Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                marker.showInfoWindow();
+                profil.setMarker(marker);
+            }
+        }
     }
 
     // ajout ou mise à jour du marker d'un profil
@@ -247,38 +293,13 @@ public class MapFragment_ extends BlankFragment
         LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
         Marker marker;
 
-        if (profil.getMarker() == null)
+        if (profil.getMarker() == null) // si marker a null alors il n'est pas dans un groupe !
         {
             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
             marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
             marker.showInfoWindow();
             profil.setMarker(marker);
         }
-
-        else
-        {
-
-           /* profilsGroupManager.onUpdate(profil, profilsManager.getAllProfilsOnPromenade());
-            if (profilsGroupManager.getHashProfilMarker().containsKey(profil))
-            {
-                Log.e("AAAA", "BBB");
-                marker = profilsGroupManager.getHashProfilMarker().get(profil);
-                marker.setPosition(latLng);
-
-                int nbPersonnesParGroupe = profilsGroupManager.getHashMarkerGroupProfil().get(profil).size();
-                marker.setTitle(String.valueOf(nbPersonnesParGroupe));
-            }*/
-           // else
-           // {
-                Log.e("AAAA", "CCC");
-                marker = profil.getMarker();
-                marker.setPosition(latLng);
-                marker.showInfoWindow();
-         //   }
-
-        }
         refresh();
     }
-
-
 }

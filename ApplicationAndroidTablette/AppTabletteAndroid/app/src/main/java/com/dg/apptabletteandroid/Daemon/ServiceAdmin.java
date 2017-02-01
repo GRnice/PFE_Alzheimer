@@ -80,7 +80,11 @@ public class ServiceAdmin extends Service
         unregisterReceiver(serverReceiver);
         unregisterReceiver(activityReceiver);
         unregisterReceiver(networkReceiver);
-        comm.interrupt(); // arret du socket
+        if (comm != null)
+        {
+            comm.interrupt(); // arret du socket
+        }
+
     }
 
     @Override
