@@ -77,7 +77,7 @@ class AssistanceServer(Thread):
             self.broadcast("ALERT$STARTBATTERY_"+tracker.id+"\r\n")
 
         elif(evt == "ALERT-BATTERY_STOP"):
-            print("(alerte) BATTERY FAIBLE", tracker.id)
+            print("(alerte) STOP BATTERY FAIBLE", tracker.id)
             self.broadcast("ALERT$STOPBATTERY_"+tracker.id+"\r\n")
 			
         elif(evt == "ALERT-IMMOBILE"):
@@ -252,28 +252,16 @@ class AssistanceServer(Thread):
                                     print("send du synch modif")
                                     print("SYNCH$MODIFPROFIL_"+message[1])
                                     self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
-
+                                elif message[0] == "CONTINUE":
+                                    print("CONTINUE")
+                                    #L'ancien socket meurt automatiquement dans le except Exception quand on essaye d'envoyer un update dans l'ancien socket
+                                    #L'ancien socket est aussi supprimé dans le except
+                                    #On ajoute le nouveau socket à la liste d'assistants
+                                    self.addAssistant(sock)
                             else:
                                 print("Assistant (%s) is offline" % sock)
                                 sock.close()
                                 self.removeAssistant(sock)
-                            elif message[0] == "MODIFPROFIL":
-                                print("MODIFPROFIL")
-                                oldAndNewProfil = message[1].split('*')
-                                self.managerProfils.modifProfil(oldAndNewProfil[0],oldAndNewProfil[1])
-                                print("send du synch modif")
-                                print("SYNCH$MODIFPROFIL_"+message[1])
-                                self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
-                            elif message[0] == "CONTINUE":
-                                print("CONTINUE")
-                                #L'ancien socket meurt automatiquement dans le except Exception quand on essaye d'envoyer un update dans l'ancien socket
-                                #L'ancien socket est aussi supprimé dans le except
-                                #On ajoute le nouveau socket à la liste d'assistants
-                                self.addAssistant(sock)
-                        else:
-                            print("Assistant (%s) is offline" % sock)
-                            sock.close()
-                            self.removeAssistant(sock)
 
 
 

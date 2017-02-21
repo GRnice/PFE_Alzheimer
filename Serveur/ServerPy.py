@@ -31,13 +31,15 @@ class Tracker: ## Classe representant un tracker
         self.dureePromenade = None
         self.tempsRestant = None
         # 0 -> connecté mais aucune information de l'utilisateur;
-        # 1 -> connecté avec information;
-        # 2 -> connecté et suivi
+        # 1 -> connecté avec information -> (idtel);
+        # 2 -> connecté et suivi (nom prenom et idtel connues)
         # 172.20.10.2
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
 
-    def startPromenade(self,nom,prenom,duree):
+
+
+    def startPromenade(self,nom,prenom,duree): # OKPROMENADE RECU
         if self.etat == 1:
             self.etat = 2
             self.nom = nom
@@ -234,7 +236,6 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             latitude = float(requeteArray[2])
             battery = int(requeteArray[3])
             tracker = self.getTracker(socket)
-            tracker.updateTimeout = False
             secondesCourantes = str(time.time()).split(".")[0] ; secondesCourantesDepuisannee70 = int(secondesCourantes)
 
             tracker.updatePosition((longitude,latitude),time.time(),battery,secondesCourantesDepuisannee70)
@@ -276,22 +277,22 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker = self.getTracker(socket)
             self.removePatient(socket)
             tracker.stopPromenade()
+            tracker.lastEmit = time.time()
             #print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
         elif (entete == "IMMOBILE"):
             print("Alerte immobilite")
-            tracker.updateTimeout = False
             tracker = self.getTracker(socket)
+            tracker.lastEmit = time.time()
             self.serverAssistant.event("ALERT-IMMOBILE",socket,tracker)
 
         elif (entete == "CONTINUE"):
             print("CONTINUE RECEIVE")
             idTel = requeteArray[1]
             nwTracker = self.getTracker(socket)
-            nwTracker.updateTimeout = False
             oldSocket = self.mapIdSock[idTel]
-
+            
             alltrackers = list(self.dictSocketPatient.values())
     #                self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
    #     self.dictSocketPatient = dict() # <sockPatient,Tracker>
@@ -307,6 +308,14 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     nwTracker.etat = oldTracker.etat
                     nwTracker.lastEmit = time.time()
                     nwTracker.nbFollower = oldTracker.nbFollower
+                    nwTracker.battery = oldTracker.battery
+                    nwTracker.isHorsZone = oldTracker.isHorsZone
+                    nwTracker.batteryIsLow = oldTracker.batteryIsLow
+                    nwTracker.timeout = oldTracker.timeout
+                    nwTracker.updateTimeout = oldTracker.updateTimeout
+                    nwTracker.dureePromenade = oldTracker.dureePromenade
+                    nwTracker.tempsRestant = oldTracker.tempsRestant
+                    nwTracker.lastEmit = time.time()
 
                     del self.dictSocketPatient[oldSocket]
                     self.mapIdSock[idTel] = socket

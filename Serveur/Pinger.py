@@ -3,7 +3,7 @@ import time
 class Pinger(Thread):
     def __init__(self,mapper,serverAssistant):
         Thread.__init__(self)
-        self.num = 0
+        self.DELAYMAX = 20
         self.mapper = mapper
         self.serverAssistant = serverAssistant
         self.onRun = None
@@ -20,18 +20,20 @@ class Pinger(Thread):
             if (len(allPatients) == 0):
                 continue
             
-            socketPatient = allPatients[self.num % len(allPatients)]
-            tracker = self.mapper.getTracker(socketPatient)
-            self.num = self.num + 1
-            if (tracker.lastEmit != None):
-                tempsCourant = time.time()
-                if ((tempsCourant - tracker.lastEmit) > 10 and (not tracker.updateTimeout)): # si > 10s
-                    tracker.updateTimeout = True
-                    self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_START",None,tracker)
+            for i in range(len(allPatients)):
+                tracker = self.mapper.getTracker(allPatients[i])
+                ## check le temps d'emission de la derniere alerte...
+                if (tracker.lastEmit != None):
+                    tempsCourant = time.time()
+                    if ((tempsCourant - tracker.lastEmit) > self.DELAYMAX and (not tracker.updateTimeout)): # si > 20s
+                        print("DETECT UPDATE TIMEOUT")
+                        tracker.updateTimeout = True
+                        self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_START",None,tracker)
 
-                elif ((tempsCourant - tracker.lastEmit) < 10 and tracker.updateTimeout):
-                    tracker.updateTime = False
-                    self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_STOP",None,tracker)
+                    elif ((tempsCourant - tracker.lastEmit) < self.DELAYMAX and tracker.updateTimeout):
+                        print("RELEASE UPDATE TIMEOUT")
+                        tracker.updateTimeout = False
+                        self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_STOP",None,tracker)
                     
                     
                 
