@@ -36,6 +36,8 @@ class Tracker: ## Classe representant un tracker
         # 172.20.10.2
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
+        self.lastAlert = None
+        self.alertTimeout = False
 
 
 

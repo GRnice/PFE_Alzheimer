@@ -499,6 +499,11 @@ public class ServiceAdmin extends Service
                 comm.sendMessage("MODIFPROFIL$" + modifiedProfil);
 
             }
+
+            if(arg1.hasExtra("CHECKALERT")) {
+                String idTel = arg1.getStringExtra("CHECKALERT");  // ancienProfil*nouveauProfil
+                comm.sendMessage("CHECKALERT$" + idTel);
+            }
         }
     }
 

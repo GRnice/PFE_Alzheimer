@@ -225,4 +225,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     }
 
 
+    public void follow(Profil p) {
+        p.setEstSuiviParMoi(true);
+    }
 }

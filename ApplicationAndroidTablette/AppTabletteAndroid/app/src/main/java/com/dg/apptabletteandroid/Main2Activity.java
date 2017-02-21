@@ -98,6 +98,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             fragmentManager.pushFragment(profilFragment,this);
         }
 
+        Intent intentAlerteGeree = new Intent();
+        intentAlerteGeree.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+        intentAlerteGeree.putExtra("CHECKALERT", intent.getStringExtra("IDTEL"));
+        sendBroadcast(intentAlerteGeree);
+
 
     }
 
@@ -212,6 +217,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     public void followProfil(Profil p)
     {
         String idTel = profilsManager.findIdTelByProfil(p);
+        profilsManager.follow(p);
         if (idTel != null)
         {
             Intent intent = new Intent();
