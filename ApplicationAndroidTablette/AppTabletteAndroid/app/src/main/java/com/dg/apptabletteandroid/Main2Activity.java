@@ -306,14 +306,30 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 double longitude = Double.parseDouble(parametres[1]);
                 double latitude = Double.parseDouble(parametres[2]);
                 int level = Integer.parseInt(parametres[3]);
+                int tempsRestant = Integer.parseInt(parametres[4]);
                 Log.d("Size", String.valueOf(profilsManager.getAllProfilsOnPromenade().size()));
                 profil.setLatLong(latitude,longitude);
                 profil.setBattery(level);
+                profil.setTempsRestant(tempsRestant);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).update(profil);
                 }
             }
+            else if (arg1.hasExtra("UNFOLLOW_AUTHORIZED"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUnfollow;
+                if ((profilUnfollow = profilsManager.getProfilOnPromenade(idTel)) != null)
+                {
+                    profilsManager.unfollow(profilUnfollow);
+                    if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                    {
+                        ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                    }
+                }
+            }
+
 
             // indique que une promenade se termine pour cet idTel
             else if (arg1.hasExtra("STOPPROMENADE"))
@@ -411,6 +427,51 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profilHorsZone = profilsManager.getAllProfilsOnPromenade().get(idTelHorsZone);
                 profilHorsZone.setHorsZone(! profilHorsZone.isHorsZone());
 
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
+
+            else if (arg1.hasExtra("BATTERYLOW"))
+            {
+                String idTelBatteryLow = arg1.getStringExtra("IDTEL");
+                Profil profilBatteryLow = profilsManager.getAllProfilsOnPromenade().get(idTelBatteryLow);
+                profilBatteryLow.setBatteryLow(! profilBatteryLow.batteryIsLow());
+
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
+
+            else if (arg1.hasExtra("PROMENADE_TIMEOUT"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilTimeOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilTimeOut.setTempsRestant(-1);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
+
+            else if (arg1.hasExtra("UPDATE_TIMEOUT_START"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUpOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilUpOut.setUpdateOut(true);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
+
+            else if (arg1.hasExtra("UPDATE_TIMEOUT_STOP"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUpOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilUpOut.setUpdateOut(false);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();

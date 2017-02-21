@@ -3,6 +3,7 @@ import socket , select
 from threading import Thread,RLock
 import Profils
 import LookupAssistantPatient
+from Pinger import Pinger
 
 lockPool = RLock()
 
@@ -61,7 +62,7 @@ class AssistanceServer(Thread):
         elif (evt == "POSITION"):
             print("(update) TRANSMISSION DE LA POSITION DE ",tracker.id)
             self.broadcast("UPDATE$"+str(tracker.id) + "*" + str(tracker.position[0]) + "*" +
-                                       str(tracker.position[1])+ "*" +  str(tracker.battery) + "\r\n")
+                                       str(tracker.position[1])+ "*" +  str(tracker.battery) + "*" + str(tracker.tempsRestant) + "\r\n")
 
         elif (evt == "ALERT-POSITION_START"):
             print("(alerte) HORS ZONE",tracker.id)
@@ -71,13 +72,29 @@ class AssistanceServer(Thread):
             print("STOP HORS ZONE",tracker.id)
             self.broadcast("ALERT$STOPHORSZONE_"+tracker.id+"\r\n")
 
-        elif(evt == "ALERT-BATTERY"):
+        elif(evt == "ALERT-BATTERY_START"):
             print("(alerte) BATTERY FAIBLE", tracker.id)
-            self.broadcast("ALERT$BATTERY_"+tracker.id+"\r\n")
+            self.broadcast("ALERT$STARTBATTERY_"+tracker.id+"\r\n")
+            
+        elif(evt == "ALERT-BATTERY_START"):
+            print("(alerte) BATTERY FAIBLE", tracker.id)
+            self.broadcast("ALERT$STOPBATTERY_"+tracker.id+"\r\n")
 			
         elif(evt == "ALERT-IMMOBILE"):
             print("(alerte) IMMOBILE", tracker.id)
             self.broadcast("ALERT$IMMOBILE_"+tracker.id+"\r\n")
+
+        elif (evt == "ALERT-TIMEOUT-UPDATE_START"):
+            print("(alerte) TIMEOUT UPDATE", tracker.id)
+            self.broadcast("ALERT$STARTTIMEOUTUPDATE_"+tracker.id+"\r\n")
+
+        elif (evt == "ALERT-TIMEOUT-UPDATE_STOP"):
+            print("(alerte) STOP TIMEOUT UPDATE", tracker.id)
+            self.broadcast("ALERT$STOPTIMEOUTUPDATE_"+tracker.id+"\r\n")
+
+        elif (evt == "ALERT-DURATION_START"):
+            print("(alerte) fin de promenade",tracker.id)
+            self.broadcast("ALERT$DURATION_"+tracker.id+"\r\n")
 			
     # ajout d'un assistant
     def addAssistant(self,sockAssistant):
@@ -105,28 +122,33 @@ class AssistanceServer(Thread):
     # soit idTel*prenom*nom -> configuration d'une promenade, cet assistant s'abonne egalement au suivi de ce patient
     def follow(self,sockAssistant,data):
         data = data.split("*")
-
+        print(data)
         if (len(data) == 1):
             # si FOLLOW$idTel
             idTel = data[0]
             socketPatient = self.mapper.getSocketPatientById(idTel)
             self.mapper.attachAssistant(socketPatient,sockAssistant)
 
-        elif (len(data) == 3):
-            # si FOLLOW$idTel*prenom*nom
-            idTel = data[0] ; prenom = data[1] ; nom = data[2]
+        
+        elif (len(data) == 4):
+            # si FOLLOW$idTel*prenom*nom*duree
+            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3]
 
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
 
             if (tracker.etat == 1): # le premier qui défini le profil du device
-                tracker.startPromenade(nom,prenom)
+                tracker.startPromenade(nom,prenom,duree)
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
                 self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)
 
             self.mapper.attachAssistant(sockPatient,sockAssistant)
 
+    def canUnfollow(self,sock,idTel):
+        trackerPatient = self.mapper.getTrackerById(idTel)
+        return trackerPatient.nbFollower > 1
+        
 
     def stopPromenade(self,sockAssistant,data):
         data = data.split("*")
@@ -141,6 +163,8 @@ class AssistanceServer(Thread):
 
     def run(self):
         self.serverOnline = True
+        self.pinger = Pinger(self.mapper,self)
+        self.pinger.start()
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('', self.PORT))
         server_socket.listen(self.maxClientSocket)
@@ -165,6 +189,7 @@ class AssistanceServer(Thread):
                     sockfd.send(message.encode('utf-8'))
                     self.addAssistant(sockfd)
                     print("Assistant (%s, %s) connected" % addr)
+                    print("NB ASSISTANT",len(self.mapper.getSocketsAssistant()))
 
                 else:
                     # Data received from client, process it
@@ -185,7 +210,15 @@ class AssistanceServer(Thread):
                             elif message[0] == "UNFOLLOW":
                                 # entete$idTel
                                 print('unfollow received')
-                                self.unfollow(sock,message[1])
+                                idTel = message[1]
+                                if (self.canUnfollow(sock,idTel)): # message[1] = idTel
+                                    self.unfollow(sock,idTel)
+                                    sock.send(("UNFOLLOW$ALLOW_"+idTel).encode('utf-8'))
+                                    print("OK UNFOLLOW")
+                                else:
+                                    sock.send(("UNFOLLOW$INTERDICT_"+idTel).encode('utf-8'))
+                                    print("NO UNFOLLOW")
+                                
 
                             elif message[0] == "STOPPROMENADE":
                                 # "entete$idTel"
@@ -234,4 +267,6 @@ class AssistanceServer(Thread):
 
 
         server_socket.close()
+        self.pinger.stop()
+        self.pinger.join()
         print("=============SERVEUR OFFLINE=============")

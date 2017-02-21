@@ -93,7 +93,6 @@ public class ServiceAdmin extends Service
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-
     /**
      * ServerReceiver , recoit les messages venants du serveur
      * NEWSESSION
@@ -129,6 +128,32 @@ public class ServiceAdmin extends Service
                     break;
                 }
 
+                case "UNFOLLOW":
+                {
+                    String[] dataParams = content.split("\\_");
+                    String idTel = dataParams[1];
+                    String response = dataParams[0];
+                    if (response.equals("ALLOW")) // UNFOLLOW OK
+                    {
+                        Log.e("UNFOLLOW AUTHORIZED", content);
+                        Intent intent = new Intent();
+                        intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                        intent.putExtra("UNFOLLOW_AUTHORIZED", "");
+                        intent.putExtra("IDTEL", idTel);
+                        alertManager.removeListening(idTel); // desabonnement aux alertes
+                        if (activity_is_on_background)
+                        { // si en background alors on notifiera l'activity à son retour.
+                            dataKeeper.addData(intent);
+                        } else {
+                            sendBroadcast(intent);
+                        }
+                    }
+                    else // UNFOLLOW INTERDICT
+                    {
+
+                    }
+                    break;
+                }
                 case "ALERT":
                 {
                     String[] dataParams = content.split("\\_");
@@ -173,11 +198,84 @@ public class ServiceAdmin extends Service
                             break;
                         }
 
-                        case "BATTERY":
+                        case "STARTBATTERY":
                         {
                             alertManager.notifBattery(getBaseContext(), idTel);
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("BATTERYLOW","");
+                            intent.putExtra("IDTEL", idTel);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
                             break;
                         }
+
+                        case "STOPBATTERY":
+                        {
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("BATTERYLOW","");
+                            intent.putExtra("IDTEL", idTel);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
+                            break;
+                        }
+
+                        case "DURATION":
+                        {
+                            alertManager.notifPromenadeTimeout(getBaseContext(), idTel);
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("PROMENADE_TIMEOUT","");
+                            intent.putExtra("IDTEL", idTel);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
+                            break;
+                        }
+
+                        case "STARTTIMEOUTUPDATE":
+                        {
+                            alertManager.notifTimeoutUpdate(getBaseContext(), idTel);
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("UPDATE_TIMEOUT_START","");
+                            intent.putExtra("IDTEL", idTel);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
+                            break;
+                        }
+
+                        case "STOPTIMEOUTUPDATE":
+                        {
+                            Intent intent = new Intent();
+                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                            intent.putExtra("UPDATE_TIMEOUT_STOP","");
+                            intent.putExtra("IDTEL", idTel);
+                            if (activity_is_on_background)
+                            {
+                                dataKeeper.addData(intent);
+                            } else {
+                                sendBroadcast(intent);
+                            }
+                            break;
+                        }
+
                         case "IMMOBILE":
                         {
                             alertManager.notifImmobile(getBaseContext(), idTel);
@@ -275,6 +373,7 @@ public class ServiceAdmin extends Service
                     Log.e("UPDATE", content);
                     Intent intent = new Intent();
                     String idTel = content.split("\\*")[0];
+                    Log.e("Temps Restant !",content.split("\\*")[4]);
                     intent.putExtra("UPDATE", content);
                     intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
 
@@ -338,8 +437,11 @@ public class ServiceAdmin extends Service
                 String idTel = arg1.getStringExtra("IDTEL");
                 String prenom = arg1.getStringExtra("PRENOM");
                 String nom = arg1.getStringExtra("NOM");
+                String duree = arg1.getStringExtra("DURATION");
                 Log.e("FOLLOW_NEW_SESSION", idTel);
-                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom);
+                Log.e("DUREE", duree);
+
+                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree);
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 

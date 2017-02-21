@@ -16,4 +16,6 @@ public interface ProfilOnPromenadeManager
     public HashMap<String,Profil> getAllProfilsOnPromenade();
     public Profil getProfilOnPromenade(String idTel);
     public String findIdTelByProfil(Profil p);
+
+    void unfollow(Profil profilUnfollow);
 }

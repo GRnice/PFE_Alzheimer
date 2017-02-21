@@ -88,9 +88,10 @@ public class MapFragment_ extends BlankFragment
         listView.setAdapter(customAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                View lesDetails = customAdapter.detailsList.get(i);
-                View icons = customAdapter.iconsList.get(i) ;
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
+            {
+                View lesDetails = customAdapter.detailsList.get(position);
+                View icons = customAdapter.iconsList.get(position);
                 if(lesDetails.getVisibility() == View.GONE)
                 {
                     lesDetails.setVisibility(View.VISIBLE);
@@ -128,6 +129,13 @@ public class MapFragment_ extends BlankFragment
                 int res = getActivity().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
                 // For showing a move to my location button
                 googleMap.setMyLocationEnabled(false);
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker)
+                    {
+                        return false;
+                    }
+                });
                 LatLng sophia = new LatLng(43.6155793,7.0696861);
                 CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(12).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -147,7 +155,7 @@ public class MapFragment_ extends BlankFragment
                             group.setMarqueurRecherche(marqueurRecherche);
                             profil = group.getAnyProfil();
                             marker = profil.getMarker();
-                            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.mipmap.avatar_groupe);
+                            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), group.getDrawable());
                             String messageMarker = group.stringifyForMarker();
                             marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                             marker.showInfoWindow();
@@ -238,6 +246,7 @@ public class MapFragment_ extends BlankFragment
         refreshListe();
     }
 
+
     // mise à jour de la listeView
     private void refreshListe()
     {
@@ -254,6 +263,8 @@ public class MapFragment_ extends BlankFragment
     private void refreshMap()
     {
         googleMap.clear();
+
+
         Iterator<Profil> profilsPromenade = profilsManager.getAllProfilsOnPromenade().values().iterator();
         int marqueurRecherche = new Random().nextInt();
 
@@ -270,7 +281,7 @@ public class MapFragment_ extends BlankFragment
                 group.setMarqueurRecherche(marqueurRecherche);
                 profil = group.getAnyProfil();
                 LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
-                Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.mipmap.avatar_groupe);
+                Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), group.getDrawable());
                 String messageMarker = group.stringifyForMarker();
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                 marker.showInfoWindow();

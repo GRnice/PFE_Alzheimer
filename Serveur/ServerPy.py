@@ -25,6 +25,11 @@ class Tracker: ## Classe representant un tracker
         self.battery = 0
         self.etat = 0
         self.isHorsZone = False
+        self.batteryIsLow = False
+        self.timeout = False
+        self.updateTimeout = False
+        self.dureePromenade = None
+        self.tempsRestant = None
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information;
         # 2 -> connecté et suivi
@@ -32,11 +37,15 @@ class Tracker: ## Classe representant un tracker
         self.lastEmit = None # date de la dernier emission du tracker
         self.nbFollower = 0
 
-    def startPromenade(self,nom,prenom):
+    def startPromenade(self,nom,prenom,duree):
         if self.etat == 1:
             self.etat = 2
             self.nom = nom
             self.prenom = prenom
+            timeEpoch70 = str(time.time()).split(".") # xxx.yyy # secondes depuis les années 70
+            timeEpoch70 = int(timeEpoch70[0]) # recupere que les secondes # xxx
+            # xxx + temps promenade en secondes
+            self.dureePromenade = timeEpoch70 + (int(duree) * 60) # passe de minutes en secondes, on obtient l'heure de fin en seconde de la promenade
             return True
 
         if self.etat == 0:
@@ -44,6 +53,7 @@ class Tracker: ## Classe representant un tracker
 
         if self.etat == 2:
             raise PermissionError("startPromenade appelé, mais le tracker est deja suivi")
+
 
     def stopPromenade(self):
         if self.etat == 2:
@@ -82,10 +92,11 @@ class Tracker: ## Classe representant un tracker
         if self.etat == 2:
             raise PermissionError("startSuiviAborted appelé , mais le tracker en cours de promenade")
 
-    def updatePosition(self,position,timeupdate, battery):
+    def updatePosition(self,position,timeupdate, battery,tempsCourant):
         self.position = position
         self.lastEmit = timeupdate
         self.battery = battery
+        self.tempsRestant = self.dureePromenade - tempsCourant
 
 
 class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
@@ -93,7 +104,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         self.mapIdSock = dict() # HashMap<IdTel,sockPatient>
         self.dictSocketPatient = dict() # <sockPatient,Tracker>
         self.watchman = WatchMan()
-        self.dictAssistance = dict() # HashMap<sockAssistant,sockPatient>
+        self.dictAssistance = dict() # HashMap<sockAssistant,[sockPatient]>
 
         self.serverAssistant = serverAssistant
         self.serverAssistant.setMapper(self)
@@ -189,7 +200,6 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 if (sockPatient in listeSock):
                     index = listeSock.index(sockPatient)
                     listeSock.pop(index)
-                    #self.dictAssistance[assistantSock] = listeSock
 
             del self.mapIdSock[tracker.id]
             self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
@@ -212,7 +222,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         if (entete == "STARTSUIVI"):
             idTel = requeteArray[1]
             tracker = self.getTracker(socket)
-            tracker.startSuiviCalled(idTel,time.time())
+            tracker.startSuiviCalled(idTel,None)
             self.mapIdSock[idTel] = socket
 
             #print("Demarrage du suivi pour le tel à l'id : ",idTel)
@@ -225,10 +235,22 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             latitude = float(requeteArray[2])
             battery = int(requeteArray[3])
             tracker = self.getTracker(socket)
-            tracker.updatePosition((longitude,latitude),time.time(),battery)
+            tracker.updateTimeout = False
+            secondesCourantes = str(time.time()).split(".")[0] ; secondesCourantesDepuisannee70 = int(secondesCourantes)
+
+            tracker.updatePosition((longitude,latitude),time.time(),battery,secondesCourantesDepuisannee70)
+            
+            
             print("Nouvelle position connue pour :",tracker.id," (",longitude,",",latitude,"), battery = ", battery)
             self.serverAssistant.event("POSITION",socket,tracker)
 
+            
+            if (tracker.tempsRestant < 0):
+                # si le temps de promenade est depassé !
+                if (not tracker.timeout): # et si c'est la premiere fois
+                    print("WARNING TIMEOUT PROMENADE")
+                    tracker.timeout = True
+                    self.serverAssistant.event("ALERT-DURATION_START",socket,tracker)
 
             if (not self.watchman.positionIsGood(longitude,latitude)): # si mauvaise position
                 if (not tracker.isHorsZone): # si le tracker n'a pas taggé isHorsZone à True
@@ -241,8 +263,15 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                 self.serverAssistant.event("ALERT-POSITION_STOP",socket,tracker) # un deuxieme envoi de l'alerte la desactive
 
 
-            if (battery < 21):
-                self.serverAssistant.event("ALERT-BATTERY", socket, tracker)
+            if (battery < 21 and (not tracker.batteryIsLow)):
+                print("WARNING BATTERY LOW /!\/!\\")
+                tracker.batteryIsLow = True
+                self.serverAssistant.event("ALERT-BATTERY_START", socket, tracker)
+
+            elif (battery >= 21 and tracker.batteryIsLow):
+                tracker.batteryIsLow = False
+                self.serverAssistant.event("ALERT-BATTERY_STOP",socket,tracker) # un deuxieme envoi de l'alerte la desactive
+                
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
@@ -253,6 +282,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
         elif (entete == "IMMOBILE"):
             print("Alerte immobilite")
+            tracker.updateTimeout = False
             tracker = self.getTracker(socket)
             self.serverAssistant.event("ALERT-IMMOBILE",socket,tracker)
 
@@ -260,6 +290,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             print("CONTINUE RECEIVE")
             idTel = requeteArray[1]
             nwTracker = self.getTracker(socket)
+            nwTracker.updateTimeout = False
             oldSocket = self.mapIdSock[idTel]
 
             alltrackers = list(self.dictSocketPatient.values())
@@ -284,8 +315,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     self.updateSocketPatient(oldSocket,socket)
                     socket.send("OKPROMENADE\r\n".encode('utf-8'))
                     break
-                    
-
+                
 
 
 

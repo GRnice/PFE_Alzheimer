@@ -1,0 +1,127 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.dg.apptabletteandroid.fragments.Profils.ConfigPromenade">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.2"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:layout_width="0px"
+            android:gravity="center_vertical|fill_vertical|center_horizontal|fill_horizontal">
+
+            <TextView
+                android:text="Profil selectionné :"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/textView6"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:gravity="center_vertical|center_horizontal"
+                android:background="@color/common_google_signin_btn_text_dark_disabled" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="0.8">
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/textViewConfigomPrenom"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:id="@+id/container_config_prom"
+        android:weightSum="1"
+        android:layout_weight="0.15">
+
+        <TextView
+            android:text="Temps de la promenade :"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:id="@+id/textview_temps_prom"
+            android:layout_weight="0.4"
+            android:textSize="18sp"
+            android:background="@color/common_google_signin_btn_text_light_disabled"
+            android:gravity="fill_vertical|center_horizontal" />
+
+        <EditText
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/entry_temps_promenade"
+            android:layout_weight="0.4"
+            android:hint="@string/duration_promenade" />
+
+        <TextView
+            android:text="minutes"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:id="@+id/textviewDurationUnit"
+            android:layout_weight="0.2"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:gravity="fill_vertical"
+            android:background="@color/common_google_signin_btn_text_light_disabled" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.3"></LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.45">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:text="Annuler selection"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:id="@+id/button_back_config_prom"
+                android:layout_weight="1"
+                android:background="@android:color/holo_red_light" />
+
+            <Button
+                android:text="Valider configuration"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:id="@+id/button_valid_promenade"
+                android:background="@android:color/holo_green_light"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
