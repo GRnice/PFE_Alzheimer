@@ -37,7 +37,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     public ProfilsManager(SharedPreferences sharedPreferences)
     {
         this.profilArrayList = new ArrayList<>(); // contiendra tous les profils
-        this.profilOnPromenade = new HashMap<>();
+        this.profilOnPromenade = new HashMap<>(); // hashmap<IdTel , Profil>
         Set<String> allProfils = sharedPreferences.getStringSet("profils",null);
         if (allProfils != null)
         {
@@ -97,12 +97,17 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     public void removeProfilOnPromenade(String idTel)
     {
         Log.e("ProfilManager",""+idTel+" is removed");
+
         if (this.profilOnPromenade.containsKey(idTel))
         {
-            this.profilOnPromenade.get(idTel).setMarker(null);
-            this.profilOnPromenade.get(idTel).setEstSuiviParMoi(false);
-            this.profilOnPromenade.get(idTel).setHorsZone(false);
-            this.profilOnPromenade.get(idTel).setImmobile(false);
+            Profil p = this.profilOnPromenade.get(idTel);
+            p.setBatteryLow(false);
+            p.setMarker(null);
+            p.setEstSuiviParMoi(false);
+            p.setHorsZone(false);
+            p.setImmobile(false);
+            p.setTempsRestant(10000);
+            p.setUpdateOut(false);
             this.profilOnPromenade.remove(idTel);
         }
 
@@ -211,6 +216,12 @@ public class ProfilsManager implements ProfilOnPromenadeManager
             }
         }
         return null;
+    }
+
+    @Override
+    public void unfollow(Profil profilUnfollow)
+    {
+        profilUnfollow.setEstSuiviParMoi(false);
     }
 
 

@@ -12,6 +12,8 @@ import com.google.android.gms.maps.model.Marker;
 
 public class Profil
 {
+
+
     public static Profil buildProfilFromSignature(String signature)
     {
         // "nom,prenom,idRessourceAvatar,BarrierAlerte" ou "nom,prenom,idRessourceAvatar,BarrierNormal"
@@ -29,11 +31,15 @@ public class Profil
 
     private String nom = null;
     private String prenom = null;
+    private int tempsRestant = 10000;
     private int idRessourcesAvatar;
     private boolean horsZone = false;
     private boolean suivi = false; // si ce profil est suivi par au moins une personne
     private boolean suiviParTabletteCourante = false; // si la tablette courante suis ce profil
     private boolean susceptibleDeFranchirLaBarriere = false;
+    private boolean immobile = false; // si il est immobile
+    private boolean batteryLow = false; // si la batterie est faible
+    private boolean updateOut = false; // si le profil n'emet plus depuis un certains temps
     private double longitude;
     private double longitudeExtrem;  // les set en fct de long lat
     private double latitude;
@@ -41,7 +47,7 @@ public class Profil
     private double rayon;
     private Marker marker;
     private int battery;
-    private boolean immobile = false;
+
 
     public Profil(String nom,String prenom,boolean susceptibleDeFranchirLaBarriere,int idAvatar)
     {
@@ -186,6 +192,11 @@ public class Profil
         return battery;
     }
 
+    public int getTempsRestant()
+    {
+        return tempsRestant;
+    }
+
     public void setBattery(int battery) {
         this.battery = battery;
     }
@@ -194,8 +205,29 @@ public class Profil
         return immobile;
     }
 
+    public boolean batteryIsLow()
+    {
+        return batteryLow;
+    }
+
+    public boolean updateIsTimeout()
+    {
+        return updateOut;
+    }
+
     public void setImmobile(boolean immobile) {
         this.immobile = immobile;
     }
 
+    public void setBatteryLow(boolean batteryLow) {
+        this.batteryLow = batteryLow;
+    }
+
+    public void setTempsRestant(int tempsRestant) {
+        this.tempsRestant = tempsRestant;
+    }
+
+    public void setUpdateOut(boolean updateOut) {
+        this.updateOut = updateOut;
+    }
 }

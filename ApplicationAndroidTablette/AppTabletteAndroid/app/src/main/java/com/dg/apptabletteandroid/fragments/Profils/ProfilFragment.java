@@ -64,7 +64,7 @@ public class ProfilFragment extends BlankFragment
         ProfilFragment fragment = new ProfilFragment();
         fragment.selectionProfilNewSession = newsession;
         fragment.idTel = idTel;
-        fragment.setProfilsManager(profilsManager);
+        fragment.profilsManager = profilsManager;
         return fragment;
     }
 
@@ -113,18 +113,9 @@ public class ProfilFragment extends BlankFragment
                     getActivity().setTitle("Selectionner un profil");
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
-                    profilselected.setEstSuiviParMoi(true);
-                    profilsManager.addProfilOnPromenade(idTel,profilselected);
 
-                    Intent intent = new Intent();
-                    intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-                    intent.putExtra("FOLLOW_NEW_SESSION","");
-                    intent.putExtra("IDTEL",idTel);
-                    intent.putExtra("NOM",profilselected.getNom());
-                    intent.putExtra("PRENOM",profilselected.getPrenom());
-                    getActivity().sendBroadcast(intent);
-                    Fragment fragmap = MapFragment_.newInstance();
-                    ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
+                    Fragment fragConfig = ConfigPromenade.newInstance(profilsManager,profilselected,idTel);
+                    ((Main2Activity) getActivity()).pushFragmentFromActivity(fragConfig);
                 }
             });
         }
