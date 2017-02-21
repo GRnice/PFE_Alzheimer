@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -403,6 +404,7 @@ public class ServiceAdmin extends Service
 
         public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
         public boolean connected = false;
+        public boolean premiereConnexion = true;
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -438,10 +440,26 @@ public class ServiceAdmin extends Service
 
                     if (!connected)
                     {
-                        comm = new CommunicationServer();
-                        comm.setActionIntent(ACTION_FROM_SERVER);
-                        comm.setService(ServiceAdmin.this);
-                        comm.start();
+                        if(premiereConnexion){
+                            comm = new CommunicationServer();
+                            premiereConnexion = !premiereConnexion;
+                            comm.setActionIntent(ACTION_FROM_SERVER);
+                            comm.setService(ServiceAdmin.this);
+                            comm.start();
+                        }else{
+                            comm = new CommunicationServer();
+                            comm.setActionIntent(ACTION_FROM_SERVER);
+                            comm.setService(ServiceAdmin.this);
+                            comm.start();
+                            try {
+                                Thread.sleep(3000);
+                                comm.sendMessage("CONTINUE$");
+                            } catch (InterruptedException e) {
+                                Log.e("Socket", "Impossible d'établir une reconnexion.");
+                                return;
+                            }
+                        }
+
                     }
                     connected = true;
                 }

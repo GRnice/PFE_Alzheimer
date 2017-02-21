@@ -39,7 +39,8 @@ class AssistanceServer(Thread):
     def broadcast(self,messageString):
         allAssistants = self.mapper.getSocketsAssistant()
         for assistant in allAssistants:
-            assistant.send(messageString.encode("utf-8"))
+                assistant.send(messageString.encode("utf-8"))
+               
 
     # emet un message à tous les assistants sauf à l'assistant socketAssistant
 
@@ -216,7 +217,12 @@ class AssistanceServer(Thread):
                                 print("send du synch modif")
                                 print("SYNCH$MODIFPROFIL_"+message[1])
                                 self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
-
+                            elif message[0] == "CONTINUE":
+                                print("CONTINUE")
+                                #L'ancien socket meurt automatiquement dans le except Exception quand on essaye d'envoyer un update dans l'ancien socket
+                                #L'ancien socket est aussi supprimé dans le except
+                                #On ajoute le nouveau socket à la liste d'assistants
+                                self.addAssistant(sock)
                         else:
                             print("Assistant (%s) is offline" % sock)
                             sock.close()
@@ -229,6 +235,7 @@ class AssistanceServer(Thread):
                         #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                         print("(fail) Assistant (%s) is offline" % sock)
                         print("raison du crash",err)
+                        print(self.mapper.dictAssistance)
                         sock.close()
                         self.removeAssistant(sock)
 
