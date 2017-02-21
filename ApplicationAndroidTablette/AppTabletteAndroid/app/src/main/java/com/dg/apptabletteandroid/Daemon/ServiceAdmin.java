@@ -94,7 +94,6 @@ public class ServiceAdmin extends Service
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-
     /**
      * ServerReceiver , recoit les messages venants du serveur
      * NEWSESSION
@@ -107,198 +106,303 @@ public class ServiceAdmin extends Service
             /**
              * Parsing du message provenant du serveur
              */
-            String message = arg1.getStringExtra("MESSAGE");
-            if (message == null) return;
-            Log.e("MESSAGERECEIVED",message);
-            String[] tabMessage = message.split("\\$"); // syntaxe d'un message -> "Entete$contenu"
-            String header = tabMessage[0]; // l'entete
-            Log.e("HEADER", header);
-            Log.e("ALL", message);
-            String content = tabMessage[1];
-            switch (header) {
-                case "PROFILES": {
-                    Log.e("ALL_PROFILES", content);
-                    Intent intent = new Intent();
-                    intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                    intent.putExtra("ALL_PROFILES", content);
-                    if (activity_is_on_background) {
-                        dataKeeper.addData(intent);
-                    } else {
-                        sendBroadcast(intent);
+            String messagebrut = arg1.getStringExtra("MESSAGE");
+            if (messagebrut == null) return;
+            String[] allMessages = messagebrut.split("\\r?\\n");
+            for (String message : allMessages)
+            {
+                Log.e("MESSAGERECEIVED",message);
+                String[] tabMessage = message.split("\\$"); // syntaxe d'un message -> "Entete$contenu"
+                String header = tabMessage[0]; // l'entete
+                Log.e("HEADER", header);
+                Log.e("ALL", message);
+                String content = tabMessage[1];
+                switch (header) {
+                    case "PROFILES": {
+                        Log.e("ALL_PROFILES", content);
+                        Intent intent = new Intent();
+                        intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                        intent.putExtra("ALL_PROFILES", content);
+                        if (activity_is_on_background) {
+                            dataKeeper.addData(intent);
+                        } else {
+                            sendBroadcast(intent);
+                        }
+
+                        break;
                     }
 
-                    break;
-                }
-
-                case "ALERT":
-                {
-                    String[] dataParams = content.split("\\_");
-                    String typeAlert = dataParams[0];
-                    String idTel = dataParams[1];
-
-                    Log.e("ARGSALERT",typeAlert);
-
-                    switch (typeAlert)
+                    case "UNFOLLOW":
                     {
-                        case "STARTHORSZONE":
+                        String[] dataParams = content.split("\\_");
+                        String idTel = dataParams[1];
+                        String response = dataParams[0];
+                        if (response.equals("ALLOW")) // UNFOLLOW OK
                         {
-                            alertManager.notifHorsZone(getBaseContext(),idTel);
+                            Log.e("UNFOLLOW AUTHORIZED", content);
                             Intent intent = new Intent();
                             intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("HORSZONE","");
+                            intent.putExtra("UNFOLLOW_AUTHORIZED", "");
                             intent.putExtra("IDTEL", idTel);
+                            alertManager.removeListening(idTel); // desabonnement aux alertes
                             if (activity_is_on_background)
-                            {
+                            { // si en background alors on notifiera l'activity à son retour.
                                 dataKeeper.addData(intent);
                             } else {
                                 sendBroadcast(intent);
                             }
-                            break;
                         }
-
-                        case "STOPHORSZONE":
+                        else // UNFOLLOW INTERDICT
                         {
-                            Intent intent = new Intent();
-                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("HORSZONE","");
-                            intent.putExtra("IDTEL", idTel);
 
-                            if (activity_is_on_background)
-                            {
-                                dataKeeper.addData(intent);
-                            }
-                            else
-                            {
-                                sendBroadcast(intent);
-                            }
-                            break;
                         }
-
-                        case "BATTERY":
-                        {
-                            alertManager.notifBattery(getBaseContext(), idTel);
-                            break;
-                        }
-                        case "IMMOBILE":
-                        {
-                            alertManager.notifImmobile(getBaseContext(), idTel);
-                        }
+                        break;
                     }
-                }
-
-                case "SYNCH": {
-
-                    String[] dataParams = content.split("\\_");
-                    String typeSynch = dataParams[0];
-
-                    Log.e("ARGSSYNCH", dataParams[1]);
-
-                    switch (typeSynch) {
-                        // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
-                        case "NWPROMENADE": {
-                            String[] args = dataParams[1].split("\\*");
-                            Intent intent = new Intent();
-                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("NWPROMENADE", args);
-                            if (activity_is_on_background) {
-                                dataKeeper.addData(intent);
-                            } else {
-                                sendBroadcast(intent);
-                            }
-                            break;
-                        }
-
-                        // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
-                        case "NWPROFIL": {
-                            String[] args = dataParams[1].split("\\*");
-                            Intent intent = new Intent();
-                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("NWPROFIL", args);
-                            if (activity_is_on_background) {
-                                dataKeeper.addData(intent);
-                            } else {
-                                sendBroadcast(intent);
-                            }
-                            break;
-                        }
-
-                        // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
-                        case "RMPROFIL": {
-                            String[] args = dataParams[1].split("\\*");
-                            Intent intent = new Intent();
-                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("RMPROFIL", args);
-
-                            if (activity_is_on_background) {
-                                dataKeeper.addData(intent);
-                            } else {
-                                sendBroadcast(intent);
-                            }
-                            break;
-                        }
-
-                        case "MODIFPROFIL": { //SYNCH$MODIFPROFIL_oldNom,prenom,Barriere*newNom,prenom,Barriere
-                            String[] args = dataParams[1].split("\\*");
-                            Intent intent = new Intent();
-                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("MODIFPROFIL", args);
-
-                            if (activity_is_on_background) {
-                                dataKeeper.addData(intent);
-                            } else {
-                                sendBroadcast(intent);
-                            }
-                            break;
-                        }
-
-                        // SYNCH syntaxe -> SYNCH$STOPPROMENADE_idTel
-                        case "STOPPROMENADE": {
-                            alertManager.removeListening(dataParams[1]); // params est idTel ici
-                            Log.e("STOP PROMENADE", dataParams[1]); // idtel
-                            Intent intent = new Intent();
-                            intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                            intent.putExtra("STOPPROMENADE", dataParams[1]);
-                            if (activity_is_on_background) {
-                                dataKeeper.addData(intent);
-                            } else {
-                                sendBroadcast(intent);
-                            }
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-
-                case "UPDATE": {
-                    // METTRE A JOUR UN PROFIL SUIVI
-                    // UPDATE$idTel*longitude*latitude
-                    Log.e("UPDATE", content);
-                    Intent intent = new Intent();
-                    String idTel = content.split("\\*")[0];
-                    intent.putExtra("UPDATE", content);
-                    intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-
-                    if (activity_is_on_background)
+                    case "ALERT":
                     {
-                        dataKeeper.addPosition(idTel,intent);
-                    }
-                    else
-                    {
-                        sendBroadcast(intent);
+                        String[] dataParams = content.split("\\_");
+                        String typeAlert = dataParams[0];
+                        String idTel = dataParams[1];
+
+                        Log.e("ARGSALERT",typeAlert);
+
+                        switch (typeAlert)
+                        {
+                            case "STARTHORSZONE":
+                            {
+                                alertManager.notifHorsZone(getBaseContext(),idTel);
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STOPHORSZONE":
+                            {
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("IDTEL", idTel);
+
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                }
+                                else
+                                {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STARTBATTERY":
+                            {
+                                alertManager.notifBattery(getBaseContext(), idTel);
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("STARTBATTERYLOW","");
+                                intent.putExtra("IDTEL", idTel);
+                                Log.e("STARTBATTERY","INTENTGEN");
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STOPBATTERY":
+                            {
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("STOPBATTERYLOW","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "DURATION":
+                            {
+                                alertManager.notifPromenadeTimeout(getBaseContext(), idTel);
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("PROMENADE_TIMEOUT","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STARTTIMEOUTUPDATE":
+                            {
+                                alertManager.notifTimeoutUpdate(getBaseContext(), idTel);
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("UPDATE_TIMEOUT_START","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STOPTIMEOUTUPDATE":
+                            {
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("UPDATE_TIMEOUT_STOP","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "IMMOBILE":
+                            {
+                                alertManager.notifImmobile(getBaseContext(), idTel);
+                            }
+                        }
                     }
 
-                    /**
-                     * a completer
-                     */
-                    break;
-                }
+                    case "SYNCH": {
 
-                case "NEWSESSION": {
-                    // SELECTIONNER UN PROFIL
-                    Log.e("NEWSESSION", content);
-                    alertManager.notifNewSession(getBaseContext(), content);
-                    break;
+                        String[] dataParams = content.split("\\_");
+                        String typeSynch = dataParams[0];
+
+                        Log.e("ARGSSYNCH", dataParams[1]);
+
+                        switch (typeSynch) {
+                            // SYNCH syntaxe -> SYNCH$NWPROMENADE_idTel*nom*prenom
+                            case "NWPROMENADE": {
+                                String[] args = dataParams[1].split("\\*");
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("NWPROMENADE", args);
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
+                            case "NWPROFIL": {
+                                String[] args = dataParams[1].split("\\*");
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("NWPROFIL", args);
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            // SYNCH syntaxe -> SYNCH$RMPROFIL_nom*prenom
+                            case "RMPROFIL": {
+                                String[] args = dataParams[1].split("\\*");
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("RMPROFIL", args);
+
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "MODIFPROFIL": { //SYNCH$MODIFPROFIL_oldNom,prenom,Barriere*newNom,prenom,Barriere
+                                String[] args = dataParams[1].split("\\*");
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("MODIFPROFIL", args);
+
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            // SYNCH syntaxe -> SYNCH$STOPPROMENADE_idTel
+                            case "STOPPROMENADE": {
+                                alertManager.removeListening(dataParams[1]); // params est idTel ici
+                                Log.e("STOP PROMENADE", dataParams[1]); // idtel
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("STOPPROMENADE", dataParams[1]);
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case "UPDATE": {
+                        // METTRE A JOUR UN PROFIL SUIVI
+                        // UPDATE$idTel*longitude*latitude
+                        Log.e("UPDATE", content);
+                        Intent intent = new Intent();
+                        String idTel = content.split("\\*")[0];
+                        Log.e("Temps Restant !",content.split("\\*")[4]);
+                        intent.putExtra("UPDATE", content);
+                        intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+
+                        if (activity_is_on_background)
+                        {
+                            dataKeeper.addPosition(idTel,intent);
+                        }
+                        else
+                        {
+                            sendBroadcast(intent);
+                        }
+
+                        /**
+                         * a completer
+                         */
+                        break;
+                    }
+
+                    case "NEWSESSION": {
+                        // SELECTIONNER UN PROFIL
+                        Log.e("NEWSESSION", content);
+                        alertManager.notifNewSession(getBaseContext(), content);
+                        break;
+                    }
                 }
             }
         }
@@ -339,8 +443,11 @@ public class ServiceAdmin extends Service
                 String idTel = arg1.getStringExtra("IDTEL");
                 String prenom = arg1.getStringExtra("PRENOM");
                 String nom = arg1.getStringExtra("NOM");
+                String duree = arg1.getStringExtra("DURATION");
                 Log.e("FOLLOW_NEW_SESSION", idTel);
-                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom);
+                Log.e("DUREE", duree);
+
+                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree);
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 
@@ -357,7 +464,6 @@ public class ServiceAdmin extends Service
                 String idTel = arg1.getStringExtra("IDTEL");
                 Log.e("UNFOLLOW_SESSION",idTel);
                 comm.sendMessage("UNFOLLOW$"+idTel);
-                alertManager.removeListening(idTel);
             }
 
             if(arg1.hasExtra("ADDPROFIL")) {

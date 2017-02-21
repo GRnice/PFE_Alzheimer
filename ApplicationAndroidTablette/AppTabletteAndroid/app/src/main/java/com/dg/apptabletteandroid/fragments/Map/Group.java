@@ -1,6 +1,7 @@
 package com.dg.apptabletteandroid.fragments.Map;
 
 import com.dg.apptabletteandroid.Profils.Profil;
+import com.dg.apptabletteandroid.R;
 import com.google.android.gms.maps.model.Marker;
 
 import java.lang.reflect.Method;
@@ -122,4 +123,30 @@ public class Group
         return sb.toString();
     }
 
+    public int getDrawable()
+    {
+
+        switch (getSize()){
+            case 2:
+            {
+                return R.drawable.avatar_groupe_2;
+            }
+            case 3:
+            {
+                return R.drawable.avatar_groupe_3;
+            }
+            case 4:
+            {
+                return R.drawable.avatar_groupe_4;
+            }
+            case 5:
+            {
+                return R.drawable.avatar_groupe_5;
+            }
+            default:
+            {
+                return R.drawable.avatar_groupe_5plus;
+            }
+        }
+    }
 }

@@ -2,7 +2,7 @@ import socket
 import time
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-sock.connect(("192.168.2.20",3000))
+sock.connect(("127.0.0.1",3000))
 idtel = input("entrez IDTEL:")
 sock.send(("STARTSUIVI*"+idtel+"\r\n").encode())
 #19

@@ -4,7 +4,6 @@ package com.dg.apptabletteandroid.Communication;
  * Created by Remy on 15/12/2016.
  */
 
-
 import android.app.Service;
 
 import android.content.Intent;
@@ -27,7 +26,7 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "192.168.2.20";
+    public static final String SOCKET_ADDR = "10.212.118.187";
 
     public static final int PORT = 3100;
     private Socket m_sock;

@@ -1,3 +1,5 @@
+
+
 class Profile:
     def __init__(self, nom, prenom,idAvatar,risqueFranchissementBarriere):
         self.firstName = prenom
@@ -65,5 +67,4 @@ class ManagerProfile:
         
         with open(self.nomFichier, 'w') as out:
             out.write(chaine)
-        out.close()
         
