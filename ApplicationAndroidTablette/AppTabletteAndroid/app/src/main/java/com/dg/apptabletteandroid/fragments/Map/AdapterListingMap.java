@@ -15,11 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
-
 import java.util.ArrayList;
 import java.util.List;
 

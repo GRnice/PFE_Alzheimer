@@ -3,27 +3,6 @@
     android:stretchColumns="1"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-<TableRow
-    android:layout_marginTop="10dp"
-    >
-
-    <ImageView
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"
-    android:maxHeight="50dp"
-    android:maxWidth="50dp"
-        android:layout_marginTop="5dp"
-    android:layout_marginLeft="1dp"
-    android:src="@drawable/wifi"
-    android:adjustViewBounds="true"
-    />
-
-    <TextView
-        android:layout_marginTop="12dp"
-    android:layout_column="4"
-    android:text="Connecté"
-    android:layout_marginRight="15dp" />
-</TableRow>
 
     <TableRow
         android:layout_marginTop="10dp"
@@ -37,7 +16,7 @@
             android:layout_width="wrap_content"
             android:maxHeight="50dp"
             android:maxWidth="50dp"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="8dp"
             android:src="@drawable/clock"
             android:adjustViewBounds="true"
             />
@@ -56,7 +35,7 @@
             android:maxHeight="40dp"
             android:maxWidth="40dp"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="1dp"
+            android:layout_marginLeft="10dp"
             android:src="@drawable/full"
             android:adjustViewBounds="true"
             android:id="@+id/batteryIcon"
@@ -70,5 +49,7 @@
             android:id="@+id/batteryDetails"
             />
     </TableRow>
+    <TableRow>
 
+    </TableRow>
     </TableLayout>

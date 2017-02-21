@@ -7,22 +7,40 @@
     android:weightSum="10">
 
 
-    <RelativeLayout
+    <include layout="@layout/details"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:id="@+id/details"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"
+        android:layout_below="@+id/i"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/i"
-        >
+        android:orientation="horizontal"
+        android:layout_marginTop="13dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
-        <LinearLayout android:layout_height="wrap_content"
-            android:layout_width="match_parent"
+
+        <LinearLayout
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            >
+            android:layout_below="@+id/details"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="5dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:maxHeight="50dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="0dp"
                 android:maxWidth="50dp"
                 android:layout_marginLeft="5dp"
                 android:background="@drawable/avatar"
@@ -36,14 +54,27 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/nom_profil"
                 android:layout_marginLeft="6dp"
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/imageView"
                 android:layout_alignStart="@+id/itemOnPromenadeAvatar"
                 />
 
 
         </LinearLayout>
 
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp"
+            android:layout_marginStart="340dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/pas_suivre"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:id="@+id/imageSuivre"
+            android:layout_alignParentTop="true" />
 
         <include layout="@layout/icons"
             android:layout_marginTop="15dp"
@@ -54,32 +85,7 @@
             android:layout_alignBottom="@+id/imageView"
             android:layout_alignParentStart="true"
             />
-        <ImageView
-            android:layout_height="wrap_content"
-            android:layout_width="38dp"
-            android:maxHeight="50dp"
-            android:maxWidth="50dp"
-            android:layout_marginStart="310dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_below="@+id/icons"
-            android:src="@drawable/pas_suivre"
-            android:adjustViewBounds="true"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:id="@+id/imageSuivre" />
 
     </RelativeLayout>
 
-    <include layout="@layout/details"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/details"
-        android:visibility="gone"
-        android:layout_marginTop="12dp"
-        android:layout_below="@+id/i"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp" />
 </RelativeLayout>
