@@ -197,63 +197,66 @@ class AssistanceServer(Thread):
                         #In Windows, sometimes when a TCP program closes abruptly,
                         # a "Connection reset by peer" exception will be thrown
                         data = sock.recv(self.RECV_BUFFER)
+                        tabdata = data.decode('utf-8').rstrip().split("\r\n")
+                        print(tabdata)
+                        for data in tabdata:
+                            
+                            if len(data) > 0:
 
-                        if len(data) > 0:
+                                message = data.rstrip().split("$")
+                                # Si c'est un follow
+                                if message[0] == "FOLLOW":
+                                    print('follow received')
+                                    #"entete$idelTel*prenom*nom"
+                                    self.follow(sock,message[1])
 
-                            message = (data.decode('utf-8')).rstrip().split("$")
-                            # Si c'est un follow
-                            if message[0] == "FOLLOW":
-                                print('follow received')
-                                #"entete$idelTel*prenom*nom"
-                                self.follow(sock,message[1])
+                                elif message[0] == "UNFOLLOW":
+                                    # entete$idTel
+                                    print('unfollow received')
+                                    idTel = message[1]
+                                    if (self.canUnfollow(sock,idTel)): # message[1] = idTel
+                                        self.unfollow(sock,idTel)
+                                        sock.send(("UNFOLLOW$ALLOW_"+idTel+"\r\n").encode('utf-8'))
+                                        print("OK UNFOLLOW")
+                                    else:
+                                        sock.send(("UNFOLLOW$INTERDICT_"+idTel+"\r\n").encode('utf-8'))
+                                        print("NO UNFOLLOW")
+                                    
 
-                            elif message[0] == "UNFOLLOW":
-                                # entete$idTel
-                                print('unfollow received')
-                                idTel = message[1]
-                                if (self.canUnfollow(sock,idTel)): # message[1] = idTel
-                                    self.unfollow(sock,idTel)
-                                    sock.send(("UNFOLLOW$ALLOW_"+idTel).encode('utf-8'))
-                                    print("OK UNFOLLOW")
-                                else:
-                                    sock.send(("UNFOLLOW$INTERDICT_"+idTel).encode('utf-8'))
-                                    print("NO UNFOLLOW")
-                                
+                                elif message[0] == "STOPPROMENADE":
+                                    # "entete$idTel"
+                                    self.stopPromenade(sock,message[1])
 
-                            elif message[0] == "STOPPROMENADE":
-                                # "entete$idTel"
-                                self.stopPromenade(sock,message[1])
+                                # ENTETE$nom,prenom,barriereAlerte | barriereNormal
+                                elif message[0] == "ADDPROFIL":
+                                    print("ADDPROFIL",message[1])
+                                    profilStr = message[1].split(',')
+                                    nom = profilStr[0]; prenom = profilStr[1];idAvatar = profilStr[2]; barriere = profilStr[3]
+                                    self.managerProfils.addProfil(nom,prenom,idAvatar,barriere)
+                                    self.broadcastFilter("SYNCH$NWPROFIL_"+nom+"*"+prenom+"*"+idAvatar+"*"+barriere+"\r\n",sock)
 
-                            # ENTETE$nom,prenom,barriereAlerte | barriereNormal
-                            elif message[0] == "ADDPROFIL":
-                                print("ADDPROFIL",message[1])
-                                profilStr = message[1].split(',')
-                                nom = profilStr[0]; prenom = profilStr[1];idAvatar = profilStr[2]; barriere = profilStr[3]
-                                self.managerProfils.addProfil(nom,prenom,idAvatar,barriere)
-                                self.broadcastFilter("SYNCH$NWPROFIL_"+nom+"*"+prenom+"*"+idAvatar+"*"+barriere+"\r\n",sock)
+                                elif message[0] == "SUPPRPROFIL":
+                                    print('SUPPRPROFIL')
+                                    print(message[1])
+                                    profilStr = message[1].split(',')
+                                    nom = profilStr[0]; prenom = profilStr[1]; barriere = profilStr[2]
+                                    self.managerProfils.supprProfil(nom,prenom)
+                                    print('send du synch')
+                                    print("SYNCH$RMPROFIL_"+nom+"*"+prenom)
+                                    self.broadcastFilter("SYNCH$RMPROFIL_"+nom+"*"+prenom+"\r\n",sock)
 
-                            elif message[0] == "SUPPRPROFIL":
-                                print('SUPPRPROFIL')
-                                print(message[1])
-                                profilStr = message[1].split(',')
-                                nom = profilStr[0]; prenom = profilStr[1]; barriere = profilStr[2]
-                                self.managerProfils.supprProfil(nom,prenom)
-                                print('send du synch')
-                                print("SYNCH$RMPROFIL_"+nom+"*"+prenom)
-                                self.broadcastFilter("SYNCH$RMPROFIL_"+nom+"*"+prenom+"\r\n",sock)
+                                elif message[0] == "MODIFPROFIL":
+                                    print("MODIFPROFIL")
+                                    oldAndNewProfil = message[1].split('*')
+                                    self.managerProfils.modifProfil(oldAndNewProfil[0],oldAndNewProfil[1])
+                                    print("send du synch modif")
+                                    print("SYNCH$MODIFPROFIL_"+message[1])
+                                    self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
 
-                            elif message[0] == "MODIFPROFIL":
-                                print("MODIFPROFIL")
-                                oldAndNewProfil = message[1].split('*')
-                                self.managerProfils.modifProfil(oldAndNewProfil[0],oldAndNewProfil[1])
-                                print("send du synch modif")
-                                print("SYNCH$MODIFPROFIL_"+message[1])
-                                self.broadcastFilter("SYNCH$MODIFPROFIL_"+message[1]+"\r\n",sock)
-
-                        else:
-                            print("Assistant (%s) is offline" % sock)
-                            sock.close()
-                            self.removeAssistant(sock)
+                            else:
+                                print("Assistant (%s) is offline" % sock)
+                                sock.close()
+                                self.removeAssistant(sock)
 
 
 

@@ -57,7 +57,6 @@ class Tracker: ## Classe representant un tracker
 
     def stopPromenade(self):
         if self.etat == 2:
-            self.etat = 0
             self.reset()
             return True
 

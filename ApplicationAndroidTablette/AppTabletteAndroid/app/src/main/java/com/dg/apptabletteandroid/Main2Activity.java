@@ -438,7 +438,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String idTelBatteryLow = arg1.getStringExtra("IDTEL");
                 Profil profilBatteryLow = profilsManager.getAllProfilsOnPromenade().get(idTelBatteryLow);
                 profilBatteryLow.setBatteryLow(true);
-
+                Log.e("BATTERYLOW","ACTIVITY id :"+idTelBatteryLow);
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();

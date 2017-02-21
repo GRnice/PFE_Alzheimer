@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,14 @@ public class AdapterListingMap extends ArrayAdapter
         ImageView batteryIcons = (ImageView) rowView.findViewById(R.id.batteryIcons);
         ImageView batteryIcon = (ImageView) rowView.findViewById(R.id.batteryIcon);
 
+        Log.e("UPDATELISTINMAP","bat -> "+profil.batteryIsLow());
+
+        if(profil.getBattery() < 51)
+        {
+            batteryIcon.setImageResource(R.drawable.medium);
+            batteryIcons.setImageResource(R.drawable.medium);
+        }
+
         // si profil immobile -> yellow
         if (profil.isHorsZone())
         {
@@ -97,20 +106,18 @@ public class AdapterListingMap extends ArrayAdapter
         // jaune
         else if (profil.batteryIsLow())
         {
-            batteryTextView.setTextColor(Color.YELLOW);
+            Log.e("batteryLow","yellow");
+            rowView.setBackgroundColor(Color.YELLOW);
             batteryIcon.setImageResource(R.drawable.low);
             batteryIcons.setImageResource(R.drawable.low);
         }
         // si non couleur
         else
         {
-            batteryTextView.setTextColor(Color.WHITE);
+            rowView.setBackgroundColor(Color.WHITE);
         }
 
-        if(profil.getBattery() < 51){
-            batteryIcon.setImageResource(R.drawable.medium);
-            batteryIcons.setImageResource(R.drawable.medium);
-        }
+
 
 
         ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
@@ -122,9 +129,11 @@ public class AdapterListingMap extends ArrayAdapter
         {
             imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
         }
-        imageView.setOnClickListener(new View.OnClickListener() {
+        imageView.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 if(profil.estSuiviParMoi()) // si je le suis
                 {
                     act.unfollowProfil(profil); // alors j'afficherai suivre puisque à cet instant je ne suis pas
