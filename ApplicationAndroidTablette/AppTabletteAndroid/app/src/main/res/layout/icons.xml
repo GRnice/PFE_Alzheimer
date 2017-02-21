@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="8dp"
     android:id="@+id/icons">
 
     <ImageView
@@ -11,35 +11,32 @@
         android:maxHeight="50dp"
         android:maxWidth="50dp"
         android:layout_marginTop="2dp"
-        android:layout_marginLeft="0dp"
+        android:layout_marginLeft="15dp"
         android:src="@drawable/wifi"
 
         android:adjustViewBounds="true"
         />
 
     <ImageView
-        android:layout_height="34dp"
-        android:layout_width="wrap_content"
-        android:maxHeight="50dp"
-        android:maxWidth="50dp"
-        android:layout_marginLeft="7dp"
-        android:src="@drawable/clock"
-        android:adjustViewBounds="true"
-        />
-
-    <ImageView
         android:layout_height="wrap_content"
-        android:layout_width="36dp"
+        android:layout_width="38dp"
         android:maxHeight="50dp"
         android:maxWidth="50dp"
-        android:layout_marginLeft="7dp"
+        android:layout_marginLeft="15dp"
         android:layout_marginTop="5dp"
         android:src="@drawable/full"
         android:adjustViewBounds="true"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="10dp"
         android:id="@+id/batteryIcons"
-        />
+        android:text="Time" />
 
+    <TextView
+        android:text="TextView"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/timming"
+        android:layout_weight="1" />
 
 
 </LinearLayout>
