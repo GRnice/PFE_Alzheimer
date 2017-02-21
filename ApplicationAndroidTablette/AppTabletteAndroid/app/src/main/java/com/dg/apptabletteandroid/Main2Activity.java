@@ -433,11 +433,23 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 }
             }
 
-            else if (arg1.hasExtra("BATTERYLOW"))
+            else if (arg1.hasExtra("STARTBATTERYLOW"))
             {
                 String idTelBatteryLow = arg1.getStringExtra("IDTEL");
                 Profil profilBatteryLow = profilsManager.getAllProfilsOnPromenade().get(idTelBatteryLow);
-                profilBatteryLow.setBatteryLow(! profilBatteryLow.batteryIsLow());
+                profilBatteryLow.setBatteryLow(true);
+
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
+
+            else if (arg1.hasExtra("STOPBATTERYLOW"))
+            {
+                String idTelBatteryLow = arg1.getStringExtra("IDTEL");
+                Profil profilBatteryLow = profilsManager.getAllProfilsOnPromenade().get(idTelBatteryLow);
+                profilBatteryLow.setBatteryLow(false);
 
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {

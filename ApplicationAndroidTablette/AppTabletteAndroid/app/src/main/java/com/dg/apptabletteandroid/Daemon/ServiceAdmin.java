@@ -458,7 +458,6 @@ public class ServiceAdmin extends Service
                 String idTel = arg1.getStringExtra("IDTEL");
                 Log.e("UNFOLLOW_SESSION",idTel);
                 comm.sendMessage("UNFOLLOW$"+idTel);
-                alertManager.removeListening(idTel);
             }
 
             if(arg1.hasExtra("ADDPROFIL")) {

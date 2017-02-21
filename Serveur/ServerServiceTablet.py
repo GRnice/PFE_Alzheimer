@@ -76,7 +76,7 @@ class AssistanceServer(Thread):
             print("(alerte) BATTERY FAIBLE", tracker.id)
             self.broadcast("ALERT$STARTBATTERY_"+tracker.id+"\r\n")
             
-        elif(evt == "ALERT-BATTERY_START"):
+        elif(evt == "ALERT-BATTERY_STOP"):
             print("(alerte) BATTERY FAIBLE", tracker.id)
             self.broadcast("ALERT$STOPBATTERY_"+tracker.id+"\r\n")
 			
