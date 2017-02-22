@@ -27,7 +27,7 @@ class Pinger(Thread):
                     tempsCourant = time.time()
                     if ((tempsCourant - tracker.lastEmit) > self.DELAYMAX and (not tracker.updateTimeout)): # si > 20s
                         print("DETECT UPDATE TIMEOUT")
-                        tracker.updateTimeout = True
+                        tracker.updateTimeout = True 
                         self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_START",None,tracker)
 
                     elif ((tempsCourant - tracker.lastEmit) < self.DELAYMAX and tracker.updateTimeout):

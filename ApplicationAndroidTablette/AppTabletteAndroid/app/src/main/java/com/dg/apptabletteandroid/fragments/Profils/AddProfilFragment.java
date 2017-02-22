@@ -4,8 +4,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -16,14 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.dg.apptabletteandroid.Daemon.DataKeeper;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -67,7 +63,7 @@ public class AddProfilFragment extends BlankFragment {
         Button cancelButton = (Button) view.findViewById(R.id.buttonAnnulerAjout);
 
         arrayAvatars = new ArrayList<>();
-        arrayAvatars.add(R.drawable.avatar);
+        arrayAvatars.add(R.drawable.avatar_bleu);
         arrayAvatars.add(R.drawable.avatar_rouge);
         arrayAvatars.add(R.drawable.avatar_vert);
 

@@ -212,6 +212,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     public void followProfil(Profil p)
     {
         String idTel = profilsManager.findIdTelByProfil(p);
+        profilsManager.follow(p);
         if (idTel != null)
         {
             Intent intent = new Intent();
@@ -488,6 +489,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
+            }
+            else if (arg1.hasExtra("SYNCHCONTINUE"))
+            {
+                String[] allProfils = arg1.getStringArrayExtra("allProfils");
+                String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
+                RefitAgent.fix(Main2Activity.this,allProfils,profilsEnPromenade);
+                Fragment fragmap = MapFragment_.newInstance();
+                fragmentManager.pushFragment(fragmap,Main2Activity.this);
+
             }
 
             // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan

@@ -24,6 +24,7 @@ import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Queue;
 
@@ -302,6 +303,33 @@ public class ServiceAdmin extends Service
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("NWPROMENADE", args);
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "SYNCH-CONTINUE":
+                            {
+                                String[] args = dataParams[1].split("\\+");
+                                String[] allProfils = args[0].split("\\*");
+                                Arrays.deepToString(allProfils);
+                                String[] allProfilsOnPromenade = null;
+                                if (!args[1].equals(""))
+                                {
+                                    allProfilsOnPromenade = args[1].split("\\*");
+                                    Arrays.deepToString(allProfilsOnPromenade);
+                                }
+
+
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("SYNCHCONTINUE", "");
+                                intent.putExtra("SYNCH-ALLPROFILS",allProfils);
+                                intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsOnPromenade);
+
                                 if (activity_is_on_background) {
                                     dataKeeper.addData(intent);
                                 } else {
