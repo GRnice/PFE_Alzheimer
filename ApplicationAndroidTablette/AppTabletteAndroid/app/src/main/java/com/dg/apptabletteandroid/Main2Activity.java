@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -195,11 +196,16 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         }
         else if (id == R.id.nav_exit)
         {
-            Intent intent = new Intent();
-            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-            intent.putExtra("QUIT","");
-            sendBroadcast(intent);
-            finish();
+            if(profilsManager.getAllProfilsOnPromenade().size() != 0) {
+                Toast.makeText(getApplicationContext(), "Des patients sont toujours en promenade !", Toast.LENGTH_LONG).show();
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+                intent.putExtra("QUIT","");
+                sendBroadcast(intent);
+                finish();
+            }
+            
         }
         // else if (id == R.id.nav_share) {} else if (id == R.id.nav_send) {}
 
