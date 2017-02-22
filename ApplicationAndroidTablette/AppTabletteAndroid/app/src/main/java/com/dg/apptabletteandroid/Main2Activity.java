@@ -383,8 +383,12 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String prenom = params[2];
                 Log.e("synch",nom+" "+prenom);
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
-                profilSelected.setEstSuiviParMoi(false);
-                profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                if (!(profilsManager.getAllProfilsOnPromenade().containsKey(idTel)))
+                { // si il existe deja ca n'a aucun sens, traite le CONTINUE
+                    profilSelected.setEstSuiviParMoi(false);
+                    profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                }
+
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
@@ -513,6 +517,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
+            }
+            else if (arg1.hasExtra("SYNCHCONTINUE"))
+            {
+                String[] allProfils = arg1.getStringArrayExtra("allProfils");
+                String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
+                RefitAgent.fix(Main2Activity.this,allProfils,profilsEnPromenade);
+                Fragment fragmap = MapFragment_.newInstance();
+                fragmentManager.pushFragment(fragmap,Main2Activity.this);
+
             }
 
             // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan

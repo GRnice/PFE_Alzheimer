@@ -92,7 +92,7 @@ public class MapFragment_ extends BlankFragment
 
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
-
+        
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
@@ -118,8 +118,16 @@ public class MapFragment_ extends BlankFragment
                     if(!v.equals(icons)) {
                         v.setVisibility(View.VISIBLE);
                     }
+
                     Profil profil = customAdapter.getProfils().get(position);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(profil.getLatitude(), profil.getLongitude()), 15));
+                    Iterator<Profil> iteratorProm = profilsManager.getAllProfilsOnPromenade().values().iterator();
+                    while(iteratorProm.hasNext()) {
+                        Profil pr = iteratorProm.next();
+                        if(pr.getPrenom().equals(profil.getPrenom()) && pr.getNom().equals(profil.getNom())) {
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 15));
+                            break;
+                        }
+                    }
                 }
             }
 

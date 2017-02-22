@@ -24,6 +24,7 @@ import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Queue;
 
@@ -310,6 +311,33 @@ public class ServiceAdmin extends Service
                                 break;
                             }
 
+                            case "SYNCH-CONTINUE":
+                            {
+                                String[] args = dataParams[1].split("\\+");
+                                String[] allProfils = args[0].split("\\*");
+                                Arrays.deepToString(allProfils);
+                                String[] allProfilsOnPromenade = null;
+                                if (args.length > 1)
+                                {
+                                    allProfilsOnPromenade = args[1].split("\\*");
+                                    Arrays.deepToString(allProfilsOnPromenade);
+                                }
+
+
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("SYNCHCONTINUE", "");
+                                intent.putExtra("SYNCH-ALLPROFILS",allProfils);
+                                intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsOnPromenade);
+
+                                if (activity_is_on_background) {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
                             // SYNCH syntaxe -> SYNCH$NWPROFIL_nom*prenom*susceptibleDeFranchirLaBarriere
                             case "NWPROFIL": {
                                 String[] args = dataParams[1].split("\\*");
@@ -515,7 +543,7 @@ public class ServiceAdmin extends Service
 
         public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
         public boolean connected = false;
-        public boolean premiereConnexion = true;
+        private boolean premiereConnexion = true;
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -553,18 +581,22 @@ public class ServiceAdmin extends Service
                     {
                         if(premiereConnexion){
                             comm = new CommunicationServer();
-                            premiereConnexion = !premiereConnexion;
+                            premiereConnexion = false;
                             comm.setActionIntent(ACTION_FROM_SERVER);
                             comm.setService(ServiceAdmin.this);
                             comm.start();
+                            connected = true;
                         }else{
                             comm = new CommunicationServer();
                             comm.setActionIntent(ACTION_FROM_SERVER);
                             comm.setService(ServiceAdmin.this);
                             comm.start();
+
                             try {
                                 Thread.sleep(3000);
+                                alertManager.clear();
                                 comm.sendMessage("CONTINUE$");
+                                connected = true;
                             } catch (InterruptedException e) {
                                 Log.e("Socket", "Impossible d'établir une reconnexion.");
                                 return;
@@ -572,7 +604,6 @@ public class ServiceAdmin extends Service
                         }
 
                     }
-                    connected = true;
                 }
             }
         }

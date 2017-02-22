@@ -4,8 +4,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -16,18 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.dg.apptabletteandroid.Daemon.DataKeeper;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 import com.dg.apptabletteandroid.fragments.BlankFragment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static android.R.color.holo_green_light;
@@ -74,7 +69,7 @@ public class AddProfilFragment extends BlankFragment {
         TextView titre =(TextView)view.findViewById(R.id.titre);
         TextView ajouter=(TextView)view.findViewById(R.id.add);
         arrayAvatars = new ArrayList<>();
-        arrayAvatars.add(R.drawable.avatar);
+        arrayAvatars.add(R.drawable.avatar_bleu);
         arrayAvatars.add(R.drawable.avatar_rouge);
         arrayAvatars.add(R.drawable.avatar_vert);
         adapterSpinnerAvatar = new AdapterSpinnerAvatar(getActivity(),R.layout.item_adapter_avatar_listing,arrayAvatars);

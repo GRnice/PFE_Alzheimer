@@ -161,4 +161,9 @@ public class AlertManager
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         sendNotification(baseContext,idTel,R.drawable.ic_report_problem_white,"ALERTETIMEOUTUPDATE","ALERTE - PERTE SUIVI",profil.getPrenom() + " " + profil.getNom() + " ne répond plus depuis au moins 20 secondes !");
     }
+
+    public void clear()
+    {
+        listOfIdTelOnListening.clear();
+    }
 }
