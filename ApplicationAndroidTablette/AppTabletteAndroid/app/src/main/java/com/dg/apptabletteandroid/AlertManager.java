@@ -17,6 +17,7 @@ import com.dg.apptabletteandroid.Profils.ProfilsManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -28,6 +29,7 @@ public class AlertManager
 {
     private ArrayList<String> listOfIdTelOnListening; // liste des idTels a écouter
     private MediaPlayer mediaPlayer;
+    public static HashMap<String, ArrayList<String>> idTelAlertes = new HashMap<>();
 
     public AlertManager()
     {
@@ -62,6 +64,13 @@ public class AlertManager
         intent.putExtra("WAKE_UP",typeNotif);
         intent.putExtra("IDTEL",idTel);
         int idNotif = (int)System.currentTimeMillis();
+        if(idTelAlertes.get(idTel) == null){
+            ArrayList<String> alertes = new ArrayList<>();
+            alertes.add(typeNotif + "$" + idNotif);
+            idTelAlertes.put(idTel, alertes);
+        }else{
+            idTelAlertes.get(idTel).add(typeNotif + "$" + idNotif);
+        }
         intent.putExtra("IDNOTIF",idNotif);
 
         PendingIntent pintent = PendingIntent.getActivity(context,idNotif,intent,0);
@@ -123,33 +132,33 @@ public class AlertManager
     public void notifHorsZone(Context context,String idTel)
     {
         if (!listen(idTel)) return;
-        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTE","ALERTE - HORS ZONE","Hors zone detecté ! cliquez pour désactiver l'alerte");
+        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEHORSZONE","ALERTE - HORS ZONE","Hors zone detecté ! cliquez pour désactiver l'alerte");
     }
 
     public void notifBattery(Context context, String idTel) {
         if (!listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
-        sendNotification(context,idTel,R.drawable.ic_battery_alert,"ALERTE","ALERTE - BATTERIE","Battery de " + profil.getPrenom() + " " + profil.getNom() + " est faible!");
+        sendNotification(context,idTel,R.drawable.ic_battery_alert,"ALERTEBATTERY","ALERTE - BATTERIE","Battery de " + profil.getPrenom() + " " + profil.getNom() + " est faible!");
     }
     public void notifImmobile(Context context, String idTel)
     {
         if (!listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         profil.setImmobile(true);
-        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTE","ALERTE - IMMOBILITE",profil.getPrenom() + " " + profil.getNom() + " est immobile!\"");
+        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEIMMOBILE","ALERTE - IMMOBILITE",profil.getPrenom() + " " + profil.getNom() + " est immobile!\"");
 
     }
 
     public void notifPromenadeTimeout(Context baseContext, String idTel) {
         if (!listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
-        sendNotification(baseContext,idTel,R.drawable.ic_directions_walk,"ALERTE","ALERTE - PROMENADE TERMINEE",profil.getPrenom() + " " + profil.getNom() + " a terminé la promenade");
+        sendNotification(baseContext,idTel,R.drawable.ic_directions_walk,"ALERTEPROMENADETIMEOUT","ALERTE - PROMENADE TERMINEE",profil.getPrenom() + " " + profil.getNom() + " a terminé la promenade");
     }
 
     public void notifTimeoutUpdate(Context baseContext, String idTel)
     {
         if (!listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
-        sendNotification(baseContext,idTel,R.drawable.ic_report_problem_white,"ALERTE","ALERTE - PERTE SUIVI",profil.getPrenom() + " " + profil.getNom() + " ne répond plus depuis au moins 20 secondes !");
+        sendNotification(baseContext,idTel,R.drawable.ic_report_problem_white,"ALERTETIMEOUTUPDATE","ALERTE - PERTE SUIVI",profil.getPrenom() + " " + profil.getNom() + " ne répond plus depuis au moins 20 secondes !");
     }
 }

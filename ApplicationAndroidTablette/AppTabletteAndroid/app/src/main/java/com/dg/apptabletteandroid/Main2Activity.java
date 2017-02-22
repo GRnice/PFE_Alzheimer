@@ -34,6 +34,9 @@ import com.dg.apptabletteandroid.fragments.Profils.AddProfilFragment;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
 
@@ -102,8 +105,24 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         intentAlerteGeree.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
         intentAlerteGeree.putExtra("CHECKALERT", intent.getStringExtra("IDTEL"));
         sendBroadcast(intentAlerteGeree);
+        String idTel = intent.getStringExtra("IDTEL");
+        if (intent.getStringExtra("WAKE_UP") != null){
+            ArrayList<String> alertes = AlertManager.idTelAlertes.get(idTel);
+            String typeNotif = intent.getStringExtra("WAKE_UP");
+            for(String string : alertes){
+                if(string.contains(typeNotif)){
+                    String[] idNotif = string.split("\\$");
 
-
+                    notifManager.cancel(Integer.parseInt(idNotif[1]));
+                }
+            }
+            ArrayList<String> alertes2 = (ArrayList<String>) alertes.clone();
+            for(String string: alertes2){
+                if(string.contains(typeNotif)){
+                    alertes.remove(alertes.indexOf(string));
+                }
+            }
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
