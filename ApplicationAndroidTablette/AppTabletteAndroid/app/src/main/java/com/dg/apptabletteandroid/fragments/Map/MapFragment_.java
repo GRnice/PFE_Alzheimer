@@ -115,15 +115,17 @@ public class MapFragment_ extends BlankFragment
                     }
                 }
                 for (View v : customAdapter.iconsList){
-                    if(!v.equals(icons)){
+                    if(!v.equals(icons)) {
                         v.setVisibility(View.VISIBLE);
                     }
+                    Profil profil = customAdapter.getProfils().get(position);
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(profil.getLatitude(), profil.getLongitude()), 15));
                 }
-
-
             }
 
         });
+
+
         
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
@@ -154,7 +156,7 @@ public class MapFragment_ extends BlankFragment
                             minimizeAll();
                             single = false;
                         }
-                        
+
                         if(marker.getSnippet() != null) {  // dans un groupe
                             String[] allNames = marker.getSnippet().split("\n");
 

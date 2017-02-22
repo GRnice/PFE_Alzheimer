@@ -39,6 +39,11 @@ public class AdapterListingMap extends ArrayAdapter
         detailsList.clear();
         iconsList.clear();
     }
+
+    public ArrayList<Profil> getProfils() {
+        return profils;
+    }
+
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
@@ -62,8 +67,8 @@ public class AdapterListingMap extends ArrayAdapter
         }
         if(!detailsList.contains(detailView)){
             detailsList.add(detailView);
-
         }
+
         final Profil profil = profils.get(position);
         Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), profil.getIdRessourcesAvatar());
         imageProfil.setImageBitmap(bitmap);
