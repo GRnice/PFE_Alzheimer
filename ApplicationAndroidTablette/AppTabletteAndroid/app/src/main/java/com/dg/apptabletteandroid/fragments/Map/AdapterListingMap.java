@@ -126,11 +126,11 @@ public class AdapterListingMap extends ArrayAdapter
         final ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
         if (profil.estSuiviParMoi())
         {
-            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
+            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
         }
         else
         {
-            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
+            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
         }
         imageView.setOnClickListener(new View.OnClickListener()
         {
@@ -144,7 +144,7 @@ public class AdapterListingMap extends ArrayAdapter
                 }
                 else{
                     act.followProfil(profil); // et inversement
-                    imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
+                    imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone plus suivre
 
                 }
             }

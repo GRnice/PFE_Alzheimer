@@ -266,7 +266,6 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
             }
             else if (!startGps)
             {
-                onPromenade = false;
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 lm.removeUpdates(ServiceSocket.this);
             }
