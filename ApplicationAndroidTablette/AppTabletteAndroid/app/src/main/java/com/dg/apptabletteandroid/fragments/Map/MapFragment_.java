@@ -92,7 +92,7 @@ public class MapFragment_ extends BlankFragment
 
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
-
+        
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
@@ -115,15 +115,25 @@ public class MapFragment_ extends BlankFragment
                     }
                 }
                 for (View v : customAdapter.iconsList){
-                    if(!v.equals(icons)){
+                    if(!v.equals(icons)) {
                         v.setVisibility(View.VISIBLE);
                     }
+
+                    Profil profil = customAdapter.getProfils().get(position);
+                    Iterator<Profil> iteratorProm = profilsManager.getAllProfilsOnPromenade().values().iterator();
+                    while(iteratorProm.hasNext()) {
+                        Profil pr = iteratorProm.next();
+                        if(pr.getPrenom().equals(profil.getPrenom()) && pr.getNom().equals(profil.getNom())) {
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 15));
+                            break;
+                        }
+                    }
                 }
-
-
             }
 
         });
+
+
         
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
@@ -154,7 +164,7 @@ public class MapFragment_ extends BlankFragment
                             minimizeAll();
                             single = false;
                         }
-                        
+
                         if(marker.getSnippet() != null) {  // dans un groupe
                             String[] allNames = marker.getSnippet().split("\n");
 
