@@ -1,6 +1,7 @@
 package com.dg.apptabletteandroid;
 
 import android.content.Intent;
+import android.support.annotation.BoolRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -21,9 +22,15 @@ public class RefitAgent
 {
     public static void fix(Main2Activity m,String[] allProfils,String[] profilsOnPromenade)
     {
+
         if (profilsOnPromenade != null)
         {
             synchPromenades(m,profilsOnPromenade);
+        }
+        else
+        {
+            ProfilsManager profilsManager = m.getProfilsManager();
+            profilsManager.getAllProfilsOnPromenade().clear();
         }
     }
 
@@ -43,8 +50,8 @@ public class RefitAgent
                 String nom = unProfilEnPromenadeServ[3];
                 String prenom = unProfilEnPromenadeServ[5];
                 Profil p = prof.getProfil(nom,prenom);
-                
-                if (p != null)
+
+                if (p != null) // si le profil n'existe pas, on a un profil à cet adresse idtel
                 {
                     p = synchProfilEnPromenade(m,p,allProfilsOnPromenade.get(idTelProfilEnPromenadeServeur),unProfilEnPromenadeServ);
                     prof.removeProfilOnPromenade(idTelProfilEnPromenadeServeur); // je supprime l'ancien objet
@@ -54,8 +61,6 @@ public class RefitAgent
                 {
                     prof.removeProfilOnPromenade(idTelProfilEnPromenadeServeur); // je supprime l'ancien objet
                 }
-
-
             }
             else
             {
@@ -91,10 +96,20 @@ public class RefitAgent
         String isUpdateTimeout = profilSent[17];
         String dureePromenade = profilSent[19];
         // appliquer les modifs de profilSent à enPromenade
-        enPromenade.setPrenom(prenom);
-        enPromenade.setNom(nom);
-        if (profilObsolete != null && profilObsolete.estSuiviParMoi())
+
+        if (profilObsolete != null)
         {
+
+            Log.e("Nom prenom fix old",profilObsolete.getNom()+" "+profilObsolete.getPrenom());
+            Log.e("EstSuiviParMoi", String.valueOf(profilObsolete.estSuiviParMoi()));
+        }
+        else
+        {
+            Log.e("fix old NULL","!");
+        }
+        if (profilObsolete != null && profilObsolete.estSuiviParMoi() && profilObsolete.getPrenom().equals(prenom) && profilObsolete.getNom().equals(nom))
+        {
+            Log.e("Nom prenom fix old",profilObsolete.getNom()+" "+profilObsolete.getPrenom());
             enPromenade.setEstSuiviParMoi(true);
             Intent intentFollow = new Intent();
             intentFollow.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);

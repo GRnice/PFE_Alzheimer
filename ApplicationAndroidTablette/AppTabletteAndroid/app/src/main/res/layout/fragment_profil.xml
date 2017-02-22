@@ -15,29 +15,37 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.1"
-            android:weightSum="1">
+            >
 
             <EditText
-                android:layout_width="0dp"
+                android:layout_width="250dp"
+                android:layout_marginLeft="100dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.7"
                 android:inputType="textPersonName"
                 android:ems="10"
                 android:id="@+id/editTextForSearchingProfil"
                 android:hint="@string/edit_text_searching_profil" />
 
             <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.3"
+                android:id="@+id/buttonAddProfil"
+               android:layout_marginStart="300dp"
+              android:layout_marginTop="8dp"
+                 android:layout_marginRight="50dp"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/add"
                 android:text="Ajouter un profil"
-                android:id="@+id/buttonAddProfil"/>
+                android:background="@null"
+                android:textStyle="normal|bold"
+                android:textSize="20dp" />
+
         </LinearLayout>
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="0px"
-            android:layout_weight="0.90"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.87"
             android:id="@+id/listingprofils" />
 
     </LinearLayout>

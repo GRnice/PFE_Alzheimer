@@ -4,6 +4,7 @@ from threading import Thread,RLock
 import Profils
 import LookupAssistantPatient
 from Pinger import Pinger
+import time
 
 lockPool = RLock()
 
@@ -65,34 +66,66 @@ class AssistanceServer(Thread):
                                        str(tracker.position[1])+ "*" +  str(tracker.battery) + "*" + str(tracker.tempsRestant) + "\r\n")
 
         elif (evt == "ALERT-POSITION_START"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$STARTHORSZONE_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$STARTHORSZONE_"+tracker.id+"\r\n")
             print("(alerte) HORS ZONE",tracker.id)
             self.broadcast("ALERT$STARTHORSZONE_"+tracker.id+"\r\n")
 
         elif (evt == "ALERT-POSITION_STOP"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$STOPHORSZONE_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$STOPHORSZONE_"+tracker.id+"\r\n")
             print("STOP HORS ZONE",tracker.id)
             self.broadcast("ALERT$STOPHORSZONE_"+tracker.id+"\r\n")
 
         elif(evt == "ALERT-BATTERY_START"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$STARTBATTERY_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$STARTBATTERY_"+tracker.id+"\r\n")
             print("(alerte) BATTERY FAIBLE", tracker.id)
             self.broadcast("ALERT$STARTBATTERY_"+tracker.id+"\r\n")
 
         elif(evt == "ALERT-BATTERY_STOP"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$STOPBATTERY_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$STOPBATTERY_"+tracker.id+"\r\n")
             print("(alerte) STOP BATTERY FAIBLE", tracker.id)
             self.broadcast("ALERT$STOPBATTERY_"+tracker.id+"\r\n")
 			
         elif(evt == "ALERT-IMMOBILE"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$IMMOBILE_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$IMMOBILE_"+tracker.id+"\r\n")
             print("(alerte) IMMOBILE", tracker.id)
             self.broadcast("ALERT$IMMOBILE_"+tracker.id+"\r\n")
 
         elif (evt == "ALERT-TIMEOUT-UPDATE_START"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$STARTTIMEOUTUPDATE_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$STARTTIMEOUTUPDATE_"+tracker.id+"\r\n")
             print("(alerte) TIMEOUT UPDATE", tracker.id)
             self.broadcast("ALERT$STARTTIMEOUTUPDATE_"+tracker.id+"\r\n")
 
         elif (evt == "ALERT-TIMEOUT-UPDATE_STOP"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$STOPTIMEOUTUPDATE_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$STOPTIMEOUTUPDATE_"+tracker.id+"\r\n")
             print("(alerte) STOP TIMEOUT UPDATE", tracker.id)
             self.broadcast("ALERT$STOPTIMEOUTUPDATE_"+tracker.id+"\r\n")
 
         elif (evt == "ALERT-DURATION_START"):
+            if(tracker.lastAlert == None):
+                tracker.lastAlert = [time.time(), "ALERT$DURATION_"+tracker.id+"\r\n"]
+            else:
+                tracker.lastAlert.append("ALERT$DURATION_"+tracker.id+"\r\n")
             print("(alerte) fin de promenade",tracker.id)
             self.broadcast("ALERT$DURATION_"+tracker.id+"\r\n")
 
@@ -258,6 +291,7 @@ class AssistanceServer(Thread):
                                     #L'ancien socket est aussi supprimé dans le except
                                     #On ajoute le nouveau socket à la liste d'assistants
                                     self.addAssistant(sock)
+
                                     message = ""
                                     message += str(self.managerProfils) + "+"
                                     allPatients = list(self.mapper.getSocketPatient())
@@ -267,6 +301,10 @@ class AssistanceServer(Thread):
                                         message += "*"
                                         
                                     sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
+
+                                elif message[0] == "CHECKALERT":
+                                    print("CHECKALERT")
+                                    self.mapper.getTrackerById(message[1]).lastAlert = None
                             else:
                                 print("Assistant (%s) is offline" % sock)
                                 sock.close()

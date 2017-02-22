@@ -4,6 +4,7 @@ class Pinger(Thread):
     def __init__(self,mapper,serverAssistant):
         Thread.__init__(self)
         self.DELAYMAX = 20
+        self.DELAYMAXALERT = 20 # Délai d'inaction d'alertes
         self.mapper = mapper
         self.serverAssistant = serverAssistant
         self.onRun = None
@@ -34,7 +35,18 @@ class Pinger(Thread):
                         print("RELEASE UPDATE TIMEOUT")
                         tracker.updateTimeout = False
                         self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_STOP",None,tracker)
-                    
+                if (tracker.lastAlert != None):
+                    tempsCourant = time.time()
+                    if ((tempsCourant - tracker.lastAlert[0]) > self.DELAYMAXALERT and (not tracker.alertTimeout)): # si > 20s
+                        print("DETECT ALERTES PAS GEREES")
+                        tracker.alertTimeout = True
+                        for id, val in enumerate(tracker.lastAlert):
+                            if(id != 0):
+                                self.serverAssistant.broadcast(val)
+                        
+                    elif ((tempsCourant - tracker.lastAlert[0]) < self.DELAYMAXALERT and tracker.alertTimeout):
+                        print("RELEASE UPDATE TIMEOUT")
+                        tracker.alertTimeout = False
                     
                 
             

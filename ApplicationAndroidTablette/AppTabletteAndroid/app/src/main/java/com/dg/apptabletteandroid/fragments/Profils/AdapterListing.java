@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,8 +47,8 @@ public class AdapterListing extends ArrayAdapter<Profil> {
         final ImageView avatar = (ImageView) rowView.findViewById(R.id.photoProfil);
 
         // ImageView image = (ImageView) rowView.findViewById(R.id.photoProfil);
-        Button editButton = (Button) rowView.findViewById(R.id.buttonEdit);
-        Button supprButton = (Button) rowView.findViewById(R.id.buttonSuppr);
+        ImageButton editButton = (ImageButton) rowView.findViewById(R.id.buttonEdit);
+        ImageButton supprButton = (ImageButton) rowView.findViewById(R.id.buttonSuppr);
 
         if (selectionProfilPourPromenade)
         {

@@ -64,14 +64,31 @@ public class ProfilsManager implements ProfilOnPromenadeManager
         SharedPreferences.Editor editor = sharedPreferences.edit();
         HashSet<String> ensembleProfils = new HashSet<>();
         String[] lesProfils = allSignaturesProfils.split("\\*");
+        Log.e("SIZEARRAYPROMENADE",String.valueOf(profilOnPromenade.size()));
+        ArrayList<Profil> arr = new ArrayList<>(profilOnPromenade.values());
+        if (arr.size() > 0)
+        {
+            Log.e("SIZEARRAYPROMENADE",String.valueOf(arr.get(0).estSuiviParMoi()));
+        }
 
         this.profilArrayList.clear();
+
+        arr = new ArrayList<>(profilOnPromenade.values());
+        if (arr.size() > 0)
+        {
+            Log.e("SIZEARRAYPROMENADE",String.valueOf(arr.get(0).estSuiviParMoi()));
+        }
 
         for(String uneSignature : lesProfils)
         {
             ensembleProfils.add(uneSignature);
             Profil unProfil = Profil.buildProfilFromSignature(uneSignature);
             profilArrayList.add(unProfil);
+        }
+        arr = new ArrayList<>(profilOnPromenade.values());
+        if (arr.size() > 0)
+        {
+            Log.e("SIZEARRAYPROMEN -AFTER",String.valueOf(arr.get(0).estSuiviParMoi()));
         }
         Log.e("strsetTTT", Arrays.deepToString(ensembleProfils.toArray()));
         editor.remove("profils");
@@ -223,7 +240,6 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     {
         profilUnfollow.setEstSuiviParMoi(false);
     }
-
 
     public void follow(Profil p)
     {

@@ -98,6 +98,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             fragmentManager.pushFragment(profilFragment,this);
         }
 
+        Intent intentAlerteGeree = new Intent();
+        intentAlerteGeree.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+        intentAlerteGeree.putExtra("CHECKALERT", intent.getStringExtra("IDTEL"));
+        sendBroadcast(intentAlerteGeree);
+
 
     }
 
@@ -359,8 +364,12 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String prenom = params[2];
                 Log.e("synch",nom+" "+prenom);
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
-                profilSelected.setEstSuiviParMoi(false);
-                profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                if (!(profilsManager.getAllProfilsOnPromenade().containsKey(idTel)))
+                { // si il existe deja ca n'a aucun sens, traite le CONTINUE
+                    profilSelected.setEstSuiviParMoi(false);
+                    profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                }
+
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();

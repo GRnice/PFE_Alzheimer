@@ -317,7 +317,7 @@ public class ServiceAdmin extends Service
                                 String[] allProfils = args[0].split("\\*");
                                 Arrays.deepToString(allProfils);
                                 String[] allProfilsOnPromenade = null;
-                                if (!args[1].equals(""))
+                                if (args.length > 1)
                                 {
                                     allProfilsOnPromenade = args[1].split("\\*");
                                     Arrays.deepToString(allProfilsOnPromenade);
@@ -527,6 +527,11 @@ public class ServiceAdmin extends Service
                 comm.sendMessage("MODIFPROFIL$" + modifiedProfil);
 
             }
+
+            if(arg1.hasExtra("CHECKALERT")) {
+                String idTel = arg1.getStringExtra("CHECKALERT");  // ancienProfil*nouveauProfil
+                comm.sendMessage("CHECKALERT$" + idTel);
+            }
         }
     }
 
@@ -538,7 +543,7 @@ public class ServiceAdmin extends Service
 
         public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
         public boolean connected = false;
-        public boolean premiereConnexion = true;
+        private boolean premiereConnexion = true;
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -576,18 +581,22 @@ public class ServiceAdmin extends Service
                     {
                         if(premiereConnexion){
                             comm = new CommunicationServer();
-                            premiereConnexion = !premiereConnexion;
+                            premiereConnexion = false;
                             comm.setActionIntent(ACTION_FROM_SERVER);
                             comm.setService(ServiceAdmin.this);
                             comm.start();
+                            connected = true;
                         }else{
                             comm = new CommunicationServer();
                             comm.setActionIntent(ACTION_FROM_SERVER);
                             comm.setService(ServiceAdmin.this);
                             comm.start();
+
                             try {
                                 Thread.sleep(3000);
+                                alertManager.clear();
                                 comm.sendMessage("CONTINUE$");
+                                connected = true;
                             } catch (InterruptedException e) {
                                 Log.e("Socket", "Impossible d'établir une reconnexion.");
                                 return;
@@ -595,7 +604,6 @@ public class ServiceAdmin extends Service
                         }
 
                     }
-                    connected = true;
                 }
             }
         }

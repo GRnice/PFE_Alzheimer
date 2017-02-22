@@ -15,11 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,14 +118,14 @@ public class AdapterListingMap extends ArrayAdapter
 
 
 
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
+        final ImageView imageView = (ImageView) rowView.findViewById(R.id.imageSuivre);
         if (profil.estSuiviParMoi())
         {
-            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
+            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
         }
         else
         {
-            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
+            imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
         }
         imageView.setOnClickListener(new View.OnClickListener()
         {
@@ -137,9 +135,12 @@ public class AdapterListingMap extends ArrayAdapter
                 if(profil.estSuiviParMoi()) // si je le suis
                 {
                     act.unfollowProfil(profil); // alors j'afficherai suivre puisque à cet instant je ne suis pas
+//                    imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
                 }
                 else{
                     act.followProfil(profil); // et inversement
+                    imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone plus suivre
+
                 }
             }
         });
