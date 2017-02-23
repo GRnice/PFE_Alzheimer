@@ -29,7 +29,6 @@ import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
 public class ConfigPromenade extends BlankFragment {
 
 
-
     private ProfilsManager profManager;
     private Profil profilSelected;
     private String idTel;
@@ -97,6 +96,8 @@ public class ConfigPromenade extends BlankFragment {
                 intent.putExtra("DURATION",duration.getText().toString());
                 intent.putExtra("MAXIMMOBILITE",max.getText().toString());
                 getActivity().sendBroadcast(intent);
+               int  time = Integer.parseInt(duration.getText().toString());
+                profilSelected.setTempsRestant(time*60);
                 profilSelected.setEstSuiviParMoi(true);
                 profManager.addProfilOnPromenade(idTel,profilSelected);
                 MapFragment_ fragMap = MapFragment_.newInstance();
