@@ -68,11 +68,16 @@ public class AdapterListingMap extends ArrayAdapter
         if(!detailsList.contains(detailView)){
             detailsList.add(detailView);
         }
-
         final Profil profil = profils.get(position);
         Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), profil.getIdRessourcesAvatar());
         imageProfil.setImageBitmap(bitmap);
-
+        if(profil.isEnVueDetail()){
+            detailView.setVisibility(View.VISIBLE);
+            iconView.setVisibility(View.GONE);
+        }else{
+            detailView.setVisibility(View.GONE);
+            iconView.setVisibility(View.VISIBLE);
+        }
 
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());

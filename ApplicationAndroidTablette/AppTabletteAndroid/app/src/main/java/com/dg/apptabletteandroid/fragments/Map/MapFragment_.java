@@ -148,6 +148,7 @@ public class MapFragment_ extends BlankFragment
                     }
 
                     Profil profil = customAdapter.getProfils().get(position);
+                    profil.setEnVueDetail(!profil.isEnVueDetail());
                     Iterator<Profil> iteratorProm = profilsManager.getAllProfilsOnPromenade().values().iterator();
                     while(iteratorProm.hasNext())
                     {
