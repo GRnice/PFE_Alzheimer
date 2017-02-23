@@ -63,6 +63,7 @@
         <ImageView
             android:layout_height="wrap_content"
             android:layout_width="45dp"
+            android:layout_marginTop="3dp"
             android:maxHeight="50dp"
             android:maxWidth="50dp"
             android:layout_marginStart="340dp"
@@ -81,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:id="@+id/icons" android:visibility="visible"
-            android:layout_marginStart="130dp"
+            android:layout_marginStart="140dp"
             android:layout_alignBottom="@+id/imageView"
             android:layout_alignParentStart="true"
             />
