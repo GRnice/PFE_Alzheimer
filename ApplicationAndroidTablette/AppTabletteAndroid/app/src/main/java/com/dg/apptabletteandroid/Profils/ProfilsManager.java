@@ -245,4 +245,9 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     {
         p.setEstSuiviParMoi(true);
     }
+
+    public void clearPromenade()
+    {
+        this.profilOnPromenade.clear();
+    }
 }

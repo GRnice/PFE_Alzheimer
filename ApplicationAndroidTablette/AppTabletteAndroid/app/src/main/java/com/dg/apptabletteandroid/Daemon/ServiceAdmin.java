@@ -86,7 +86,6 @@ public class ServiceAdmin extends Service
         {
             comm.interrupt(); // arret du socket
         }
-
     }
 
     @Override
@@ -112,12 +111,21 @@ public class ServiceAdmin extends Service
             String[] allMessages = messagebrut.split("\\r?\\n");
             for (String message : allMessages)
             {
+                boolean broadcastAlerte = false;
                 Log.e("MESSAGERECEIVED",message);
                 String[] tabMessage = message.split("\\$"); // syntaxe d'un message -> "Entete$contenu"
                 String header = tabMessage[0]; // l'entete
+                String content = tabMessage[1];
+                if (tabMessage[0].equals("BROADCASTALERT"))
+                {
+                    broadcastAlerte = true;
+                    header = tabMessage[1];
+                    content = tabMessage[2];
+                }
+
                 Log.e("HEADER", header);
                 Log.e("ALL", message);
-                String content = tabMessage[1];
+
                 switch (header) {
                     case "PROFILES": {
                         Log.e("ALL_PROFILES", content);
@@ -171,7 +179,7 @@ public class ServiceAdmin extends Service
                         {
                             case "STARTHORSZONE":
                             {
-                                alertManager.notifHorsZone(getBaseContext(),idTel);
+                                alertManager.notifHorsZone(broadcastAlerte,getBaseContext(),idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("HORSZONE","");
@@ -205,7 +213,7 @@ public class ServiceAdmin extends Service
 
                             case "STARTBATTERY":
                             {
-                                alertManager.notifBattery(getBaseContext(), idTel);
+                                alertManager.notifBattery(broadcastAlerte,getBaseContext(), idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("STARTBATTERYLOW","");
@@ -237,7 +245,7 @@ public class ServiceAdmin extends Service
 
                             case "DURATION":
                             {
-                                alertManager.notifPromenadeTimeout(getBaseContext(), idTel);
+                                alertManager.notifPromenadeTimeout(broadcastAlerte,getBaseContext(), idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("PROMENADE_TIMEOUT","");
@@ -253,7 +261,7 @@ public class ServiceAdmin extends Service
 
                             case "STARTTIMEOUTUPDATE":
                             {
-                                alertManager.notifTimeoutUpdate(getBaseContext(), idTel);
+                                alertManager.notifTimeoutUpdate(broadcastAlerte,getBaseContext(), idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("UPDATE_TIMEOUT_START","");
@@ -284,7 +292,7 @@ public class ServiceAdmin extends Service
 
                             case "IMMOBILE":
                             {
-                                alertManager.notifImmobile(getBaseContext(), idTel);
+                                alertManager.notifImmobile(broadcastAlerte,getBaseContext(), idTel);
                             }
                         }
                     }
@@ -592,23 +600,22 @@ public class ServiceAdmin extends Service
                             comm.setService(ServiceAdmin.this);
                             comm.start();
 
-                            try {
-                                Thread.sleep(3000);
-                                alertManager.clear();
-                                comm.sendMessage("CONTINUE$");
-                                connected = true;
-                            } catch (InterruptedException e) {
+                            try
+                            {
+                                Thread.sleep(5000);
+                                alertManager.clear(); // clear car lors d'un continu on se resynchronisera totalement
+                                connected = comm.sendMessage("CONTINUE$");
+                            }
+                            catch (InterruptedException e)
+                            {
                                 Log.e("Socket", "Impossible d'établir une reconnexion.");
                                 return;
                             }
                         }
-
                     }
                 }
             }
         }
     }
-
-
 }
 

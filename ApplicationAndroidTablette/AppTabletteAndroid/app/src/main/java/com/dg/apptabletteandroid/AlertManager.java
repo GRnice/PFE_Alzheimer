@@ -129,35 +129,35 @@ public class AlertManager
     }
 
 
-    public void notifHorsZone(Context context,String idTel)
+    public void notifHorsZone(boolean broadcastAlert,Context context,String idTel)
     {
-        if (!listen(idTel)) return;
+        if (!broadcastAlert && !listen(idTel)) return;
         sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEHORSZONE","ALERTE - HORS ZONE","Hors zone detecté ! cliquez pour désactiver l'alerte");
     }
 
-    public void notifBattery(Context context, String idTel) {
-        if (!listen(idTel)) return;
+    public void notifBattery(boolean broadcastAlert,Context context, String idTel) {
+        if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         sendNotification(context,idTel,R.drawable.ic_battery_alert,"ALERTEBATTERY","ALERTE - BATTERIE","Battery de " + profil.getPrenom() + " " + profil.getNom() + " est faible!");
     }
-    public void notifImmobile(Context context, String idTel)
+    public void notifImmobile(boolean broadcastAlert,Context context, String idTel)
     {
-        if (!listen(idTel)) return;
+        if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         profil.setImmobile(true);
         sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEIMMOBILE","ALERTE - IMMOBILITE",profil.getPrenom() + " " + profil.getNom() + " est immobile!\"");
 
     }
 
-    public void notifPromenadeTimeout(Context baseContext, String idTel) {
-        if (!listen(idTel)) return;
+    public void notifPromenadeTimeout(boolean broadcastAlert,Context baseContext, String idTel) {
+        if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         sendNotification(baseContext,idTel,R.drawable.ic_directions_walk,"ALERTEPROMENADETIMEOUT","ALERTE - PROMENADE TERMINEE",profil.getPrenom() + " " + profil.getNom() + " a terminé la promenade");
     }
 
-    public void notifTimeoutUpdate(Context baseContext, String idTel)
+    public void notifTimeoutUpdate(boolean broadcastAlert,Context baseContext, String idTel)
     {
-        if (!listen(idTel)) return;
+        if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         sendNotification(baseContext,idTel,R.drawable.ic_report_problem_white,"ALERTETIMEOUTUPDATE","ALERTE - PERTE SUIVI",profil.getPrenom() + " " + profil.getNom() + " ne répond plus depuis au moins 20 secondes !");
     }
