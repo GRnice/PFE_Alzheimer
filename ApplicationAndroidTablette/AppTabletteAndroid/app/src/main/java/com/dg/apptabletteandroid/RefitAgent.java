@@ -122,7 +122,15 @@ public class RefitAgent
 
         String[] latlong = position.split("\\(|\\)|\\,");
         Log.e("CONTENU LATLONG",Arrays.deepToString(latlong));
-        enPromenade.setLatLong(Double.valueOf(latlong[2]),Double.valueOf(latlong[1])); // 48 -> latitude , 7 -> longitude
+        if (latlong.length == 2)
+        {
+            enPromenade.setLatLong(Double.valueOf(latlong[2]),Double.valueOf(latlong[1])); // 48 -> latitude , 7 -> longitude
+        }
+        else
+        {
+            enPromenade.setLatLong(43.612248,7.079400); // 48 -> latitude , 7 -> longitude
+        }
+
         enPromenade.setBattery(Integer.valueOf(niveauBatterie));
         enPromenade.setHorsZone(Boolean.valueOf(isHorsZone));
         enPromenade.setBatteryLow(Boolean.valueOf(batteryIsLow));
