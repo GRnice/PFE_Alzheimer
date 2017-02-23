@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.dg.apptabletteandroid.Main2Activity;
@@ -81,6 +82,28 @@ public class AdapterListingMap extends ArrayAdapter
 
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
+        TextView duree=(TextView)rowView.findViewById(R.id.timming);
+        TextView dureeD=(TextView)rowView.findViewById(R.id.duree);
+        duree.setText(profil.getTempsRestant()+"m");
+        dureeD.setText(profil.getTempsRestant()+"m");
+        int d =profil.getTempsRestant();
+        if(d<=0){
+            duree.setText("0");
+            dureeD.setText("Promenade Terminée");
+        }
+        else if (d <60){
+            duree.setText(profil.getTempsRestant()+"s");
+            dureeD.setText(profil.getTempsRestant()+"s");
+
+
+        }else{
+            d= d /60;
+            int s= profil.getTempsRestant()%60;
+            duree.setText(d+"m");
+            dureeD.setText(d+"m"+s+"s");
+
+        }
+
         TextView batteryTextView = (TextView) rowView.findViewById(R.id.details).findViewById(R.id.batteryDetails);
         batteryTextView.setText(String.valueOf(profil.getBattery()) + "%");
         ImageView batteryIcons = (ImageView) rowView.findViewById(R.id.batteryIcons);

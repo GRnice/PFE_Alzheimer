@@ -43,7 +43,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     public static final int DELAY = 2000;
     //Période de temps entre envoie de deux updates
     public static final int PERIOD = 5000;
-
+    public static long maxTime;
     private CommunicationServer comm;
     private ClientReceiver clientReceiver;
     private ServerReceiver serverReceiver;
@@ -121,7 +121,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 if (ompteur >= 1.34) {
                     valeurCompteur += 1;
                 }
-                if ((curTime - lastUpdate) > 20000) {
+                if ((curTime - lastUpdate) > maxTime) {
                     if(lastValeurCompteur != 0){
                         if((valeurCompteur - lastValeurCompteur) <5) {
                             //Alerte Immobile

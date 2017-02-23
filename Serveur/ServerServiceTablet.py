@@ -171,9 +171,9 @@ class AssistanceServer(Thread):
             self.mapper.attachAssistant(socketPatient,sockAssistant)
 
 
-        elif (len(data) == 4):
-            # si FOLLOW$idTel*prenom*nom*duree
-            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3]
+        elif (len(data) == 5):
+            # si FOLLOW$idTel*prenom*nom*duree*tempsImmobile
+            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3] ; tempsImmobile = data[4]
 
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
@@ -181,7 +181,7 @@ class AssistanceServer(Thread):
             if (tracker.etat == 1): # le premier qui défini le profil du device
                 tracker.startPromenade(nom,prenom,duree)
                 print("OKPROMENADE POUR ",tracker.id)
-                sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+                sockPatient.send(("OKPROMENADE*" + tempsImmobile + "\r\n").encode("utf-8"))
                 self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)
 
             self.mapper.attachAssistant(sockPatient,sockAssistant)
