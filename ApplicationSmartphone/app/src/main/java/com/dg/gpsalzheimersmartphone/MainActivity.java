@@ -1,8 +1,10 @@
 package com.dg.gpsalzheimersmartphone;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.provider.Settings;
@@ -133,10 +135,28 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent)
         {
             boolean mustKill = intent.getBooleanExtra("KILL",false);
+            boolean showAlert = intent.getBooleanExtra("ALERTGPS", false);
 
             if (mustKill)
             {
                 MainActivity.this.finishAffinity();
+            }
+            if(showAlert){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("Vous devez activer le GPS. Voulez-vous l'activer maintenant?")
+                        .setCancelable(false)
+                        .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                            public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        })
+                        .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         }
     }

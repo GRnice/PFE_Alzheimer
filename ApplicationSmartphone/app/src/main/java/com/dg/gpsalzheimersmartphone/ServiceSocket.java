@@ -1,9 +1,11 @@
 package com.dg.gpsalzheimersmartphone;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Sensor;
@@ -19,6 +21,8 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 import static com.dg.gpsalzheimersmartphone.MainActivity.android_id;
@@ -35,7 +39,11 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     final public static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
     final public static String ACTION_RECEIVE_FROM_SERVER = "RECEIVE_FROM_SERVER";
     final public static String MESSAGE_FROM_SERVICE = "DATA_FROM_SERVICE";
-
+    //Delay du premier envoie de location
+    public static final int DELAY = 2000;
+    //Période de temps entre envoie de deux updates
+    public static final int PERIOD = 5000;
+    public static long maxTime;
     private CommunicationServer comm;
     private ClientReceiver clientReceiver;
     private ServerReceiver serverReceiver;
@@ -49,6 +57,8 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     private float valeurCompteur = 0;
     private long lastUpdate = 0;
     private float lastValeurCompteur;
+    public static Location currentLocation;
+    public static Timer timer;
 
     public ServiceSocket()
     {
@@ -111,7 +121,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 if (ompteur >= 1.34) {
                     valeurCompteur += 1;
                 }
-                if ((curTime - lastUpdate) > 20000) {
+                if ((curTime - lastUpdate) > maxTime) {
                     if(lastValeurCompteur != 0){
                         if((valeurCompteur - lastValeurCompteur) <5) {
                             //Alerte Immobile
@@ -147,6 +157,9 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
         unregisterReceiver(serverReceiver);
         unregisterReceiver(networkChangeReceiver);
         unregisterReceiver(batteryChangeReceiver);
+        if(timer != null){
+            timer.cancel();
+        }
         super.onDestroy();
     }
 
@@ -159,9 +172,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     @Override
     public void onLocationChanged(Location location)
     {
-        comm.sendMessage(POSITION + SEPARATOR + String.valueOf(location.getLongitude()) +
-                SEPARATOR +
-                String.valueOf(location.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
+        currentLocation = location;
     }
 
     @Override
@@ -200,6 +211,9 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
 
             if(stopSuivi){
                 ServiceSocket.this.comm.sendMessage(STOPSUIVI);
+                if(timer != null){
+                    timer.cancel();
+                }
             }
             if(startSuivi){
                 ServiceSocket.this.comm.sendMessage(STARTSUIVI + SEPARATOR + android_id);
@@ -259,15 +273,35 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
             if (startGps)
             {
                 onPromenade = true;
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(currentLocation != null && onPromenade && networkChangeReceiver.connected){
+                            comm.sendMessage(POSITION + SEPARATOR + String.valueOf(currentLocation.getLongitude()) +
+                                    SEPARATOR +
+                                    String.valueOf(currentLocation.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
+                        }
+                    }
+                }, DELAY, PERIOD);
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    Intent intent = new Intent();
+                    intent.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
+                    intent.putExtra("ALERTGPS", true);
+                    sendBroadcast(intent);
+                }
                 checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
-                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,8000,0,ServiceSocket.this);
+                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0,ServiceSocket.this);
 
             }
             else if (!startGps)
             {
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 lm.removeUpdates(ServiceSocket.this);
+                if(timer != null){
+                    timer.cancel();
+                }
             }
         }
 
