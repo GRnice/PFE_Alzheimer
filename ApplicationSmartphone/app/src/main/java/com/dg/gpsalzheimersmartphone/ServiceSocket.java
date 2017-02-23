@@ -35,6 +35,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     final public static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
     final public static String ACTION_RECEIVE_FROM_SERVER = "RECEIVE_FROM_SERVER";
     final public static String MESSAGE_FROM_SERVICE = "DATA_FROM_SERVICE";
+    public static long maxTime;
 
     private CommunicationServer comm;
     private ClientReceiver clientReceiver;
@@ -111,7 +112,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 if (ompteur >= 1.34) {
                     valeurCompteur += 1;
                 }
-                if ((curTime - lastUpdate) > 20000) {
+                if ((curTime - lastUpdate) > maxTime) {
                     if(lastValeurCompteur != 0){
                         if((valeurCompteur - lastValeurCompteur) <5) {
                             //Alerte Immobile

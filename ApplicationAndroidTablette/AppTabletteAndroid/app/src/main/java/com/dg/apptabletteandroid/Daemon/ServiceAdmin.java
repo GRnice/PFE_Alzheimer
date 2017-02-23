@@ -444,10 +444,12 @@ public class ServiceAdmin extends Service
                 String prenom = arg1.getStringExtra("PRENOM");
                 String nom = arg1.getStringExtra("NOM");
                 String duree = arg1.getStringExtra("DURATION");
+                String maxImmobile = arg1.getStringExtra("MAXIMMOBILITE");
                 Log.e("FOLLOW_NEW_SESSION", idTel);
                 Log.e("DUREE", duree);
 
-                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree);
+
+                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree + "*" + maxImmobile);
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 

@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static com.dg.gpsalzheimersmartphone.ServiceSocket.maxTime;
+
 /**
  *
  * Class used to manage the socket (IO) with the server
@@ -25,7 +27,7 @@ import java.net.Socket;
 public class CommunicationServer extends Thread implements Runnable
 {
 
-    public static final String SOCKET_ADDR = "10.212.103.233";
+    public static final String SOCKET_ADDR = "192.168.1.94";
 
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
@@ -91,7 +93,9 @@ public class CommunicationServer extends Thread implements Runnable
                 {
                     if(line.equals(STOPSUIVI)){
                         intent.putExtra(STOPSUIVI, true);
-                    } else if(line.equals(OKPROMENADE)){
+                    } else if(line.contains(OKPROMENADE)){
+                        String []args= line.split("\\*");
+                        maxTime = Long.parseLong(args[1]) *60;
                         intent.putExtra(OKPROMENADE, true);
                     }
                     synchronized (this.service)

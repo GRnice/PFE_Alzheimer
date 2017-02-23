@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,121 +8,125 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="0.2"
-        android:weightSum="1">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_height="match_parent"
-            android:layout_weight="0.3"
-            android:layout_width="0px"
-            android:gravity="center_vertical|fill_vertical|center_horizontal|fill_horizontal">
+    <TextView
+        android:text="Page de configuration d'une promenade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="38dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textSize="25dp"
+        android:textStyle="normal|bold"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:maxHeight="50dp"
+        android:layout_marginTop="74dp"
+        android:maxWidth="50dp"
+        android:layout_marginLeft="30dp"
+        android:background="@drawable/avatar"
+        android:id="@+id/imageProfilSelected"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="102dp" />
 
-            <TextView
-                android:text="Profil selectionné :"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/textView6"
-                android:layout_weight="1"
-                android:textSize="18sp"
-                android:gravity="center_vertical|center_horizontal"
-                android:background="@color/common_google_signin_btn_text_dark_disabled" />
-        </LinearLayout>
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewConfigomPrenom"
+        android:textSize="20dp"
+        android:textStyle="normal|bold"
+        android:layout_marginStart="94dp"
+        android:layout_alignBottom="@+id/imageProfilSelected"
+        android:layout_toEndOf="@+id/imageProfilSelected"
+        android:layout_marginBottom="26dp" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:layout_weight="0.8">
+    <TextView
+        android:text="Temps de la promenade :"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textview_temps_prom"
+        android:textSize="20dp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:gravity="fill_vertical|center_horizontal"
+        android:textStyle="normal|bold"
+        android:layout_marginTop="220dp"
+        android:layout_marginLeft="80dp"/>
 
-            <TextView
-                android:text="TextView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/textViewConfigomPrenom"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal"
-                android:textSize="18sp" />
-        </LinearLayout>
-    </LinearLayout>
+    <TextView
+        android:text="Temps maximal d'immobilité:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_temp_immo"
+        android:textSize="20dp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:gravity="fill_vertical|center_horizontal"
+        android:textStyle="normal|bold"
+        android:layout_marginTop="290dp"
+        android:layout_marginLeft="80dp"
+       />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:id="@+id/container_config_prom"
-        android:weightSum="1"
-        android:layout_weight="0.15">
+    <EditText
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:id="@+id/entry_temps_immobilite"
+        android:hint="temps maximal de l'immobilité"
+        android:layout_marginTop="280dp"
+        android:layout_marginLeft="400dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content" />
 
-        <TextView
-            android:text="Temps de la promenade :"
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:id="@+id/textview_temps_prom"
-            android:layout_weight="0.4"
-            android:textSize="18sp"
-            android:background="@color/common_google_signin_btn_text_light_disabled"
-            android:gravity="fill_vertical|center_horizontal" />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:id="@+id/entry_temps_promenade"
+        android:hint="@string/duration_promenade"
+      android:layout_marginLeft="400dp"
+        android:layout_marginTop="210dp"/>
 
-        <EditText
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/entry_temps_promenade"
-            android:layout_weight="0.4"
-            android:hint="@string/duration_promenade" />
+    <TextView
+        android:text="minutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textviewDurationUnit"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        android:gravity="fill_vertical"
+      android:layout_marginStart="750dp"
+        android:layout_marginTop="216dp"/>
+    <Button
+        android:text="Valider"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_valid_promenade"
+        android:layout_marginEnd="200dp"
+        android:layout_marginTop="370dp"
+        android:background="@android:color/holo_green_light"
+        android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:text="minutes"
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:id="@+id/textviewDurationUnit"
-            android:layout_weight="0.2"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:gravity="fill_vertical"
-            android:background="@color/common_google_signin_btn_text_light_disabled" />
-    </LinearLayout>
+    <TextView
+        android:text="minutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView9"
+        android:textSize="20dp"
+        android:layout_alignBaseline="@+id/entry_temps_immobilite"
+        android:layout_alignBottom="@+id/entry_temps_immobilite"
+        android:layout_alignStart="@+id/textviewDurationUnit" />
+    <Button
+        android:text="Retour"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_dark"
+        android:id="@+id/button_back_config_prom"
+        android:layout_marginStart="200dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="370dp"
+        android:textColor="@android:color/black" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="0.3"></LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="0.45">
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:text="Annuler selection"
-                android:layout_width="0px"
-                android:layout_height="match_parent"
-                android:id="@+id/button_back_config_prom"
-                android:layout_weight="1"
-                android:background="@android:color/holo_red_light" />
-
-            <Button
-                android:text="Valider configuration"
-                android:layout_width="0px"
-                android:layout_height="match_parent"
-                android:id="@+id/button_valid_promenade"
-                android:background="@android:color/holo_green_light"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
@@ -65,6 +66,8 @@ public class ConfigPromenade extends BlankFragment {
         final View v = inflater.inflate(R.layout.fragment_config_promenade, container, false);
         TextView nomprenom = (TextView) v.findViewById(R.id.textViewConfigomPrenom);
         String nomPrenom = profilSelected.getPrenom() + "" + profilSelected.getNom();
+        ImageView image =(ImageView)v.findViewById(R.id.imageProfilSelected);
+        image.setImageDrawable(getResources().getDrawable(profilSelected.getIdRessourcesAvatar()));
         nomprenom.setText(nomPrenom);
 
         Button back = (Button) v.findViewById(R.id.button_back_config_prom);
@@ -84,7 +87,7 @@ public class ConfigPromenade extends BlankFragment {
             public void onClick(View view)
             {
                 EditText duration = (EditText) v.findViewById(R.id.entry_temps_promenade);
-
+                EditText max =(EditText) v.findViewById(R.id.entry_temps_immobilite);
                 Intent intent = new Intent();
                 intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
                 intent.putExtra("FOLLOW_NEW_SESSION","");
@@ -92,6 +95,7 @@ public class ConfigPromenade extends BlankFragment {
                 intent.putExtra("NOM",profilSelected.getNom());
                 intent.putExtra("PRENOM",profilSelected.getPrenom());
                 intent.putExtra("DURATION",duration.getText().toString());
+                intent.putExtra("MAXIMMOBILITE",max.getText().toString());
                 getActivity().sendBroadcast(intent);
                 profilSelected.setEstSuiviParMoi(true);
                 profManager.addProfilOnPromenade(idTel,profilSelected);
