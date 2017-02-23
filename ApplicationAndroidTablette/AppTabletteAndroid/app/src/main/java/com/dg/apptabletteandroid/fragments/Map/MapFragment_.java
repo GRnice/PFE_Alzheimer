@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +72,32 @@ public class MapFragment_ extends BlankFragment
         super.onCreate(savedInstanceState);
 
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
+    }
+
+    public void limitCentre() {
+        // Instantiates a new Polygon object and adds points to define a rectangle
+        PolygonOptions rectOptions = new PolygonOptions()
+                .add(new LatLng(43.612690, 7.079368),
+                        new LatLng(43.612669, 7.079243),
+                        new LatLng(43.612522, 7.079179),
+                        new LatLng(43.612432, 7.079147),
+                        new LatLng(43.612366, 7.079048),
+                        new LatLng(43.612304, 7.078982),
+                        new LatLng(43.612246, 7.078964),
+                        new LatLng(43.611973, 7.079333),
+                        new LatLng(43.611956, 7.079453),
+                        new LatLng(43.612008, 7.079529),
+                        new LatLng(43.612113, 7.079854),
+                        new LatLng(43.612213, 7.080000),
+                        new LatLng(43.612286, 7.080029),
+                        new LatLng(43.612655, 7.079521))
+                .strokeColor(Color.BLUE)
+                .strokeWidth(2);
+
+
+
+//      Get back the mutable Polygon
+        Polygon polygon = googleMap.addPolygon(rectOptions);
     }
 
 
@@ -121,7 +149,8 @@ public class MapFragment_ extends BlankFragment
 
                     Profil profil = customAdapter.getProfils().get(position);
                     Iterator<Profil> iteratorProm = profilsManager.getAllProfilsOnPromenade().values().iterator();
-                    while(iteratorProm.hasNext()) {
+                    while(iteratorProm.hasNext())
+                    {
                         Profil pr = iteratorProm.next();
                         if(pr.getPrenom().equals(profil.getPrenom()) && pr.getNom().equals(profil.getNom())) {
                             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 15));
@@ -140,6 +169,7 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+                limitCentre();
 
                 HashMap<String,Profil> allProfilsOnPromenade = profilsManager.getAllProfilsOnPromenade();
 
@@ -241,12 +271,13 @@ public class MapFragment_ extends BlankFragment
                         else if (group == null)
                         {
                             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
+
                             marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+
                             marker.showInfoWindow();
                             profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
                         }
                     }
-
                 }
 
                 if (res != PackageManager.PERMISSION_GRANTED)
@@ -365,6 +396,7 @@ public class MapFragment_ extends BlankFragment
     private void refreshMap()
     {
         googleMap.clear();
+        limitCentre();
 
 
         Iterator<Profil> profilsPromenade = profilsManager.getAllProfilsOnPromenade().values().iterator();

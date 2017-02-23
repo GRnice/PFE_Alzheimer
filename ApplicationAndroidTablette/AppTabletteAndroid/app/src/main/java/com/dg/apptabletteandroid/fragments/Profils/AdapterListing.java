@@ -15,9 +15,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
+import com.dg.apptabletteandroid.NetworkUtil;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 
@@ -66,6 +68,11 @@ public class AdapterListing extends ArrayAdapter<Profil> {
             @Override
             public void onClick(View v) {
 
+                if (NetworkUtil.getConnectivityStatus(getContext()) == 0)
+                {
+                    Toast.makeText(getContext(),"Connectez vous au réseau pour modifier le profil",Toast.LENGTH_LONG).show();
+                }
+
                 Fragment fragEditProfil = AddProfilFragment.newInstance(profil);
                 ((Main2Activity) getContext()).pushFragmentFromActivity(fragEditProfil);
             }
@@ -73,7 +80,13 @@ public class AdapterListing extends ArrayAdapter<Profil> {
 
         supprButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
+                if (NetworkUtil.getConnectivityStatus(getContext()) == 0)
+                {
+                    Toast.makeText(getContext(),"Connectez vous au réseau",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 ((Main2Activity)getContext()).getProfilsManager().getAllProfils().remove(profil);
                 Fragment fragProfils = ProfilFragment.newInstance(((Main2Activity)getContext()).getProfilsManager());  //(profilsManager);
 
@@ -90,10 +103,8 @@ public class AdapterListing extends ArrayAdapter<Profil> {
                 // nom,prenom,BarriereNormal
                 intent.putExtra("SUPPRPROFIL", profil.makeSignature());
                 ((Main2Activity)getContext()).sendBroadcast(intent);
-
             }
         });
-
 
         return rowView;
     }

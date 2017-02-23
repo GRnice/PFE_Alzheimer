@@ -19,8 +19,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
+import com.dg.apptabletteandroid.NetworkUtil;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
@@ -95,14 +97,25 @@ public class ProfilFragment extends BlankFragment
         buttonAddProfil = (Button) view.findViewById(R.id.buttonAddProfil);
         buttonAddProfil.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Fragment fragmentAdd = AddProfilFragment.newInstance(null);
-                ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmentAdd);
+            public void onClick(View view)
+            {
+                if (NetworkUtil.getConnectivityStatus(getActivity()) == 0)
+                {
+                    Toast.makeText(getActivity(), "Connectez vous au réseau", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                else
+                {
+                    Fragment fragmentAdd = AddProfilFragment.newInstance(null);
+                    ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmentAdd);
+                }
+
             }
         });
 
         if (this.selectionProfilNewSession)
         {
+            buttonAddProfil.setVisibility(View.INVISIBLE);
             AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,true);
             this.listView.setAdapter(adapterListing);
 
@@ -183,10 +196,15 @@ public class ProfilFragment extends BlankFragment
      * @return if event is consumed, it will return true.
      */
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         Log.d("AAA", "BACKPressed profile");
-        Fragment fragmap = MapFragment_.newInstance();
-        ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
+        if (!selectionProfilNewSession) // back bloqué si on selectionne un profil
+        {
+            Fragment fragmap = MapFragment_.newInstance();
+            ((Main2Activity) getActivity()).pushFragmentFromActivity(fragmap);
+        }
+
     }
 
 

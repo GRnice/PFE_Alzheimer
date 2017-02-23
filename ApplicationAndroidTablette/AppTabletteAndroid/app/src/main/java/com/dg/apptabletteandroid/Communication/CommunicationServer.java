@@ -105,9 +105,11 @@ public class CommunicationServer extends Thread implements Runnable
 
     }
 
-    public synchronized void sendMessage(String message)
+    public synchronized boolean sendMessage(String message) throws NullPointerException
     {
+        if (output == null) return false;
         this.output.println(message);
+        return true;
     }
 
     public synchronized void deconnect()

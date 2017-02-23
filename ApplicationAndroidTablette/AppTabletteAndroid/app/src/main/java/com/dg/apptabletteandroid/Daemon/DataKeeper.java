@@ -104,7 +104,6 @@ public class DataKeeper
                 {
 
                 }
-
                 onPublish.set(false);
             }
         }

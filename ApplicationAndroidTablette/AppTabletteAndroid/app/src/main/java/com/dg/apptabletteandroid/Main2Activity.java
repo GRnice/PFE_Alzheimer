@@ -199,13 +199,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             if(profilsManager.getAllProfilsOnPromenade().size() != 0) {
                 Toast.makeText(getApplicationContext(), "Des patients sont toujours en promenade !", Toast.LENGTH_LONG).show();
             } else {
-                Intent intent = new Intent();
-                intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-                intent.putExtra("QUIT","");
-                sendBroadcast(intent);
+                Intent intentServiceSocket = new Intent(Main2Activity.this,ServiceAdmin.class);
+                stopService(intentServiceSocket);
+                profilsManager.clearPromenade();
                 finish();
             }
-            
         }
         // else if (id == R.id.nav_share) {} else if (id == R.id.nav_send) {}
 
@@ -370,7 +368,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Profil profil = profilsManager.getProfilOnPromenade(idTel);
                 profilsManager.removeProfilOnPromenade(idTel);
 
-
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).getProfilsGroupManager().onRemoveProfil(profil);
@@ -397,7 +394,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
-                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                    pushFragmentFromActivity(MapFragment_.newInstance());
                 }
                 Log.e("SYNCH_NW prom ok ?",String.valueOf(profilSelected != null));
             }
