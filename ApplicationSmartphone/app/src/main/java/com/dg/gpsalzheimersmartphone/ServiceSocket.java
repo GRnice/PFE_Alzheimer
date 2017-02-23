@@ -173,9 +173,9 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     public void onLocationChanged(Location location)
     {
         currentLocation = location;
-        comm.sendMessage(POSITION + SEPARATOR + String.valueOf(location.getLongitude()) +
-                SEPARATOR +
-                String.valueOf(location.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
+//        comm.sendMessage(POSITION + SEPARATOR + String.valueOf(location.getLongitude()) +
+//                SEPARATOR +
+//                String.valueOf(location.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
     }
 
     @Override
