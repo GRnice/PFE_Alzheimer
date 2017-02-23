@@ -77,7 +77,7 @@ class AssistanceServer(Thread):
         elif (evt == "ALERT-POSITION_STOP"):
             messageAlerte = "ALERT$STOPHORSZONE_"+tracker.id+"\r\n"
             if(tracker.lastAlert == None):
-                tracker.lastAlert = [time.time(), messageAlerte]
+                pass
             else:
                 tracker.lastAlert.append(messageAlerte)
             print("STOP HORS ZONE",tracker.id)
@@ -95,7 +95,7 @@ class AssistanceServer(Thread):
         elif(evt == "ALERT-BATTERY_STOP"):
             messageAlerte = "ALERT$STOPBATTERY_"+tracker.id+"\r\n"
             if(tracker.lastAlert == None):
-                tracker.lastAlert = [time.time(), messageAlerte]
+                pass
             else:
                 tracker.lastAlert.append(messageAlerte)
             print("(alerte) STOP BATTERY FAIBLE", tracker.id)
@@ -122,7 +122,7 @@ class AssistanceServer(Thread):
         elif (evt == "ALERT-TIMEOUT-UPDATE_STOP"):
             messageAlerte = "ALERT$STOPTIMEOUTUPDATE_"+tracker.id+"\r\n"
             if(tracker.lastAlert == None):
-                tracker.lastAlert = [time.time(), messageAlerte]
+                pass
             else:
                 tracker.lastAlert.append(messageAlerte)
             print("(alerte) STOP TIMEOUT UPDATE", tracker.id)
