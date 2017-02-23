@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,6 +50,7 @@ public class MapFragment_ extends BlankFragment
     private GoogleMap googleMap;
 
     private ListView listView;
+    private Button synchRefreshTitre;
     private ProfilOnPromenadeManager profilsManager;
     private ProfilGroupManager profilsGroupManager;
 
@@ -112,6 +114,16 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
+        synchRefreshTitre = (Button) view.findViewById(R.id.btnListViewTitre);
+        synchRefreshTitre.setText("Profils en promenade ("+profilsManager.getAllProfilsOnPromenade().size()+")");
+        synchRefreshTitre.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+
+            }
+        });
 
         getActivity().setTitle("Carte");
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
@@ -385,7 +397,7 @@ public class MapFragment_ extends BlankFragment
     {
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
         ArrayList<Profil> profilsOnPromenade = new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values());
-
+        synchRefreshTitre.setText("Profils en promenade ("+profilsOnPromenade.size()+")");
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity)getActivity()
                 ,R.layout.item_profil_en_promenade
                 ,profilsOnPromenade);

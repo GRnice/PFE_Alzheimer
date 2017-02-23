@@ -41,7 +41,10 @@ class AssistanceServer(Thread):
     def broadcast(self,messageString):
         allAssistants = self.mapper.getSocketsAssistant()
         for assistant in allAssistants:
-            assistant.send(messageString.encode("utf-8"))
+            try:
+                assistant.send(messageString.encode("utf-8"))
+            except ConnectionResetError as err:
+                self.removeAssistant(assistant)
 
     # emet un message à tous les assistants sauf à l'assistant socketAssistant
 
@@ -50,7 +53,11 @@ class AssistanceServer(Thread):
         allAssistants = self.mapper.getSocketsAssistant()
         for assistant in allAssistants:
             if (assistant != socketAssistant):
-                assistant.send(messageString.encode("utf-8"))
+                try:
+                    assistant.send(messageString.encode("utf-8"))
+                except ConnectionResetError as err:
+                    self.removeAssistant(assistant)
+                
 
 
 
@@ -147,6 +154,11 @@ class AssistanceServer(Thread):
             tracker = self.mapper.getTracker(sockPatient)
             if tracker.etat == 2: # si le tracker courant a recu un OKPROMENADE
                 message = "SYNCH$NWPROMENADE_"+tracker.id+"*"+tracker.nom+"*"+tracker.prenom+"\r\n"
+                sockAssistant.send(message.encode('utf-8'))
+
+            elif tracker.etat == 1:
+                message = "NEWSESSION$"+tracker.id+"\r\n"
+                print("REPORTED NEW SESSION")
                 sockAssistant.send(message.encode('utf-8'))
 
     # retrait d'un assistant
