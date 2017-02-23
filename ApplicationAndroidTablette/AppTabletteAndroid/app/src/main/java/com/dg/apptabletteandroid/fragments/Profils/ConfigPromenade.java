@@ -4,6 +4,8 @@ package com.dg.apptabletteandroid.fragments.Profils;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
@@ -85,6 +88,14 @@ public class ConfigPromenade extends BlankFragment {
             {
                 EditText duration = (EditText) v.findViewById(R.id.entry_temps_promenade);
 
+                try{
+                    Integer.parseInt(duration.getText().toString());
+                }
+                catch(NumberFormatException err)
+                {
+                    Toast.makeText(getActivity(),"Durée de la promenade incorrecte",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 Intent intent = new Intent();
                 intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
                 intent.putExtra("FOLLOW_NEW_SESSION","");
