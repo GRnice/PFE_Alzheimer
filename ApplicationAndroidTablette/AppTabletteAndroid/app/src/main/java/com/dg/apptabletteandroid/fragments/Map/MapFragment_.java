@@ -121,7 +121,8 @@ public class MapFragment_ extends BlankFragment
 
                     Profil profil = customAdapter.getProfils().get(position);
                     Iterator<Profil> iteratorProm = profilsManager.getAllProfilsOnPromenade().values().iterator();
-                    while(iteratorProm.hasNext()) {
+                    while(iteratorProm.hasNext())
+                    {
                         Profil pr = iteratorProm.next();
                         if(pr.getPrenom().equals(profil.getPrenom()) && pr.getNom().equals(profil.getNom())) {
                             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 15));
@@ -241,12 +242,11 @@ public class MapFragment_ extends BlankFragment
                         else if (group == null)
                         {
                             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
-                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                             marker.showInfoWindow();
                             profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
                         }
                     }
-
                 }
 
                 if (res != PackageManager.PERMISSION_GRANTED)

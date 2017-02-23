@@ -304,7 +304,8 @@ class AssistanceServer(Thread):
                                     message += str(self.managerProfils) + "+"
                                     allPatients = list(self.mapper.getSocketPatient())
                                     for socketPatient in allPatients:
-                                        if socketPatient.etat == 2:
+                                        tracker = self.mapper.getTracker(socketPatient)
+                                        if tracker != None and tracker.etat == 2:
                                             tracker = self.mapper.getTracker(socketPatient)
                                             message += tracker.toString()
                                             message += "*"

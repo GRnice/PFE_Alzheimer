@@ -44,7 +44,7 @@ public class RefitAgent
             String[] unProfilEnPromenadeServ = profilsOnPromenadeServeur[i].split("\\:");
             String idTelProfilEnPromenadeServeur = unProfilEnPromenadeServ[1];
             allIdTelServ.add(idTelProfilEnPromenadeServeur);
-            if (allProfilsOnPromenade.containsKey(idTelProfilEnPromenadeServeur))
+            if (allProfilsOnPromenade.containsKey(idTelProfilEnPromenadeServeur)) // si IDTEL existe
             {
                 // si l'ancienne liste contient cet id
                 String nom = unProfilEnPromenadeServ[3];
@@ -53,18 +53,20 @@ public class RefitAgent
 
                 if (p != null) // si le profil n'existe pas, on a un profil à cet adresse idtel
                 {
+                    // à ce profil on le synchronise avec les infos de cette promenade + l'info follow contenue dans
+                    // l'ancien objet de la prom -> allProfilsOnPromenade.get(idTelProfilEnPromenadeServeur)
                     p = synchProfilEnPromenade(m,p,allProfilsOnPromenade.get(idTelProfilEnPromenadeServeur),unProfilEnPromenadeServ);
                     prof.removeProfilOnPromenade(idTelProfilEnPromenadeServeur); // je supprime l'ancien objet
                     prof.addProfilOnPromenade(idTelProfilEnPromenadeServeur,p);
                 }
-                else
+                else // si ce profil n'existe pas alors il faut supprimer la promenade attachée à ce profil supprimé.
                 {
                     prof.removeProfilOnPromenade(idTelProfilEnPromenadeServeur); // je supprime l'ancien objet
                 }
             }
-            else
+            else // CREATION
             {
-                // cet id n'existe pas donc il faut l'ajouter
+                // cet id n'existe pas donc il faut l'ajouter, avec son profil associé.
                 String nom = unProfilEnPromenadeServ[3];
                 String prenom = unProfilEnPromenadeServ[5];
                 Profil p = prof.getProfil(nom,prenom);

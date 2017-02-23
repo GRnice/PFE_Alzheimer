@@ -90,10 +90,8 @@ public class AdapterListing extends ArrayAdapter<Profil> {
                 // nom,prenom,BarriereNormal
                 intent.putExtra("SUPPRPROFIL", profil.makeSignature());
                 ((Main2Activity)getContext()).sendBroadcast(intent);
-
             }
         });
-
 
         return rowView;
     }

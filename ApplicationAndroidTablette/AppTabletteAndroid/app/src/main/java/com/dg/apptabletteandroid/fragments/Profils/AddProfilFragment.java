@@ -72,23 +72,24 @@ public class AddProfilFragment extends BlankFragment {
         arrayAvatars.add(R.drawable.avatar_bleu);
         arrayAvatars.add(R.drawable.avatar_rouge);
         arrayAvatars.add(R.drawable.avatar_vert);
+        arrayAvatars.add(R.drawable.avatar_orange);
         adapterSpinnerAvatar = new AdapterSpinnerAvatar(getActivity(),R.layout.item_adapter_avatar_listing,arrayAvatars);
         adapterSpinnerAvatar.setDropDownViewResource(R.layout.item_adapter_avatar_listing);
         spinnerSelectAvatar.setAdapter(adapterSpinnerAvatar);
         spinnerSelectAvatar.getSelectedItemPosition();
         buttonBarriere.setBackgroundColor(Color.rgb(153,204,0));
-        buttonBarriere.setText("Pas suscpetible de franchir la barrière");
+        buttonBarriere.setText("Pas susceptible de franchir la barrière");
 
         buttonBarriere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(((ColorDrawable)buttonBarriere.getBackground()).getColor() == Color.RED )  {
                     buttonBarriere.setBackgroundColor(Color.rgb(153,204,0));
-                    buttonBarriere.setText("Pas suscpetible de franchir la barrière");
+                    buttonBarriere.setText("Pas susceptible de franchir la barrière");
 
                 } else {
                     buttonBarriere.setBackgroundColor(Color.RED);
-                    buttonBarriere.setText("SUSCPETIBLE DE FRANCHIR LA BARRIÈRE");
+                    buttonBarriere.setText("SUSCEPTIBLE DE FRANCHIR LA BARRIÈRE");
                 }
             }
         });
@@ -101,10 +102,10 @@ public class AddProfilFragment extends BlankFragment {
             if (!profilModif.getSusceptibleDeFranchirLaBarriere())
             {
                 buttonBarriere.setBackgroundColor(Color.rgb(153,204,0));
-                buttonBarriere.setText("Pas suscpetible de franchir la barrière");
+                buttonBarriere.setText("Pas susceptible de franchir la barrière");
 
             }else{              buttonBarriere.setBackgroundColor(Color.RED);
-                buttonBarriere.setText("SUSCPETIBLE DE FRANCHIR LA BARRIÈRE");
+                buttonBarriere.setText("SUSCEPTIBLE DE FRANCHIR LA BARRIÈRE");
             }
             addButton.setText("MODIFIER");
             titre.setText("Modifier un profil");
@@ -128,7 +129,7 @@ public class AddProfilFragment extends BlankFragment {
                 int idAvatar = arrayAvatars.get(spinnerSelectAvatar.getSelectedItemPosition());
                 Log.e("idAvatar",String.valueOf(idAvatar));
                 final boolean barriereBool;
-                if(buttonBarriere.getText().toString().equals("SUSCPETIBLE DE FRANCHIR LA BARRIÈRE")) {
+                if(buttonBarriere.getText().toString().equals("SUSCEPTIBLE DE FRANCHIR LA BARRIÈRE")) {
                     barriereBool = true;
                 }
                 else {
@@ -144,22 +145,22 @@ public class AddProfilFragment extends BlankFragment {
                             profilModif.getIdRessourcesAvatar());
                     if (oldProfil.getSusceptibleDeFranchirLaBarriere())
                     {
-                        buttonBarriere.setText("SUSCPETIBLE DE FRANCHIR LA BARRIÈRE");
+                        buttonBarriere.setText("SUSCEPTIBLE DE FRANCHIR LA BARRIÈRE");
                         buttonBarriere.setBackgroundColor(Color.RED);}
                     else {
                         buttonBarriere.setBackgroundColor(Color.rgb(153,204,0));
-                        buttonBarriere.setText("Pas suscpetible de franchir la barrière");
+                        buttonBarriere.setText("Pas susceptible de franchir la barrière");
                     }
                     profilModif.setPrenom(newPrenom);
                     profilModif.setNom(newNom);
                     profilModif.susceptibleDeFranchirLaBarriere(barriereBool);
                     if (profilModif.getSusceptibleDeFranchirLaBarriere())
                     {
-                        buttonBarriere.setText("SUSCPETIBLE DE FRANCHIR LA BARRIÈRE");
+                        buttonBarriere.setText("SUSCEPTIBLE DE FRANCHIR LA BARRIÈRE");
                         buttonBarriere.setBackgroundColor(Color.RED);}
                     else {
                         buttonBarriere.setBackgroundColor(Color.rgb(153,204,0));
-                        buttonBarriere.setText("Pas suscpetible de franchir la barrière");
+                        buttonBarriere.setText("Pas susceptible de franchir la barrière");
                     }
                     profilModif.setIdAvatar(idAvatar);
 
