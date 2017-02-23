@@ -291,6 +291,17 @@ class AssistanceServer(Thread):
                                     #L'ancien socket est aussi supprimé dans le except
                                     #On ajoute le nouveau socket à la liste d'assistants
                                     self.addAssistant(sock)
+
+                                    message = ""
+                                    message += str(self.managerProfils) + "+"
+                                    allPatients = list(self.mapper.getSocketPatient())
+                                    for socketPatient in allPatients:
+                                        tracker = self.mapper.getTracker(socketPatient)
+                                        message += tracker.toString()
+                                        message += "*"
+                                        
+                                    sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
+
                                 elif message[0] == "CHECKALERT":
                                     print("CHECKALERT")
                                     self.mapper.getTrackerById(message[1]).lastAlert = None

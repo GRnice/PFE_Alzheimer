@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -33,6 +34,9 @@ import com.dg.apptabletteandroid.fragments.Parametres.ParameterFragment;
 import com.dg.apptabletteandroid.fragments.Profils.AddProfilFragment;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 import com.google.android.gms.maps.model.Marker;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -102,8 +106,24 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         intentAlerteGeree.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
         intentAlerteGeree.putExtra("CHECKALERT", intent.getStringExtra("IDTEL"));
         sendBroadcast(intentAlerteGeree);
+        String idTel = intent.getStringExtra("IDTEL");
+        if (intent.getStringExtra("WAKE_UP") != null){
+            ArrayList<String> alertes = AlertManager.idTelAlertes.get(idTel);
+            String typeNotif = intent.getStringExtra("WAKE_UP");
+            for(String string : alertes){
+                if(string.contains(typeNotif)){
+                    String[] idNotif = string.split("\\$");
 
-
+                    notifManager.cancel(Integer.parseInt(idNotif[1]));
+                }
+            }
+            ArrayList<String> alertes2 = (ArrayList<String>) alertes.clone();
+            for(String string: alertes2){
+                if(string.contains(typeNotif)){
+                    alertes.remove(alertes.indexOf(string));
+                }
+            }
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -176,11 +196,16 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         }
         else if (id == R.id.nav_exit)
         {
-            Intent intent = new Intent();
-            intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-            intent.putExtra("QUIT","");
-            sendBroadcast(intent);
-            finish();
+            if(profilsManager.getAllProfilsOnPromenade().size() != 0) {
+                Toast.makeText(getApplicationContext(), "Des patients sont toujours en promenade !", Toast.LENGTH_LONG).show();
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+                intent.putExtra("QUIT","");
+                sendBroadcast(intent);
+                finish();
+            }
+            
         }
         // else if (id == R.id.nav_share) {} else if (id == R.id.nav_send) {}
 
@@ -364,8 +389,12 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String prenom = params[2];
                 Log.e("synch",nom+" "+prenom);
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
-                profilSelected.setEstSuiviParMoi(false);
-                profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                if (!(profilsManager.getAllProfilsOnPromenade().containsKey(idTel)))
+                { // si il existe deja ca n'a aucun sens, traite le CONTINUE
+                    profilSelected.setEstSuiviParMoi(false);
+                    profilsManager.addProfilOnPromenade(idTel,profilSelected);
+                }
+
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
@@ -494,6 +523,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 {
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
+            }
+            else if (arg1.hasExtra("SYNCHCONTINUE"))
+            {
+                String[] allProfils = arg1.getStringArrayExtra("allProfils");
+                String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
+                RefitAgent.fix(Main2Activity.this,allProfils,profilsEnPromenade);
+                Fragment fragmap = MapFragment_.newInstance();
+                fragmentManager.pushFragment(fragmap,Main2Activity.this);
+
             }
 
             // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan

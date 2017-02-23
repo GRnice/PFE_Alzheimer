@@ -40,6 +40,15 @@ class Tracker: ## Classe representant un tracker
         self.alertTimeout = False
 
 
+    def toString(self):
+        message = ""
+        message += "IDTEL:"+self.id +":NOM:"+self.nom +":PRENOM:"+self.prenom+":POSITION:"+str(self.position)+":"
+        message += "BATTERY:"+str(self.battery) + ":ISHORSZONE:" + str(self.isHorsZone) + ":BATTERYISLOW:" + str(self.batteryIsLow)+":"
+        message += "TIMEOUTPROMENADE:"+str(self.timeout) + ":"
+        message += "UPDATETIMEOUT:"+str(self.updateTimeout) + ":DUREEPROMENADE:" + str(self.dureePromenade)
+        return message
+
+
 
     def startPromenade(self,nom,prenom,duree): # OKPROMENADE RECU
         if self.etat == 1:
