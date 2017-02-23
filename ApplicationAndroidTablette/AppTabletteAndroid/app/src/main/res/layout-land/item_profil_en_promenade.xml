@@ -54,7 +54,8 @@
                 android:id="@+id/nom_profil"
                 android:layout_marginLeft="6dp"
                 android:layout_alignStart="@+id/itemOnPromenadeAvatar"
-                />
+                android:textStyle="normal|bold"
+                android:textSize="18dp" />
 
 
         </LinearLayout>

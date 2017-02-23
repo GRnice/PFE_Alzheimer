@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/button_valid_promenade"
         android:layout_marginEnd="200dp"
-        android:layout_marginTop="390dp"
+        android:layout_marginTop="400dp"
         android:background="@android:color/holo_green_light"
         android:layout_alignParentEnd="true" />
 
@@ -126,7 +126,7 @@
         android:id="@+id/button_back_config_prom"
         android:layout_marginStart="200dp"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="390dp"
+        android:layout_marginTop="400dp"
         android:textColor="@android:color/black" />
 
 </RelativeLayout>
