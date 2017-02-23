@@ -92,7 +92,7 @@ public class MapFragment_ extends BlankFragment
 
         listView = (ListView) view.findViewById(R.id.listProfilsOnProm);
         listView.setAdapter(customAdapter);
-        
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
@@ -242,7 +242,9 @@ public class MapFragment_ extends BlankFragment
                         else if (group == null)
                         {
                             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
-                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+
+                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+
                             marker.showInfoWindow();
                             profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
                         }
