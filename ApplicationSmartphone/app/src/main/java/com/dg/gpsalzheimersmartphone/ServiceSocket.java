@@ -261,7 +261,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 onPromenade = true;
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
-                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,0,ServiceSocket.this);
+                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,8000,0,ServiceSocket.this);
 
             }
             else if (!startGps)

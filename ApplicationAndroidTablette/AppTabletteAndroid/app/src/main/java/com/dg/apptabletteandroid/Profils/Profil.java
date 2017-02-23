@@ -169,11 +169,13 @@ public class Profil
     }
 
 
-    public double getLatitudeExtrem() {
+    public double getLatitudeExtrem()
+    {
         return latitudeExtrem;
     }
 
-    public double getLongitudeExtrem() {
+    public double getLongitudeExtrem()
+    {
         return longitudeExtrem;
     }
 
