@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TableRow;
 import android.widget.TextView;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -73,18 +75,45 @@ public class AdapterListingMap extends ArrayAdapter
         final Profil profil = profils.get(position);
         Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), profil.getIdRessourcesAvatar());
         imageProfil.setImageBitmap(bitmap);
-
-
+        //donnee profil
         TextView textView = (TextView) rowView.findViewById(R.id.nom_profil);
         textView.setText(profil.getNom()+" \n"+profil.getPrenom());
+        TextView t=(TextView)rowView.findViewById(R.id.texteTime);
         TextView duree=(TextView)rowView.findViewById(R.id.timming);
         TextView dureeD=(TextView)rowView.findViewById(R.id.duree);
+        ImageView time=(ImageView)rowView.findViewById(R.id.timeout);
+        ImageView clock=(ImageView)rowView.findViewById(R.id.clockTime);
+        ImageView clockOut=(ImageView)rowView.findViewById(R.id.clockTimeout);
+        TableRow alerteImmobilite=(TableRow)rowView.findViewById(R.id.alerteImmobile);
+        TableRow alertePerte=(TableRow)rowView.findViewById(R.id.alertePerte);
+        TableRow alerteHorsZone=(TableRow)rowView.findViewById(R.id.alerteHorszone);
+        ImageView alerte =(ImageView)rowView.findViewById(R.id.itemOnPromenadeAlert);
+
+        alerte.setVisibility(View.GONE);
+        rowView.setBackgroundColor(Color.WHITE);
+
         duree.setText(profil.getTempsRestant()+"m");
         dureeD.setText(profil.getTempsRestant()+"m");
         int d =profil.getTempsRestant();
+        time.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+
+            }
+        });
         if(d<=0){
-            duree.setText("0");
-            dureeD.setText("Promenade Terminée");
+            duree.setVisibility(View.GONE);
+            time.setVisibility(View.VISIBLE);
+            clock.setVisibility(View.GONE);
+
+            t.setText("Promenade Terminée");
+            t.setTextColor(Color.RED);
+            clockOut.setVisibility(View.VISIBLE);
+            alerte.setVisibility(View.VISIBLE);
+
+            dureeD.setVisibility(View.GONE);
         }
         else if (d <60){
             duree.setText(profil.getTempsRestant()+"s");
@@ -112,36 +141,39 @@ public class AdapterListingMap extends ArrayAdapter
             batteryIcons.setImageResource(R.drawable.medium);
         }
 
+        // jaune
         // si profil immobile -> yellow
-        if (profil.isHorsZone())
-        {
-            rowView.setBackgroundColor(Color.argb(128,255,80,41));
-        }
-        else if (profil.updateIsTimeout())
-        {
-            rowView.setBackgroundColor(Color.argb(128,255,80,41));
-        }
-        else if (profil.getTempsRestant() < 0)
-        {
+        if(profil.isImmobile()){
+            alerte.setVisibility(View.VISIBLE);
+            rowView.setBackgroundColor(Color.YELLOW);
+            alerteImmobilite.setVisibility(View.VISIBLE);
+        }else if(profil.getTempsRestant() <= 0){
             rowView.setBackgroundColor(Color.YELLOW);
         }
         // jaune
-        else if(profil.isImmobile()){
-            rowView.setBackgroundColor(Color.YELLOW);
-        }
-        // jaune
-        else if (profil.batteryIsLow())
+        if (profil.batteryIsLow())
         {
-            Log.e("batteryLow","yellow");
+            alerte.setVisibility(View.VISIBLE);
+//            Log.e("batteryLow","yellow");
             rowView.setBackgroundColor(Color.YELLOW);
             batteryIcon.setImageResource(R.drawable.low);
             batteryIcons.setImageResource(R.drawable.low);
         }
-        // si non couleur
-        else
+
+        if (profil.isHorsZone())
         {
-            rowView.setBackgroundColor(Color.WHITE);
+            alerte.setVisibility(View.VISIBLE);
+            alerteHorsZone.setVisibility(View.VISIBLE);
+            rowView.setBackgroundColor(Color.argb(128,255,80,41));
         }
+        else if (profil.updateIsTimeout())
+        {
+            alerte.setVisibility(View.VISIBLE);
+            alertePerte.setVisibility(View.VISIBLE);
+            rowView.setBackgroundColor(Color.argb(128,255,80,41));
+        }
+
+
 
 
 

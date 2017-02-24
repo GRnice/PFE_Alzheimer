@@ -4,34 +4,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TableRow
-        android:layout_marginTop="10dp"
-
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <ImageView
-            android:layout_column="0"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:maxHeight="50dp"
-            android:maxWidth="50dp"
-            android:layout_marginLeft="8dp"
-            android:src="@drawable/clock"
-            android:adjustViewBounds="true"
-            />
-        <TextView
-            android:layout_marginTop="12dp"
-            android:layout_column="4"
-            android:text="5 minutes"
-            android:layout_marginRight="15dp"
-            android:id="@+id/duree"
-            android:textStyle="normal|bold"
-            android:textSize="20dp">
-
-        </TextView>    </TableRow>
-
     <TableRow>
+
         <ImageView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -43,17 +17,154 @@
             android:adjustViewBounds="true"
             android:id="@+id/batteryIcon"
             />
-
+        <TextView
+            android:text="Batterie restante"
+            android:layout_marginTop="10dp"
+            android:textStyle="normal|bold"
+            android:layout_marginLeft="30dp"
+            android:textSize="20dp"/>
         <TextView
             android:layout_column="4"
             android:text="100%"
-            android:padding="15dp"
-            android:layout_marginTop="0dp"
+            android:gravity="right"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="12dp"
             android:id="@+id/batteryDetails"
             android:textStyle="normal|bold"
             android:textSize="20dp" />
     </TableRow>
-    <TableRow>
+    <TableRow
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <FrameLayout>
+            <ImageView
+                android:layout_column="0"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:maxHeight="50dp"
+                android:maxWidth="50dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/clock"
+                android:visibility="visible"
+                android:adjustViewBounds="true"
+                android:id="@+id/clockTime" />
+            <ImageView
+                android:layout_column="0"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:maxHeight="40dp"
+                android:maxWidth="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="0dp"
+                android:visibility="gone"
+                android:src="@drawable/timeout"
+                android:adjustViewBounds="true"
+                android:id="@+id/clockTimeout"
+                 />
+        </FrameLayout>
 
+        <TextView
+            android:text="Temps restant"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="15dp"
+            android:visibility="visible"
+            android:textSize="20dp"
+            android:textStyle="normal|bold"
+            android:id="@+id/texteTime" />
+        <TextView
+            android:layout_marginTop="15dp"
+            android:layout_column="4"
+            android:text="5 minutes"
+            android:gravity="right"
+            android:layout_marginRight="30dp"
+            android:id="@+id/duree"
+            android:textStyle="normal|bold"
+            android:textSize="20dp">
+
+        </TextView>
     </TableRow>
+
+    <TableRow
+        android:visibility="gone"
+        android:id="@+id/alertePerte">
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/existalert"
+            android:adjustViewBounds="true"
+            android:id="@+id/perte"
+            />
+        <TextView
+            android:text="Alerte perte de suivi"
+            android:layout_marginTop="10dp"
+            android:textStyle="normal|bold"
+            android:layout_marginLeft="30dp"
+            android:textSize="20dp"
+            android:id="@+id/textepertconnec"
+            android:textColor="@color/colorRed" />
+    </TableRow>
+    <TableRow
+        android:visibility="gone"
+        android:id="@+id/alerteImmobile">
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="11dp"
+            android:src="@drawable/existalert"
+            android:adjustViewBounds="true"
+            android:id="@+id/immobilité"
+            />
+        <TextView
+            android:text="Alerte immobilité"
+            android:layout_marginTop="5dp"
+            android:textStyle="normal|bold"
+            android:layout_marginLeft="30dp"
+            android:textSize="20dp"
+            android:id="@+id/texteimmobilité"
+            android:textColor="@color/colorRed"
+            />
+    </TableRow>
+    <TableRow
+        android:visibility="gone"
+        android:id="@+id/alerteHorszone">
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="11dp"
+            android:src="@drawable/existalert"
+            android:adjustViewBounds="true"
+            android:id="@+id/horsZone"
+            />
+        <TextView
+            android:text="Alerte Hors Zone"
+            android:layout_marginTop="5dp"
+            android:textStyle="normal|bold"
+            android:layout_marginLeft="30dp"
+            android:textSize="20dp"
+            android:id="@+id/textehorszone"
+            android:textColor="@color/colorRed"
+            />
+    </TableRow>
+
     </TableLayout>

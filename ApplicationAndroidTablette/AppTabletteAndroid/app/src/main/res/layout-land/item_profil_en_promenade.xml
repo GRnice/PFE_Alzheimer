@@ -34,25 +34,37 @@
             android:layout_below="@+id/details"
             android:layout_alignParentStart="true"
             android:layout_marginTop="5dp">
+<FrameLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:maxHeight="50dp"
-                android:layout_marginTop="0dp"
-                android:maxWidth="50dp"
-                android:layout_marginLeft="5dp"
-                android:background="@drawable/avatar_bleu"
-                android:id="@+id/itemOnPromenadeAvatar"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:maxHeight="50dp"
+        android:layout_marginTop="0dp"
+        android:maxWidth="50dp"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/avatar_bleu"
+        android:id="@+id/itemOnPromenadeAvatar"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+  <ImageView
+      android:layout_width="60dp"
+      android:layout_height="60dp"
+      android:visibility="gone"
+      android:id="@+id/itemOnPromenadeAlert"
+      android:background="@drawable/detailalerte"/>
+
+</FrameLayout>
+
 
             <TextView
                 android:text="TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/nom_profil"
-                android:layout_marginLeft="6dp"
+                android:layout_marginLeft="10dp"
                 android:layout_alignStart="@+id/itemOnPromenadeAvatar"
                 android:textStyle="normal|bold"
                 android:textSize="18dp" />
@@ -63,7 +75,7 @@
         <ImageView
             android:layout_height="wrap_content"
             android:layout_width="45dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="4dp"
             android:maxHeight="50dp"
             android:maxWidth="50dp"
             android:layout_marginStart="340dp"
