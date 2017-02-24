@@ -45,7 +45,7 @@ class Tracker: ## Classe representant un tracker
         message += "IDTEL:"+self.id +":NOM:"+self.nom +":PRENOM:"+self.prenom+":POSITION:"+str(self.position)+":"
         message += "BATTERY:"+str(self.battery) + ":ISHORSZONE:" + str(self.isHorsZone) + ":BATTERYISLOW:" + str(self.batteryIsLow)+":"
         message += "TIMEOUTPROMENADE:"+str(self.timeout) + ":"
-        message += "UPDATETIMEOUT:"+str(self.updateTimeout) + ":DUREEPROMENADE:" + str(self.dureePromenade)
+        message += "UPDATETIMEOUT:"+str(self.updateTimeout) + ":DUREEPROMENADE:" + str(self.tempsRestant)
         return message
 
 

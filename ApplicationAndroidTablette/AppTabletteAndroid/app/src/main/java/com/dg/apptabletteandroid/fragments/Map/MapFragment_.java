@@ -284,11 +284,11 @@ public class MapFragment_ extends BlankFragment
                         else if (group == null)
                         {
                             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
-
-                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            LatLng latLngProfil = new LatLng(profil.getLatitude(), profil.getLongitude());
+                            marker = googleMap.addMarker(new MarkerOptions().position(latLngProfil).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
 
                             marker.showInfoWindow();
-                            profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
+                            profil.setMarker(marker);
                         }
                     }
                 }
@@ -388,8 +388,11 @@ public class MapFragment_ extends BlankFragment
 
     public void refresh()
     {
-        refreshMap();
-        refreshListe();
+        if (googleMap != null && listView != null)
+        {
+            refreshMap();
+            refreshListe();
+        }
     }
 
 

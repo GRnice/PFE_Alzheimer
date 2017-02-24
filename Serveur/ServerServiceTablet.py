@@ -313,7 +313,6 @@ class AssistanceServer(Thread):
                                     self.addAssistant(sock)
 
                                     message = ""
-                                    message += str(self.managerProfils) + "+"
                                     allPatients = list(self.mapper.getSocketPatient())
                                     for socketPatient in allPatients:
                                         tracker = self.mapper.getTracker(socketPatient)
@@ -321,8 +320,9 @@ class AssistanceServer(Thread):
                                             tracker = self.mapper.getTracker(socketPatient)
                                             message += tracker.toString()
                                             message += "*"
-                                        
-                                    sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
+
+                                    if message != "":
+                                        sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
 
                                 elif message[0] == "CHECKALERT":
                                     print("CHECKALERT")

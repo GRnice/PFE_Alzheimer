@@ -284,7 +284,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         builder.setMessage("Vous n'êtes pas connecté à Internet\n" +
                 "Connectez vous !");
         builder.setCancelable(true);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Se connecter", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //dialog.dismiss();
@@ -293,7 +293,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -523,9 +523,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             }
             else if (arg1.hasExtra("SYNCHCONTINUE"))
             {
-                String[] allProfils = arg1.getStringArrayExtra("allProfils");
                 String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
-                RefitAgent.fix(Main2Activity.this,allProfils,profilsEnPromenade);
+                RefitAgent.fix(Main2Activity.this,profilsEnPromenade);
                 Fragment fragmap = MapFragment_.newInstance();
                 fragmentManager.pushFragment(fragmap,Main2Activity.this);
 
