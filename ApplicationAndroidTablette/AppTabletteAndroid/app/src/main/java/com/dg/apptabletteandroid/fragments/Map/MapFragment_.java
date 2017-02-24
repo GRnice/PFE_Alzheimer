@@ -81,7 +81,7 @@ public class MapFragment_ extends BlankFragment
     public void limitCentre() {
         // Instantiates a new Polygon object and adds points to define a rectangle
         PolygonOptions rectOptions = new PolygonOptions()
-                .add(new LatLng(43.612690, 7.079368),
+                .add(new LatLng(43.612736, 7.079357),
                         new LatLng(43.612669, 7.079243),
                         new LatLng(43.612522, 7.079179),
                         new LatLng(43.612432, 7.079147),
@@ -91,10 +91,14 @@ public class MapFragment_ extends BlankFragment
                         new LatLng(43.611973, 7.079333),
                         new LatLng(43.611956, 7.079453),
                         new LatLng(43.612008, 7.079529),
-                        new LatLng(43.612113, 7.079854),
-                        new LatLng(43.612213, 7.080000),
-                        new LatLng(43.612286, 7.080029),
-                        new LatLng(43.612655, 7.079521))
+                        new LatLng(43.612101, 7.079949),
+                        new LatLng(43.612274, 7.080104),
+                        new LatLng(43.612373, 7.080015),
+                        new LatLng(43.612492, 7.079833),
+                        new LatLng(43.612481, 7.079801), // coint gauche avant de la bariere
+                        new LatLng(43.612560, 7.079677),  // coint droit avant de la bariere
+                        new LatLng(43.612600, 7.079692),
+                        new LatLng(43.612721, 7.079515))
                 .strokeColor(Color.BLUE)
                 .strokeWidth(2);
 
@@ -104,33 +108,93 @@ public class MapFragment_ extends BlankFragment
         // Instantiates a new CircleOptions object and defines the center and radius
         CircleOptions c1 = new CircleOptions()
                 .center(new LatLng(43.612627, 7.07988))
-                .radius(16.74780868480848)  // In meters
+                .radius(15.964228068337523)  // In meters A TESTER
                 .strokeColor(Color.GREEN)
                 .strokeWidth(1);
 
         CircleOptions c2 = new CircleOptions()
                 .center(new LatLng(43.611973, 7.078922))
-                .radius(19.71319864609092)  // In meters
+                .radius(23.280438587587472)  // In meters
                 .strokeColor(Color.YELLOW)
                 .strokeWidth(1);
 
         CircleOptions c3 = new CircleOptions()
                 .center(new LatLng(43.612575, 7.078863))
-                .radius(17.77345054978547)  // In meters
+                .radius(20.98967962745375)  // In meters
                 .strokeColor(Color.MAGENTA)
                 .strokeWidth(1);
 
         CircleOptions c4 = new CircleOptions()
-                .center(new LatLng(43.611998, 7.079767))
-                .radius(7.879672095357843)  // In meters
+                .center(new LatLng(43.611893, 7.079885))
+                .radius(20.269382035649283)  // In meters
                 .strokeColor(Color.RED)
                 .strokeWidth(1);
+
+        CircleOptions c5 = new CircleOptions()
+                .center(new LatLng(43.611726, 7.079431))
+                .radius(19.430908201270515)  // In meters
+                .strokeColor(Color.GRAY)
+                .strokeWidth(1);
+
+        CircleOptions c6 = new CircleOptions()
+                .center(new LatLng(43.612213, 7.078757))
+                .radius(17.802307604071885)  // In meters
+                .strokeColor(Color.BLACK)
+                .strokeWidth(1);
+
+        CircleOptions c7 = new CircleOptions()
+                .center(new LatLng(43.612882, 7.079327))
+                .radius(13.000052212762114)  // In meters
+                .strokeColor(Color.CYAN)
+                .strokeWidth(1);
+
+        CircleOptions c8 = new CircleOptions()
+                .center(new LatLng(43.612256, 7.080276))
+                .radius(15.575127416094144)  // In meters  FAUT RAJOUTER un cercle a cote (a ca gauche)
+                .strokeColor(Color.BLUE)
+                .strokeWidth(1);
+
+        CircleOptions c9 = new CircleOptions()
+                .center(new LatLng(43.612797, 7.079686))
+                .radius(14.96345210701257)  //
+                .strokeColor(Color.WHITE)
+                .strokeWidth(1);
+
+        CircleOptions c10 = new CircleOptions()
+                .center(new LatLng(43.612753, 7.079028))
+                .radius(20.7885455706238)  //
+                .strokeColor(Color.RED)
+                .strokeWidth(1);
+
+        CircleOptions c11 = new CircleOptions()
+                .center(new LatLng(43.612524, 7.080097))
+                .radius(15.529232218378453)  //
+                .strokeColor(Color.WHITE)
+                .strokeWidth(1);
+
+        CircleOptions c12 = new CircleOptions()
+                .center(new LatLng(43.61206, 7.08007))
+                .radius(10.015846510420973)  //
+                .strokeColor(Color.GREEN)
+                .strokeWidth(1);
+
+
+
+
 
         ArrayList<CircleOptions> listCercle = new ArrayList<CircleOptions>();
         listCercle.add(c1);
         listCercle.add(c2);
         listCercle.add(c3);
         listCercle.add(c4);
+        listCercle.add(c5);
+        listCercle.add(c6);
+        listCercle.add(c7);
+        listCercle.add(c8);
+        listCercle.add(c9);
+        listCercle.add(c10);
+        listCercle.add(c11);
+        listCercle.add(c12);
 
 
         for (CircleOptions c: listCercle) {
