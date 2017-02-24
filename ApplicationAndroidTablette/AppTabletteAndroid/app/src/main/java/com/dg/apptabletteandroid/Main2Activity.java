@@ -109,8 +109,13 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         String idTel = intent.getStringExtra("IDTEL");
         if (intent.getStringExtra("WAKE_UP") != null){
             ArrayList<String> alertes = AlertManager.idTelAlertes.get(idTel);
+            if (alertes == null)
+            {
+                return;
+            }
             String typeNotif = intent.getStringExtra("WAKE_UP");
-            for(String string : alertes){
+            for(String string : alertes)
+            {
                 if(string.contains(typeNotif)){
                     String[] idNotif = string.split("\\$");
 
@@ -284,7 +289,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         builder.setMessage("Vous n'êtes pas connecté à Internet\n" +
                 "Connectez vous !");
         builder.setCancelable(true);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Se connecter", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //dialog.dismiss();
@@ -293,7 +298,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -521,11 +526,32 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
             }
+
+            else if (arg1.hasExtra("IMMOBILE_START"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUpOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilUpOut.setImmobile(true);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+
+            }
+            else if (arg1.hasExtra("STOPIMMOBILITE"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUpOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilUpOut.setImmobile(false);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
             else if (arg1.hasExtra("SYNCHCONTINUE"))
             {
-                String[] allProfils = arg1.getStringArrayExtra("allProfils");
                 String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
-                RefitAgent.fix(Main2Activity.this,allProfils,profilsEnPromenade);
+                RefitAgent.fix(Main2Activity.this,profilsEnPromenade);
                 Fragment fragmap = MapFragment_.newInstance();
                 fragmentManager.pushFragment(fragmap,Main2Activity.this);
 

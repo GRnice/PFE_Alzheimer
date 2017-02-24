@@ -116,6 +116,7 @@ public class ProfilFragment extends BlankFragment
         if (this.selectionProfilNewSession)
         {
             buttonAddProfil.setVisibility(View.INVISIBLE);
+            getActivity().setTitle("Selectionner un profil pour le dispositif :"+idTel.substring(0,6));
             AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,true);
             this.listView.setAdapter(adapterListing);
 
@@ -123,7 +124,7 @@ public class ProfilFragment extends BlankFragment
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                    getActivity().setTitle("Selectionner un profil");
+
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
 

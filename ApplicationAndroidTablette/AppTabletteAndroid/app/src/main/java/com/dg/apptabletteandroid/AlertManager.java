@@ -128,7 +128,8 @@ public class AlertManager
 
     public void notifNewSession(Context context,String idTel)
     {
-        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"NEWSESSION","Nouvelle promenade","Configurer la promenade ?");
+        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"NEWSESSION","Nouvelle promenade , id dispositif : "+idTel.substring(0,6),
+                "Configurer la promenade ?");
     }
 
 

@@ -106,6 +106,7 @@ public class ConfigPromenade extends BlankFragment {
                 intent.putExtra("IDTEL",idTel);
                 intent.putExtra("NOM",profilSelected.getNom());
                 intent.putExtra("PRENOM",profilSelected.getPrenom());
+                intent.putExtra("FRANCHISSEMENTBARRIERE",profilSelected.getSusceptibleDeFranchirLaBarriere());
                 intent.putExtra("DURATION",duration.getText().toString());
                 intent.putExtra("MAXIMMOBILITE",max.getText().toString());
                 getActivity().sendBroadcast(intent);

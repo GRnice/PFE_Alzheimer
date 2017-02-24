@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -49,6 +52,7 @@ public class MapFragment_ extends BlankFragment
     private GoogleMap googleMap;
 
     private ListView listView;
+    private Button synchRefreshTitre;
     private ProfilOnPromenadeManager profilsManager;
     private ProfilGroupManager profilsGroupManager;
 
@@ -77,7 +81,7 @@ public class MapFragment_ extends BlankFragment
     public void limitCentre() {
         // Instantiates a new Polygon object and adds points to define a rectangle
         PolygonOptions rectOptions = new PolygonOptions()
-                .add(new LatLng(43.612690, 7.079368),
+                .add(new LatLng(43.612736, 7.079357),
                         new LatLng(43.612669, 7.079243),
                         new LatLng(43.612522, 7.079179),
                         new LatLng(43.612432, 7.079147),
@@ -87,17 +91,136 @@ public class MapFragment_ extends BlankFragment
                         new LatLng(43.611973, 7.079333),
                         new LatLng(43.611956, 7.079453),
                         new LatLng(43.612008, 7.079529),
-                        new LatLng(43.612113, 7.079854),
-                        new LatLng(43.612213, 7.080000),
-                        new LatLng(43.612286, 7.080029),
-                        new LatLng(43.612655, 7.079521))
+                        new LatLng(43.612101, 7.079949),
+                        new LatLng(43.612274, 7.080104),
+                        new LatLng(43.612373, 7.080015),
+                        new LatLng(43.612492, 7.079833),
+                        new LatLng(43.612481, 7.079801), // coint gauche avant de la bariere
+                        new LatLng(43.612560, 7.079677),  // coint droit avant de la bariere
+                        new LatLng(43.612600, 7.079692),
+                        new LatLng(43.612721, 7.079515))
                 .strokeColor(Color.BLUE)
                 .strokeWidth(2);
 
-
-
 //      Get back the mutable Polygon
         Polygon polygon = googleMap.addPolygon(rectOptions);
+
+        // Instantiates a new CircleOptions object and defines the center and radius
+        CircleOptions c1 = new CircleOptions()
+                .center(new LatLng(43.612627, 7.07988))
+                .radius(15.964228068337523)  // In meters A TESTER
+                .strokeColor(Color.GREEN)
+                .strokeWidth(1);
+
+        CircleOptions c2 = new CircleOptions()
+                .center(new LatLng(43.611973, 7.078922))
+                .radius(23.280438587587472)  // In meters
+                .strokeColor(Color.YELLOW)
+                .strokeWidth(1);
+
+        CircleOptions c3 = new CircleOptions()
+                .center(new LatLng(43.612575, 7.078863))
+                .radius(23.093113929463737)  // In meters
+                .strokeColor(Color.MAGENTA)
+                .strokeWidth(1);
+
+        CircleOptions c4 = new CircleOptions()
+                .center(new LatLng(43.611893, 7.079885))
+                .radius(20.269382035649283)  // In meters
+                .strokeColor(Color.RED)
+                .strokeWidth(1);
+
+        CircleOptions c5 = new CircleOptions()
+                .center(new LatLng(43.611843, 7.079405))
+                .radius(9.747023066795371)  // In meters
+                .strokeColor(Color.GRAY)
+                .strokeWidth(1);
+
+        CircleOptions c6 = new CircleOptions()
+                .center(new LatLng(43.612213, 7.078757))
+                .radius(17.802307604071885)  // In meters
+                .strokeColor(Color.BLACK)
+                .strokeWidth(1);
+
+        CircleOptions c7 = new CircleOptions()
+                .center(new LatLng(43.612912, 7.079317))
+                .radius(17.000594793296)  // In meters
+                .strokeColor(Color.CYAN)
+                .strokeWidth(1);
+
+        CircleOptions c8 = new CircleOptions()
+                .center(new LatLng(43.612256, 7.080276))
+                .radius(15.575127416094144)  // In meters  FAUT RAJOUTER un cercle a cote (a ca gauche)
+                .strokeColor(Color.BLUE)
+                .strokeWidth(1);
+
+        CircleOptions c9 = new CircleOptions()
+                .center(new LatLng(43.612797, 7.079686))
+                .radius(14.96345210701257)  //
+                .strokeColor(Color.WHITE)
+                .strokeWidth(1);
+
+        CircleOptions c10 = new CircleOptions()
+                .center(new LatLng(43.612753, 7.079028))
+                .radius(20.7885455706238)  //
+                .strokeColor(Color.RED)
+                .strokeWidth(1);
+
+        CircleOptions c11 = new CircleOptions()
+                .center(new LatLng(43.612524, 7.080097))
+                .radius(15.529232218378453)  //
+                .strokeColor(Color.WHITE)
+                .strokeWidth(1);
+
+        CircleOptions c12 = new CircleOptions()
+                .center(new LatLng(43.61206, 7.08007))
+                .radius(10.015846510420973)  //
+                .strokeColor(Color.GREEN)
+                .strokeWidth(1);
+
+        CircleOptions c13 = new CircleOptions()
+                .center(new LatLng(43.611893, 7.079162))
+                .radius(15.486867562944084)  //
+                .strokeColor(Color.CYAN)
+                .strokeWidth(1);
+
+        CircleOptions c14 = new CircleOptions()
+                .center(new LatLng(43.611924, 7.079575))
+                .radius(9.318183487401773)  //
+                .strokeColor(Color.MAGENTA)
+                .strokeWidth(1);
+        CircleOptions c15 = new CircleOptions() // polytech -> test pour l'alerte barriere
+                .center(new LatLng(43.6154583,7.0719361111111105))
+                .radius(9.575995082650834)
+                .strokeColor(Color.CYAN)
+                .strokeWidth(1);
+
+
+
+        ArrayList<CircleOptions> listCercle = new ArrayList<CircleOptions>();
+        listCercle.add(c1);
+        listCercle.add(c2);
+        listCercle.add(c3);
+        listCercle.add(c4);
+        listCercle.add(c5);
+        listCercle.add(c6);
+        listCercle.add(c7);
+        listCercle.add(c8);
+        listCercle.add(c9);
+        listCercle.add(c10);
+        listCercle.add(c11);
+        listCercle.add(c12);
+        listCercle.add(c13);
+        listCercle.add(c12);  // the gray ONE
+        listCercle.add(c13);
+        listCercle.add(c14);
+        listCercle.add(c15); // pour test alerte barriere
+
+
+        for (CircleOptions c: listCercle) {
+            googleMap.addCircle(c);
+        }
+
     }
 
 
@@ -112,6 +235,16 @@ public class MapFragment_ extends BlankFragment
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
+        synchRefreshTitre = (Button) view.findViewById(R.id.btnListViewTitre);
+        synchRefreshTitre.setText("Profils en promenade ("+profilsManager.getAllProfilsOnPromenade().size()+")");
+        synchRefreshTitre.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+
+            }
+        });
 
         getActivity().setTitle("Carte");
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity) getActivity()
@@ -148,12 +281,13 @@ public class MapFragment_ extends BlankFragment
                     }
 
                     Profil profil = customAdapter.getProfils().get(position);
+                    profil.setEnVueDetail(!profil.isEnVueDetail());
                     Iterator<Profil> iteratorProm = profilsManager.getAllProfilsOnPromenade().values().iterator();
                     while(iteratorProm.hasNext())
                     {
                         Profil pr = iteratorProm.next();
                         if(pr.getPrenom().equals(profil.getPrenom()) && pr.getNom().equals(profil.getNom())) {
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 15));
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 19));
                             break;
                         }
                     }
@@ -169,6 +303,7 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+                googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 limitCentre();
 
                 HashMap<String,Profil> allProfilsOnPromenade = profilsManager.getAllProfilsOnPromenade();
@@ -211,9 +346,12 @@ public class MapFragment_ extends BlankFragment
                         return false;
                     }
                 });
-                LatLng sophia = new LatLng(43.6155793,7.0696861);
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(12).build();
+
+
+                LatLng centre = new LatLng(43.612248, 7.079400);
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(centre).zoom(17).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
 
                 // ce marqueur permet de savoir si le marker d'un groupe a deja ete posé ou non
                 int marqueurRecherche = new Random().nextInt();
@@ -271,11 +409,11 @@ public class MapFragment_ extends BlankFragment
                         else if (group == null)
                         {
                             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), profil.getIdRessourcesAvatar());
-
-                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            LatLng latLngProfil = new LatLng(profil.getLatitude(), profil.getLongitude());
+                            marker = googleMap.addMarker(new MarkerOptions().position(latLngProfil).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
 
                             marker.showInfoWindow();
-                            profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() +" " +  profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
+                            profil.setMarker(marker);
                         }
                     }
                 }
@@ -375,8 +513,11 @@ public class MapFragment_ extends BlankFragment
 
     public void refresh()
     {
-        refreshMap();
-        refreshListe();
+        if (googleMap != null && listView != null)
+        {
+            refreshMap();
+            refreshListe();
+        }
     }
 
 
@@ -385,7 +526,7 @@ public class MapFragment_ extends BlankFragment
     {
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
         ArrayList<Profil> profilsOnPromenade = new ArrayList<>(profilsManager.getAllProfilsOnPromenade().values());
-
+        synchRefreshTitre.setText("Profils en promenade ("+profilsOnPromenade.size()+")");
         final AdapterListingMap customAdapter = new AdapterListingMap((Main2Activity)getActivity()
                 ,R.layout.item_profil_en_promenade
                 ,profilsOnPromenade);
@@ -459,8 +600,6 @@ public class MapFragment_ extends BlankFragment
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                 marker.showInfoWindow();
                 profil.setMarker(marker);
-
-
 
             }
         }

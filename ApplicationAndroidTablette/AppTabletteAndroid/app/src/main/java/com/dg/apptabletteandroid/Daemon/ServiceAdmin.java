@@ -293,6 +293,34 @@ public class ServiceAdmin extends Service
                             case "IMMOBILE":
                             {
                                 alertManager.notifImmobile(broadcastAlerte,getBaseContext(), idTel);
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("IMMOBILE_START","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STOPIMMOBILITE":
+                            {
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("STOPIMMOBILITE","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                }
+                                else
+                                {
+                                    sendBroadcast(intent);
+                                }
+                                break;
                             }
                         }
                     }
@@ -321,26 +349,25 @@ public class ServiceAdmin extends Service
 
                             case "SYNCH-CONTINUE":
                             {
-                                String[] args = dataParams[1].split("\\+");
-                                String[] allProfils = args[0].split("\\*");
-                                Arrays.deepToString(allProfils);
-                                String[] allProfilsOnPromenade = null;
-                                if (args.length > 1)
+                                String[] allProfilsEnPromenade = dataParams[1].split("\\*");
+                                Arrays.deepToString(allProfilsEnPromenade);
+                                if (allProfilsEnPromenade.length > 0)
                                 {
-                                    allProfilsOnPromenade = args[1].split("\\*");
-                                    Arrays.deepToString(allProfilsOnPromenade);
+                                    Arrays.deepToString(allProfilsEnPromenade);
                                 }
 
 
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("SYNCHCONTINUE", "");
-                                intent.putExtra("SYNCH-ALLPROFILS",allProfils);
-                                intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsOnPromenade);
+                                intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsEnPromenade);
 
-                                if (activity_is_on_background) {
+                                if (activity_is_on_background)
+                                {
                                     dataKeeper.addData(intent);
-                                } else {
+                                }
+                                else
+                                {
                                     sendBroadcast(intent);
                                 }
                                 break;
@@ -481,11 +508,12 @@ public class ServiceAdmin extends Service
                 String nom = arg1.getStringExtra("NOM");
                 String duree = arg1.getStringExtra("DURATION");
                 String maxImmobile = arg1.getStringExtra("MAXIMMOBILITE");
+                boolean barriere = arg1.getBooleanExtra("FRANCHISSEMENTBARRIERE",false);
                 Log.e("FOLLOW_NEW_SESSION", idTel);
                 Log.e("DUREE", duree);
 
 
-                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree + "*" + maxImmobile);
+                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree + "*" + maxImmobile + "*" + String.valueOf(barriere));
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 

@@ -52,6 +52,12 @@ public class ProfilsManager implements ProfilOnPromenadeManager
         }
     }
 
+    public ProfilsManager()
+    {
+        this.profilArrayList = new ArrayList<>(); // contiendra tous les profils
+        this.profilOnPromenade = new HashMap<>(); // hashmap<IdTel , Profil>
+    }
+
     /////////////////////// SETTER ///////////////////////
 
     /**
@@ -104,7 +110,6 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
-        Log.d("idTel", idTel);
     }
 
     /**
@@ -113,7 +118,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
      */
     public void removeProfilOnPromenade(String idTel)
     {
-        Log.e("ProfilManager",""+idTel+" is removed");
+        //Log.e("ProfilManager",""+idTel+" is removed");
 
         if (this.profilOnPromenade.containsKey(idTel))
         {
@@ -125,6 +130,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
             p.setImmobile(false);
             p.setTempsRestant(10000);
             p.setUpdateOut(false);
+            p.setEnVueDetail(false);
             this.profilOnPromenade.remove(idTel);
         }
 

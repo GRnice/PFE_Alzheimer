@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 
@@ -37,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
         registerNewReceiver(serviceListener,ServiceSocket.MESSAGE_FROM_SERVICE);
 
         android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        TextView androidIdView = (TextView) findViewById(R.id.textViewIdentifiantTitle);
+
+        androidIdView.setText("Identifiant : "+android_id.substring(0,6));
 
         buttonSwitchConnexion = (Button) findViewById(R.id.button);
 
