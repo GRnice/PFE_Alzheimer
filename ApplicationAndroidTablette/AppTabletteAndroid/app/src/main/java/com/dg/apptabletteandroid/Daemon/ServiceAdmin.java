@@ -310,7 +310,7 @@ public class ServiceAdmin extends Service
                             {
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("IMMOBILE_STOP","");
+                                intent.putExtra("STOPIMMOBILITE","");
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
@@ -508,11 +508,12 @@ public class ServiceAdmin extends Service
                 String nom = arg1.getStringExtra("NOM");
                 String duree = arg1.getStringExtra("DURATION");
                 String maxImmobile = arg1.getStringExtra("MAXIMMOBILITE");
+                boolean barriere = arg1.getBooleanExtra("FRANCHISSEMENTBARRIERE",false);
                 Log.e("FOLLOW_NEW_SESSION", idTel);
                 Log.e("DUREE", duree);
 
 
-                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree + "*" + maxImmobile);
+                comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree + "*" + maxImmobile + "*" + String.valueOf(barriere));
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
             }
 

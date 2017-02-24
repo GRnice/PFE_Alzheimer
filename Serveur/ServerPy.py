@@ -30,6 +30,7 @@ class Tracker: ## Classe representant un tracker
         self.updateTimeout = False
         self.dureePromenade = None
         self.tempsRestant = None
+        self.risqueFranchissementBarriere = False
         # 0 -> connecté mais aucune information de l'utilisateur;
         # 1 -> connecté avec information -> (idtel);
         # 2 -> connecté et suivi (nom prenom et idtel connues)
@@ -50,11 +51,13 @@ class Tracker: ## Classe representant un tracker
 
 
 
-    def startPromenade(self,nom,prenom,duree): # OKPROMENADE RECU
+    def startPromenade(self,nom,prenom,duree,risqueBarriere): # OKPROMENADE RECU
         if self.etat == 1:
             self.etat = 2
             self.nom = nom
             self.prenom = prenom
+            self.risqueFranchissementBarriere = (risqueBarriere == "true")
+            print("risqueFranchissementBarriere -> "+risqueBarriere)
             timeEpoch70 = str(time.time()).split(".") # xxx.yyy # secondes depuis les années 70
             timeEpoch70 = int(timeEpoch70[0]) # recupere que les secondes # xxx
             # xxx + temps promenade en secondes
@@ -263,7 +266,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     tracker.timeout = True
                     self.serverAssistant.event("ALERT-DURATION_START",socket,tracker)
 
-            if (not self.watchman.positionIsGood(longitude,latitude)): # si mauvaise position
+            if (not self.watchman.positionIsGood(tracker,longitude,latitude)): # si mauvaise position
                 if (not tracker.isHorsZone): # si le tracker n'a pas taggé isHorsZone à True
                     print("WARNING HORS ZONE /!\/!\\")
                     tracker.isHorsZone = True
