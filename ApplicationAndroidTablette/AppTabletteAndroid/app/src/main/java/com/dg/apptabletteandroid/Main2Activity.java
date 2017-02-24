@@ -521,6 +521,28 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                     ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
                 }
             }
+
+            else if (arg1.hasExtra("IMMOBILE_START"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUpOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilUpOut.setImmobile(true);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+
+            }
+            else if (arg1.hasExtra("STOPIMMOBILITE"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Profil profilUpOut = profilsManager.getAllProfilsOnPromenade().get(idTel);
+                profilUpOut.setImmobile(false);
+                if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
+                {
+                    ((MapFragment_) fragmentManager.getCurrentFragment()).refresh();
+                }
+            }
             else if (arg1.hasExtra("SYNCHCONTINUE"))
             {
                 String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");

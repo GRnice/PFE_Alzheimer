@@ -293,6 +293,34 @@ public class ServiceAdmin extends Service
                             case "IMMOBILE":
                             {
                                 alertManager.notifImmobile(broadcastAlerte,getBaseContext(), idTel);
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("IMMOBILE_START","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                } else {
+                                    sendBroadcast(intent);
+                                }
+                                break;
+                            }
+
+                            case "STOPIMMOBILITE":
+                            {
+                                Intent intent = new Intent();
+                                intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
+                                intent.putExtra("IMMOBILE_STOP","");
+                                intent.putExtra("IDTEL", idTel);
+                                if (activity_is_on_background)
+                                {
+                                    dataKeeper.addData(intent);
+                                }
+                                else
+                                {
+                                    sendBroadcast(intent);
+                                }
+                                break;
                             }
                         }
                     }

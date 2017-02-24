@@ -298,6 +298,12 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             tracker.lastEmit = time.time()
             self.serverAssistant.event("ALERT-IMMOBILE",socket,tracker)
 
+        elif (entete == "IMMOBILE-STOP"):
+            print("Alerte immobilite stop")
+            tracker = self.getTracker(socket)
+            tracker.lastEmit = time.time()
+            self.serverAssistant.event("ALERT-IMMOBILE_STOP",socket,tracker)
+
         elif (entete == "CONTINUE"):
             print("CONTINUE RECEIVE")
             idTel = requeteArray[1]
@@ -406,6 +412,12 @@ class PatientServer(Thread):
             socketsClients = list(self.mapper.getSocketPatient())
             print("====== ALL TRACKERS ========")
             print("NB sockets -> ",len(socketsClients))
+            for checksocket in liste:
+                if (checksocket.fileno() == -1):
+                    print("fd à 1, socket remove :")
+                    print(checksocket.close())
+                    print("\n\n")
+                    liste.pop(liste.index(checksocket))
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
             for sock in read_sockets:
                 #New connection

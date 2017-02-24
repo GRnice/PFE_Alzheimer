@@ -117,6 +117,15 @@ class AssistanceServer(Thread):
             print("(alerte) IMMOBILE", tracker.id)
             self.broadcast(messageAlerte)
 
+        elif (evt == "ALERT-IMMOBILE_STOP"):
+            messageAlerte = "ALERT_STOPIMMOBILITE_"+tracker.id+"\r\n"
+            if (tracker.lastAlert == None):
+                pass
+            else:
+                tracker.lastAlert.append(messageAlerte)
+            print("(alerte) STOP IMMOBILITE",tracker.id)
+            self.broadcast(messageAlerte)
+
         elif (evt == "ALERT-TIMEOUT-UPDATE_START"):
             messageAlerte = "ALERT$STARTTIMEOUTUPDATE_"+tracker.id+"\r\n"
             if(tracker.lastAlert == None):
