@@ -13,7 +13,7 @@ input("envoyer deuxieme position")
 sock.send("POSITION*7.079275*43.612615*100\r\n".encode())  ## 43.612615, 7.079275
 messageOuiOuNon = input("Activer alerte sortie de zone ? y/n")
 if messageOuiOuNon == "y":
-    sock.send("POSITION*7.079240*43.612685*100\r\n".encode())    ## 43.612685, 7.079240
+    sock.send("POSITION*7.079440*43.612775*100\r\n".encode())    ## 43.612775, 7.079440
     time.sleep(0.5)
 
 input("envoyer Avant derniere position")
@@ -22,7 +22,7 @@ sock.send("POSITION*7.079324*43.612672*100\r\n".encode())  ## 43.612672, 7.07932
 
 messageOuiOuNon = input("Activer alerte sortie de zone ? y/n")
 if messageOuiOuNon == "y":
-    sock.send("POSITION*7.079157*43.612685*100\r\n".encode())    ## 43.612256, 7.080074
+    sock.send("POSITION*7.079413*43.612752*100\r\n".encode())    ## 43.612752, 7.079413
     time.sleep(0.5)
 
 messageOuiNon = input("Activer alerte sortie de zone BARRIERE ? y/n")
@@ -71,3 +71,10 @@ sock.close()
 
 ## hors zone gauche en haut, apres le magenta, RED;
 #43.612685, 7.079240 -  43.612646, 7.079157
+
+
+## Hors zone critique:
+## 43.611940, 7.079400 - 43.611995, 7.079294
+## 43.612452, 7.079111 - 43.612481, 7.079146
+## 43.612775, 7.079440 - 43.612752, 7.079413
+

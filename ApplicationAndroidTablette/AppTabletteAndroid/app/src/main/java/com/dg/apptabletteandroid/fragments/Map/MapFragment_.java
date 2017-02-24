@@ -120,7 +120,7 @@ public class MapFragment_ extends BlankFragment
 
         CircleOptions c3 = new CircleOptions()
                 .center(new LatLng(43.612575, 7.078863))
-                .radius(20.98967962745375)  // In meters
+                .radius(23.093113929463737)  // In meters
                 .strokeColor(Color.MAGENTA)
                 .strokeWidth(1);
 
@@ -131,8 +131,8 @@ public class MapFragment_ extends BlankFragment
                 .strokeWidth(1);
 
         CircleOptions c5 = new CircleOptions()
-                .center(new LatLng(43.611726, 7.079431))
-                .radius(19.430908201270515)  // In meters
+                .center(new LatLng(43.611843, 7.079405))
+                .radius(9.747023066795371)  // In meters
                 .strokeColor(Color.GRAY)
                 .strokeWidth(1);
 
@@ -143,8 +143,8 @@ public class MapFragment_ extends BlankFragment
                 .strokeWidth(1);
 
         CircleOptions c7 = new CircleOptions()
-                .center(new LatLng(43.612882, 7.079327))
-                .radius(13.000052212762114)  // In meters
+                .center(new LatLng(43.612912, 7.079317))
+                .radius(17.000594793296)  // In meters
                 .strokeColor(Color.CYAN)
                 .strokeWidth(1);
 
@@ -178,6 +178,18 @@ public class MapFragment_ extends BlankFragment
                 .strokeColor(Color.GREEN)
                 .strokeWidth(1);
 
+        CircleOptions c13 = new CircleOptions()
+                .center(new LatLng(43.611893, 7.079162))
+                .radius(15.486867562944084)  //
+                .strokeColor(Color.CYAN)
+                .strokeWidth(1);
+
+        CircleOptions c14 = new CircleOptions()
+                .center(new LatLng(43.611924, 7.079575))
+                .radius(9.318183487401773)  //
+                .strokeColor(Color.MAGENTA)
+                .strokeWidth(1);
+
 
 
 
@@ -194,7 +206,9 @@ public class MapFragment_ extends BlankFragment
         listCercle.add(c9);
         listCercle.add(c10);
         listCercle.add(c11);
-        listCercle.add(c12);
+        listCercle.add(c12);  // the gray ONE
+        listCercle.add(c13);
+        listCercle.add(c14);
 
 
         for (CircleOptions c: listCercle) {
