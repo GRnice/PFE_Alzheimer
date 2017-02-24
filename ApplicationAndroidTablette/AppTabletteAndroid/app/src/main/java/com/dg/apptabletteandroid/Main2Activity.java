@@ -109,8 +109,13 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         String idTel = intent.getStringExtra("IDTEL");
         if (intent.getStringExtra("WAKE_UP") != null){
             ArrayList<String> alertes = AlertManager.idTelAlertes.get(idTel);
+            if (alertes == null)
+            {
+                return;
+            }
             String typeNotif = intent.getStringExtra("WAKE_UP");
-            for(String string : alertes){
+            for(String string : alertes)
+            {
                 if(string.contains(typeNotif)){
                     String[] idNotif = string.split("\\$");
 

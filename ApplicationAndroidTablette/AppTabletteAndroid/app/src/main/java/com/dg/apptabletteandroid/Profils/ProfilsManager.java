@@ -118,7 +118,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
      */
     public void removeProfilOnPromenade(String idTel)
     {
-        Log.e("ProfilManager",""+idTel+" is removed");
+        //Log.e("ProfilManager",""+idTel+" is removed");
 
         if (this.profilOnPromenade.containsKey(idTel))
         {

@@ -26,6 +26,10 @@ public class ProfilManagerUnitTest
         mock.setNom("Nom");
         profilsManager.addProfilOnPromenade("123456789",mock);
         assertTrue(profilsManager.getAllProfilsOnPromenade().size() == 1);
+        profilsManager.removeProfilOnPromenade("123456789");
+        assertTrue(profilsManager.getAllProfilsOnPromenade().size() == 0);
+        profilsManager.unfollow(mock);
+        assertTrue(mock.getTempsRestant() == 10000);
+        assertTrue(!mock.estSuiviParMoi());
     }
-
 }

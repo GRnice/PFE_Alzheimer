@@ -178,6 +178,11 @@ public class MapFragment_ extends BlankFragment
                 .strokeColor(Color.GREEN)
                 .strokeWidth(1);
 
+                .center(new LatLng(43.6154583,7.0719361111111105))
+                .radius(9.575995082650834)
+                .strokeColor(Color.CYAN)
+                .strokeWidth(1);
+
 
 
 
@@ -195,7 +200,7 @@ public class MapFragment_ extends BlankFragment
         listCercle.add(c10);
         listCercle.add(c11);
         listCercle.add(c12);
-
+        listCercle.add(c13);
 
         for (CircleOptions c: listCercle) {
             googleMap.addCircle(c);
