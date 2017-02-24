@@ -418,7 +418,6 @@ class PatientServer(Thread):
             for checksocket in liste:
                 if (checksocket.fileno() == -1):
                     print("fd à 1, socket remove :")
-                    print(checksocket.close())
                     print("\n\n")
                     liste.pop(liste.index(checksocket))
             read_sockets,write_sockets,error_sockets = select.select(liste,[],[])
