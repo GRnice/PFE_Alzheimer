@@ -3,8 +3,8 @@ import time
 class Pinger(Thread):
     def __init__(self,mapper,serverAssistant):
         Thread.__init__(self)
-        self.DELAYMAX = 20 # delai max entre deux updates du patient. en secondes
-        self.DELAYMAXALERT = 30 # Délai d'inaction d'alertes. en secondes
+        self.DELAYMAX = 50 # delai max entre deux updates du patient. en secondes
+        self.DELAYMAXALERT = 60 # Délai d'inaction d'alertes. en secondes
         self.mapper = mapper
         self.serverAssistant = serverAssistant
         self.onRun = None
@@ -28,7 +28,7 @@ class Pinger(Thread):
                 ## check le temps d'emission de la derniere alerte...
                 if (tracker.etat == 2 and tracker.lastEmit != None):
                     tempsCourant = time.time()
-                    if ((tempsCourant - tracker.lastEmit) > self.DELAYMAX and (not tracker.updateTimeout)): # si > 20s
+                    if ((tempsCourant - tracker.lastEmit) > self.DELAYMAX and (not tracker.updateTimeout)): # si > 50s
                         print("DETECT UPDATE TIMEOUT")
                         tracker.updateTimeout = True
                         self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_START",None,tracker)
@@ -39,7 +39,7 @@ class Pinger(Thread):
                         self.serverAssistant.event("ALERT-TIMEOUT-UPDATE_STOP",None,tracker)
                 if (tracker.etat == 2 and tracker.lastAlert != None):
                     tempsCourant = time.time()
-                    if ((tempsCourant - tracker.lastAlert[0]) > self.DELAYMAXALERT and (not tracker.alertTimeout)): # si > 20s
+                    if ((tempsCourant - tracker.lastAlert[0]) > self.DELAYMAXALERT and (not tracker.alertTimeout)): # si > 60s
                         print("DETECT ALERTES PAS GEREES")
                         tracker.alertTimeout = True
                         for id, val in enumerate(tracker.lastAlert):
