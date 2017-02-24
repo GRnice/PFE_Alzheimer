@@ -4,13 +4,17 @@ package com.dg.apptabletteandroid.fragments.Profils;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
@@ -65,6 +69,8 @@ public class ConfigPromenade extends BlankFragment {
         final View v = inflater.inflate(R.layout.fragment_config_promenade, container, false);
         TextView nomprenom = (TextView) v.findViewById(R.id.textViewConfigomPrenom);
         String nomPrenom = profilSelected.getPrenom() + "" + profilSelected.getNom();
+        ImageView image =(ImageView)v.findViewById(R.id.imageProfilSelected);
+        image.setImageDrawable(getResources().getDrawable(profilSelected.getIdRessourcesAvatar()));
         nomprenom.setText(nomPrenom);
 
         Button back = (Button) v.findViewById(R.id.button_back_config_prom);
@@ -85,6 +91,15 @@ public class ConfigPromenade extends BlankFragment {
             {
                 EditText duration = (EditText) v.findViewById(R.id.entry_temps_promenade);
 
+                try{
+                    Integer.parseInt(duration.getText().toString());
+                }
+                catch(NumberFormatException err)
+                {
+                    Toast.makeText(getActivity(),"Durée de la promenade incorrecte",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                EditText max =(EditText) v.findViewById(R.id.entry_temps_immobilite);
                 Intent intent = new Intent();
                 intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
                 intent.putExtra("FOLLOW_NEW_SESSION","");
@@ -92,7 +107,10 @@ public class ConfigPromenade extends BlankFragment {
                 intent.putExtra("NOM",profilSelected.getNom());
                 intent.putExtra("PRENOM",profilSelected.getPrenom());
                 intent.putExtra("DURATION",duration.getText().toString());
+                intent.putExtra("MAXIMMOBILITE",max.getText().toString());
                 getActivity().sendBroadcast(intent);
+               int  time = Integer.parseInt(duration.getText().toString());
+                profilSelected.setTempsRestant(time*60);
                 profilSelected.setEstSuiviParMoi(true);
                 profManager.addProfilOnPromenade(idTel,profilSelected);
                 MapFragment_ fragMap = MapFragment_.newInstance();

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
@@ -94,14 +95,16 @@ public class AlertManager
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notif);
-        RingtoneManager mRing = new RingtoneManager(context);
-        int mNumberOfRingtones = mRing.getCursor().getCount();
-        Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
+//        RingtoneManager mRing = new RingtoneManager(context);
+//        int mNumberOfRingtones = mRing.getCursor().getCount();
+//        Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
+        Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context.getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+
 
         try {
             mediaPlayer.stop();
             mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(context, mRingToneUri);
+            mediaPlayer.setDataSource(context, defaultRingtoneUri);
             mediaPlayer.prepare();
             mediaPlayer.start(); // no need to call prepare(); create() does that for you
         } catch (IOException e) {

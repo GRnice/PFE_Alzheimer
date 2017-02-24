@@ -125,6 +125,7 @@ public class ProfilsManager implements ProfilOnPromenadeManager
             p.setImmobile(false);
             p.setTempsRestant(10000);
             p.setUpdateOut(false);
+            p.setEnVueDetail(false);
             this.profilOnPromenade.remove(idTel);
         }
 

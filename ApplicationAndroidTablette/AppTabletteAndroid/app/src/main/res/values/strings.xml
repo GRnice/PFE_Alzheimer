@@ -14,5 +14,5 @@
 
     <string name="edit_test_add_nom">Entrez un nom de famille</string>
     <string name="edit_test_add_prenom">Entrez un prénom</string>
-    <string name="duration_promenade">temps de promenade en minutes</string>
+    <string name="duration_promenade">temps de promenade</string>
 </resources>

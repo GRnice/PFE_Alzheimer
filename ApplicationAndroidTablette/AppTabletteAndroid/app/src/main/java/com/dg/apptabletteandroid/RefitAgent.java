@@ -1,6 +1,8 @@
 package com.dg.apptabletteandroid;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.BoolRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,6 +10,10 @@ import android.util.Log;
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +26,7 @@ import java.util.HashSet;
 
 public class RefitAgent
 {
-    public static void fix(Main2Activity m,String[] allProfils,String[] profilsOnPromenade)
+    public static void fix(Main2Activity m,String[] profilsOnPromenade)
     {
 
         if (profilsOnPromenade != null)
@@ -117,12 +123,21 @@ public class RefitAgent
             intentFollow.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
             intentFollow.putExtra("FOLLOW_SESSION","");
             intentFollow.putExtra("IDTEL",idTel);
+            enPromenade.setMarker(profilObsolete.getMarker());
             m.sendBroadcast(intentFollow);
         }
 
         String[] latlong = position.split("\\(|\\)|\\,");
         Log.e("CONTENU LATLONG",Arrays.deepToString(latlong));
-        enPromenade.setLatLong(Double.valueOf(latlong[2]),Double.valueOf(latlong[1])); // 48 -> latitude , 7 -> longitude
+        if (latlong.length == 3)
+        {
+            enPromenade.setLatLong(Double.valueOf(latlong[2]),Double.valueOf(latlong[1])); // 48 -> latitude , 7 -> longitude
+        }
+        else
+        {
+            enPromenade.setLatLong(43.612248,7.079400); // 48 -> latitude , 7 -> longitude
+        }
+
         enPromenade.setBattery(Integer.valueOf(niveauBatterie));
         enPromenade.setHorsZone(Boolean.valueOf(isHorsZone));
         enPromenade.setBatteryLow(Boolean.valueOf(batteryIsLow));

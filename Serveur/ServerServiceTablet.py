@@ -41,7 +41,10 @@ class AssistanceServer(Thread):
     def broadcast(self,messageString):
         allAssistants = self.mapper.getSocketsAssistant()
         for assistant in allAssistants:
-            assistant.send(messageString.encode("utf-8"))
+            try:
+                assistant.send(messageString.encode("utf-8"))
+            except ConnectionResetError as err:
+                self.removeAssistant(assistant)
 
     # emet un message à tous les assistants sauf à l'assistant socketAssistant
 
@@ -50,7 +53,11 @@ class AssistanceServer(Thread):
         allAssistants = self.mapper.getSocketsAssistant()
         for assistant in allAssistants:
             if (assistant != socketAssistant):
-                assistant.send(messageString.encode("utf-8"))
+                try:
+                    assistant.send(messageString.encode("utf-8"))
+                except ConnectionResetError as err:
+                    self.removeAssistant(assistant)
+                
 
 
 
@@ -149,6 +156,11 @@ class AssistanceServer(Thread):
                 message = "SYNCH$NWPROMENADE_"+tracker.id+"*"+tracker.nom+"*"+tracker.prenom+"\r\n"
                 sockAssistant.send(message.encode('utf-8'))
 
+            elif tracker.etat == 1:
+                message = "NEWSESSION$"+tracker.id+"\r\n"
+                print("REPORTED NEW SESSION")
+                sockAssistant.send(message.encode('utf-8'))
+
     # retrait d'un assistant
     def removeAssistant(self,sid):
         self.mapper.removeAssistant(sid)
@@ -171,9 +183,9 @@ class AssistanceServer(Thread):
             self.mapper.attachAssistant(socketPatient,sockAssistant)
 
 
-        elif (len(data) == 4):
-            # si FOLLOW$idTel*prenom*nom*duree
-            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3]
+        elif (len(data) == 5):
+            # si FOLLOW$idTel*prenom*nom*duree*tempsImmobile
+            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3] ; tempsImmobile = data[4]
 
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
@@ -181,7 +193,7 @@ class AssistanceServer(Thread):
             if (tracker.etat == 1): # le premier qui défini le profil du device
                 tracker.startPromenade(nom,prenom,duree)
                 print("OKPROMENADE POUR ",tracker.id)
-                sockPatient.send("OKPROMENADE\r\n".encode("utf-8"))
+                sockPatient.send(("OKPROMENADE*" + tempsImmobile + "\r\n").encode("utf-8"))
                 self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)
 
             self.mapper.attachAssistant(sockPatient,sockAssistant)
@@ -301,7 +313,6 @@ class AssistanceServer(Thread):
                                     self.addAssistant(sock)
 
                                     message = ""
-                                    message += str(self.managerProfils) + "+"
                                     allPatients = list(self.mapper.getSocketPatient())
                                     for socketPatient in allPatients:
                                         tracker = self.mapper.getTracker(socketPatient)
@@ -309,8 +320,9 @@ class AssistanceServer(Thread):
                                             tracker = self.mapper.getTracker(socketPatient)
                                             message += tracker.toString()
                                             message += "*"
-                                        
-                                    sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
+
+                                    if message != "":
+                                        sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
 
                                 elif message[0] == "CHECKALERT":
                                     print("CHECKALERT")

@@ -40,6 +40,7 @@ public class Profil
     private boolean immobile = false; // si il est immobile
     private boolean batteryLow = false; // si la batterie est faible
     private boolean updateOut = false; // si le profil n'emet plus depuis un certains temps
+    private boolean enVueDetail = false;
     private double longitude;
     private double longitudeExtrem;  // les set en fct de long lat
     private double latitude;
@@ -169,11 +170,13 @@ public class Profil
     }
 
 
-    public double getLatitudeExtrem() {
+    public double getLatitudeExtrem()
+    {
         return latitudeExtrem;
     }
 
-    public double getLongitudeExtrem() {
+    public double getLongitudeExtrem()
+    {
         return longitudeExtrem;
     }
 
@@ -229,5 +232,13 @@ public class Profil
 
     public void setUpdateOut(boolean updateOut) {
         this.updateOut = updateOut;
+    }
+
+    public boolean isEnVueDetail() {
+        return enVueDetail;
+    }
+
+    public void setEnVueDetail(boolean enVueDetail) {
+        this.enVueDetail = enVueDetail;
     }
 }
