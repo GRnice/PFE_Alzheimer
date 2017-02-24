@@ -29,6 +29,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -94,10 +96,45 @@ public class MapFragment_ extends BlankFragment
                 .strokeColor(Color.BLUE)
                 .strokeWidth(2);
 
-
-
 //      Get back the mutable Polygon
         Polygon polygon = googleMap.addPolygon(rectOptions);
+
+        // Instantiates a new CircleOptions object and defines the center and radius
+        CircleOptions c1 = new CircleOptions()
+                .center(new LatLng(43.612627, 7.07988))
+                .radius(16.74780868480848)  // In meters
+                .strokeColor(Color.GREEN)
+                .strokeWidth(1);
+
+        CircleOptions c2 = new CircleOptions()
+                .center(new LatLng(43.611973, 7.078922))
+                .radius(19.71319864609092)  // In meters
+                .strokeColor(Color.YELLOW)
+                .strokeWidth(1);
+
+        CircleOptions c3 = new CircleOptions()
+                .center(new LatLng(43.612575, 7.078863))
+                .radius(17.77345054978547)  // In meters
+                .strokeColor(Color.MAGENTA)
+                .strokeWidth(1);
+
+        CircleOptions c4 = new CircleOptions()
+                .center(new LatLng(43.611998, 7.079767))
+                .radius(7.879672095357843)  // In meters
+                .strokeColor(Color.RED)
+                .strokeWidth(1);
+
+        ArrayList<CircleOptions> listCercle = new ArrayList<CircleOptions>();
+        listCercle.add(c1);
+        listCercle.add(c2);
+        listCercle.add(c3);
+        listCercle.add(c4);
+
+
+        for (CircleOptions c: listCercle) {
+            googleMap.addCircle(c);
+        }
+
     }
 
 
@@ -153,7 +190,7 @@ public class MapFragment_ extends BlankFragment
                     {
                         Profil pr = iteratorProm.next();
                         if(pr.getPrenom().equals(profil.getPrenom()) && pr.getNom().equals(profil.getNom())) {
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 15));
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pr.getLatitude(), pr.getLongitude()), 19));
                             break;
                         }
                     }
@@ -169,6 +206,7 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+                googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 limitCentre();
 
                 HashMap<String,Profil> allProfilsOnPromenade = profilsManager.getAllProfilsOnPromenade();
@@ -211,9 +249,12 @@ public class MapFragment_ extends BlankFragment
                         return false;
                     }
                 });
-                LatLng sophia = new LatLng(43.6155793,7.0696861);
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sophia).zoom(12).build();
+
+
+                LatLng centre = new LatLng(43.612248, 7.079400);
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(centre).zoom(17).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
 
                 // ce marqueur permet de savoir si le marker d'un groupe a deja ete posé ou non
                 int marqueurRecherche = new Random().nextInt();
@@ -459,8 +500,6 @@ public class MapFragment_ extends BlankFragment
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                 marker.showInfoWindow();
                 profil.setMarker(marker);
-
-
 
             }
         }

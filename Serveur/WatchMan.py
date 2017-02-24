@@ -5,6 +5,7 @@ class Circle: # HITBOX
         self.longOrigine = longOrigine
         self.latOrigine = latOrigine
         self.rayon = math.sqrt( ((longExtremite - longOrigine)**2) + ((latExtremite - latOrigine)**2) )
+        print("latLong center :", str(self.latOrigine) + " " + str(self.longOrigine) + " and raduis = " + str( (self.rayon / 0.01) * 762.6124 ))
         
     def isInside(self,longP,latP):
         return math.sqrt(((longP - self.longOrigine)**2) + ((latP - self.latOrigine)**2)) < self.rayon
