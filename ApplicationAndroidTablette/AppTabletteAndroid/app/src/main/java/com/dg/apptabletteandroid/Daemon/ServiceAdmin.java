@@ -334,9 +334,12 @@ public class ServiceAdmin extends Service
                                 intent.putExtra("SYNCHCONTINUE", "");
                                 intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsEnPromenade);
 
-                                if (activity_is_on_background) {
+                                if (activity_is_on_background)
+                                {
                                     dataKeeper.addData(intent);
-                                } else {
+                                }
+                                else
+                                {
                                     sendBroadcast(intent);
                                 }
                                 break;
