@@ -2,7 +2,7 @@ import socket
 import time
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-sock.connect(("10.212.102.221",3000))
+sock.connect(("127.0.0.1",3000))
 idtel = input("entrez IDTEL:")
 sock.send(("STARTSUIVI*"+str(idtel)+"\r\n").encode())
 #19
@@ -23,6 +23,11 @@ sock.send("POSITION*7.079324*43.612672*100\r\n".encode())  ## 43.612672, 7.07932
 messageOuiOuNon = input("Activer alerte sortie de zone ? y/n")
 if messageOuiOuNon == "y":
     sock.send("POSITION*7.079157*43.612685*100\r\n".encode())    ## 43.612256, 7.080074
+    time.sleep(0.5)
+
+messageOuiNon = input("Activer alerte sortie de zone BARRIERE ? y/n")
+if messageOuiNon == "y":
+    sock.send("POSITION*7.071950111*43.615400*50\r\n".encode())
     time.sleep(0.5)
 
 input("envoyer derniere position")

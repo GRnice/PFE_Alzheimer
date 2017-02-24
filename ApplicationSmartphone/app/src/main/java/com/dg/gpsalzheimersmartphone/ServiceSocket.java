@@ -34,6 +34,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String POSITION = "POSITION";
     public static final String IMMOBILE = "IMMOBILE";
+    public static final String IMMOBILESTOP = "IMMOBILE-STOP";
     public static final String SEPARATOR = "*";
 
     final public static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
@@ -118,14 +119,17 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 float z =  Math.abs(sensorEvent.values[2]);
                 long curTime = System.currentTimeMillis();
                 float ompteur = (((x*x) + (y*y) + (z*z)) / (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH));
-                if (ompteur >= 1.34) {
+                if (ompteur >= 1.34)
+                {
                     valeurCompteur += 1;
                 }
                 if ((curTime - lastUpdate) > maxTime) {
                     if(lastValeurCompteur != 0){
-                        if((valeurCompteur - lastValeurCompteur) <5) {
+                        if((valeurCompteur - lastValeurCompteur) < 5) {
                             //Alerte Immobile
                             comm.sendMessage(IMMOBILE);
+                        }else{
+                            comm.sendMessage(IMMOBILESTOP);
                         }
                     }
                     lastUpdate = curTime;
@@ -215,7 +219,8 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                     timer.cancel();
                 }
             }
-            if(startSuivi){
+            if(startSuivi)
+            {
                 ServiceSocket.this.comm.sendMessage(STARTSUIVI + SEPARATOR + android_id);
             }
             if (messageContinue)

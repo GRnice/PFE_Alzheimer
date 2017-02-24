@@ -117,6 +117,15 @@ class AssistanceServer(Thread):
             print("(alerte) IMMOBILE", tracker.id)
             self.broadcast(messageAlerte)
 
+        elif (evt == "ALERT-IMMOBILE_STOP"):
+            messageAlerte = "ALERT$STOPIMMOBILITE_"+tracker.id+"\r\n"
+            if (tracker.lastAlert == None):
+                pass
+            else:
+                tracker.lastAlert.append(messageAlerte)
+            print("(alerte) STOP IMMOBILITE",tracker.id)
+            self.broadcast(messageAlerte)
+
         elif (evt == "ALERT-TIMEOUT-UPDATE_START"):
             messageAlerte = "ALERT$STARTTIMEOUTUPDATE_"+tracker.id+"\r\n"
             if(tracker.lastAlert == None):
@@ -183,15 +192,15 @@ class AssistanceServer(Thread):
             self.mapper.attachAssistant(socketPatient,sockAssistant)
 
 
-        elif (len(data) == 5):
+        elif (len(data) == 6):
             # si FOLLOW$idTel*prenom*nom*duree*tempsImmobile
-            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3] ; tempsImmobile = data[4]
+            idTel = data[0] ; prenom = data[1] ; nom = data[2] ; duree = data[3] ; tempsImmobile = data[4] ; risqueBarriere = data[5]
 
             sockPatient = self.mapper.getSocketPatientById(idTel)
             tracker = self.mapper.getTrackerById(idTel)
 
             if (tracker.etat == 1): # le premier qui défini le profil du device
-                tracker.startPromenade(nom,prenom,duree)
+                tracker.startPromenade(nom,prenom,duree,risqueBarriere)
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send(("OKPROMENADE*" + tempsImmobile + "\r\n").encode("utf-8"))
                 self.broadcastFilter("SYNCH$NWPROMENADE_"+idTel+"*"+nom+"*"+prenom+"\r\n",sockAssistant)

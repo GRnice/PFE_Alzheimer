@@ -87,7 +87,8 @@ public class AdapterListingMap extends ArrayAdapter
         duree.setText(profil.getTempsRestant()+"m");
         dureeD.setText(profil.getTempsRestant()+"m");
         int d =profil.getTempsRestant();
-        if(d<=0){
+        if(d<=0)
+        {
             duree.setText("0");
             dureeD.setText("Promenade Terminée");
         }

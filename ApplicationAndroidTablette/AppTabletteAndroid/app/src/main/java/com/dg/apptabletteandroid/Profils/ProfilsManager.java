@@ -52,6 +52,12 @@ public class ProfilsManager implements ProfilOnPromenadeManager
         }
     }
 
+    public ProfilsManager()
+    {
+        this.profilArrayList = new ArrayList<>(); // contiendra tous les profils
+        this.profilOnPromenade = new HashMap<>(); // hashmap<IdTel , Profil>
+    }
+
     /////////////////////// SETTER ///////////////////////
 
     /**
@@ -104,7 +110,6 @@ public class ProfilsManager implements ProfilOnPromenadeManager
     public void addProfilOnPromenade(String idTel,Profil prof)
     {
         this.profilOnPromenade.put(idTel,prof);
-        Log.d("idTel", idTel);
     }
 
     /**
