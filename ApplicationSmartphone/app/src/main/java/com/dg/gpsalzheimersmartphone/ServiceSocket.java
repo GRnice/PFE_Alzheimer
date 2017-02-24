@@ -34,6 +34,7 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String POSITION = "POSITION";
     public static final String IMMOBILE = "IMMOBILE";
+    public static final String IMMOBILESTOP = "IMMOBILE-STOP";
     public static final String SEPARATOR = "*";
 
     final public static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
@@ -126,6 +127,8 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                         if((valeurCompteur - lastValeurCompteur) <5) {
                             //Alerte Immobile
                             comm.sendMessage(IMMOBILE);
+                        }else{
+                            comm.sendMessage(IMMOBILESTOP);
                         }
                     }
                     lastUpdate = curTime;
