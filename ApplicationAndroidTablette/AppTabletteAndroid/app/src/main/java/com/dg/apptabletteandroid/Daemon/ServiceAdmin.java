@@ -22,6 +22,8 @@ import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.NetworkUtil;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
 import com.dg.apptabletteandroid.R;
+import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +184,7 @@ public class ServiceAdmin extends Service
                                 alertManager.notifHorsZone(broadcastAlerte,getBaseContext(),idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("HORSZONE",true);
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
@@ -197,7 +199,7 @@ public class ServiceAdmin extends Service
                             {
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("HORSZONE",false);
                                 intent.putExtra("IDTEL", idTel);
 
                                 if (activity_is_on_background)
@@ -441,16 +443,37 @@ public class ServiceAdmin extends Service
                         Log.e("UPDATE", content);
                         Intent intent = new Intent();
                         String idTel = content.split("\\*")[0];
+                        LatLng latLong = new LatLng(Double.valueOf(content.split("\\*")[2]), Double.valueOf(content.split("\\*")[1]));
                         Log.e("Temps Restant !",content.split("\\*")[4]);
                         intent.putExtra("UPDATE", content);
                         intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
 
                         if (activity_is_on_background)
                         {
+                            if(MapFragment_.builder != null) {
+                                boolean isInsideBoundary = MapFragment_.builder.build().contains(latLong); // true as the test point is inside the boundary
+                                if(!isInsideBoundary) {
+                                    Log.d("OUTT", "boby est sortie");
+                                    comm.sendMessage("HORSZONE$" + idTel);
+                                } else {
+                                    Log.d("OUTT", "boby IS IN");
+                                    comm.sendMessage("STOPHORSZONE$" + idTel);
+                                }
+                            }
                             dataKeeper.addPosition(idTel,intent);
                         }
                         else
                         {
+                            if(MapFragment_.builder != null) {
+                                boolean isInsideBoundary = MapFragment_.builder.build().contains(latLong); // true as the test point is inside the boundary
+                                if(!isInsideBoundary) {
+                                    comm.sendMessage("HORSZONE$" + idTel);
+                                    Log.d("OUTT", "boby est sortie");
+                                } else {
+                                    comm.sendMessage("STOPHORSZONE$" + idTel);
+                                    Log.d("OUTT", "boby IS IN");
+                                }
+                            }
                             sendBroadcast(intent);
                         }
 
@@ -538,7 +561,7 @@ public class ServiceAdmin extends Service
                 try {
                     comm.sendMessage("ADDPROFIL$" + newProfil);
                 } catch (NullPointerException e) {  // Bancal, cas ou la tablette n'est pas connectée, A Definir plus bas !!
-                   // Log.e("connected ", dataKeeper.)
+                    // Log.e("connected ", dataKeeper.)
                     // dataKeeper.subscrive(ServiceAdmin.this);
                     //  dataKeeper.addData(arg1);
                 }
@@ -606,8 +629,8 @@ public class ServiceAdmin extends Service
                         } else {
                             sendBroadcast(intentForActivity);  // A TEST
                         }
-                     //   Toast ts = Toast.makeText(context, "DéConnecté", Toast.LENGTH_SHORT);
-                    //    ts.show();
+                        //   Toast ts = Toast.makeText(context, "DéConnecté", Toast.LENGTH_SHORT);
+                        //    ts.show();
 
                     }
                     connected = false;
