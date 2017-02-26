@@ -79,7 +79,6 @@ class AssistanceServer(Thread):
             else:
                 tracker.lastAlert.append(messageAlerte)
             print("(alerte) HORS ZONE",tracker.id)
-            tracker.isHorsZone = True
             self.broadcast(messageAlerte)
 
         elif (evt == "ALERT-POSITION_STOP"):
@@ -89,7 +88,6 @@ class AssistanceServer(Thread):
             else:
                 tracker.lastAlert.append(messageAlerte)
             print("STOP HORS ZONE",tracker.id)
-            tracker.isHorsZone = False
             self.broadcast(messageAlerte)
 
         elif(evt == "ALERT-BATTERY_START"):
@@ -340,14 +338,6 @@ class AssistanceServer(Thread):
                                     tracker = self.mapper.getTrackerById(message[1])
                                     if tracker != None and tracker.etat == 2:
                                         self.mapper.getTrackerById(message[1]).lastAlert = None
-                                elif message[0] == "HORSZONE":
-                                    print("HORSZONE")
-                                    tracker = self.mapper.getTrackerById(message[1])
-                                    self.event("ALERT-POSITION_START", sock, tracker)
-                                elif message[0] == "STOPHORSZONE":
-                                    print("STOPHORSZONE")
-                                    tracker = self.mapper.getTrackerById(message[1])
-                                    self.event("ALERT-POSITION_STOP", sock, tracker)
                             else:
                                 print("Assistant (%s) is offline" % sock)
                                 sock.close()

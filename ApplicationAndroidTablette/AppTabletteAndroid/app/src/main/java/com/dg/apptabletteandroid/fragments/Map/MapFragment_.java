@@ -54,8 +54,6 @@ public class MapFragment_ extends BlankFragment
     private Button synchRefreshTitre;
     private ProfilOnPromenadeManager profilsManager;
     private ProfilGroupManager profilsGroupManager;
-    private Polygon limitDuCentre;
-    public static LatLngBounds.Builder builder;
 
     public MapFragment_()
     {
@@ -66,7 +64,6 @@ public class MapFragment_ extends BlankFragment
     {
         MapFragment_ fragment = new MapFragment_();
         fragment.profilsGroupManager = ProfilGroupManager.newInstance();
-        fragment.builder = new LatLngBounds.Builder();
         return fragment;
     }
 
@@ -78,12 +75,6 @@ public class MapFragment_ extends BlankFragment
         super.onCreate(savedInstanceState);
 
         profilsManager = ((Main2Activity) getActivity()).getProfilsManager();
-    }
-
-    private void initBuilder(Polygon poly) {
-        for(LatLng point : poly.getPoints()) {
-            builder.include(point);
-        }
     }
 
 
@@ -111,8 +102,8 @@ public class MapFragment_ extends BlankFragment
                 .strokeColor(Color.BLUE)
                 .strokeWidth(2);
 
-//      Get back the mutable Polygon
-        limitDuCentre = googleMap.addPolygon(rectOptions);
+        //  Get back the mutable Polygon
+        Polygon limitDuCentre = googleMap.addPolygon(rectOptions);
     }
 
 
@@ -197,7 +188,6 @@ public class MapFragment_ extends BlankFragment
                 googleMap = mMap;
                 googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 limitCentre();
-                initBuilder(limitDuCentre);
 
                 HashMap<String,Profil> allProfilsOnPromenade = profilsManager.getAllProfilsOnPromenade();
 
@@ -438,7 +428,6 @@ public class MapFragment_ extends BlankFragment
 
         while(profilsPromenade.hasNext())
         {
-            boolean isInsideBoundary;
             Profil profil = profilsPromenade.next();
             if (profil.getMarker() == null) continue;
 
@@ -450,11 +439,6 @@ public class MapFragment_ extends BlankFragment
                 group.setMarqueurRecherche(marqueurRecherche);
                 profil = group.getAnyProfil();
                 LatLng latLng = new LatLng(profil.getLatitude(), profil.getLongitude());
-                /*isInsideBoundary = builder.build().contains(latLng); // true as the test point is inside the boundary
-                if(!isInsideBoundary) {
-                    Log.d("OUTT", "boby est sortie");
-                }*/
-
                 Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), group.getDrawable());
                 String messageMarker = group.stringifyForMarker();
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title("Groupe").snippet(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
@@ -499,12 +483,6 @@ public class MapFragment_ extends BlankFragment
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                 marker.showInfoWindow();
                 profil.setMarker(marker);
-
-                /*isInsideBoundary = builder.build().contains(latLng); // true as the test point is inside the boundary
-                if(!isInsideBoundary) {
-                    Log.d("OUTT", "boby est sortie");
-                }*/
-
             }
         }
 

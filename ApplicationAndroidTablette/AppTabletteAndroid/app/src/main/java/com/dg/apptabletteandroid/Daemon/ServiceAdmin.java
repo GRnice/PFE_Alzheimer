@@ -7,28 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.dg.apptabletteandroid.AlertManager;
 import com.dg.apptabletteandroid.Communication.CommunicationServer;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.NetworkUtil;
-import com.dg.apptabletteandroid.Profils.ProfilsManager;
-import com.dg.apptabletteandroid.R;
-import com.dg.apptabletteandroid.fragments.Map.MapFragment_;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Queue;
 
 /**
  * Ce service recoit tous les messages provenants du serveur
@@ -184,7 +170,7 @@ public class ServiceAdmin extends Service
                                 alertManager.notifHorsZone(broadcastAlerte,getBaseContext(),idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE",true);
+                                intent.putExtra("HORSZONE","");
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
@@ -199,9 +185,8 @@ public class ServiceAdmin extends Service
                             {
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE",false);
+                                intent.putExtra("HORSZONE","");
                                 intent.putExtra("IDTEL", idTel);
-
                                 if (activity_is_on_background)
                                 {
                                     dataKeeper.addData(intent);
@@ -443,37 +428,16 @@ public class ServiceAdmin extends Service
                         Log.e("UPDATE", content);
                         Intent intent = new Intent();
                         String idTel = content.split("\\*")[0];
-                        LatLng latLong = new LatLng(Double.valueOf(content.split("\\*")[2]), Double.valueOf(content.split("\\*")[1]));
                         Log.e("Temps Restant !",content.split("\\*")[4]);
                         intent.putExtra("UPDATE", content);
                         intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
 
                         if (activity_is_on_background)
                         {
-                            if(MapFragment_.builder != null) {
-                                boolean isInsideBoundary = MapFragment_.builder.build().contains(latLong); // true as the test point is inside the boundary
-                                if(!isInsideBoundary) {
-                                    Log.d("OUTT", "boby est sortie");
-                                    comm.sendMessage("HORSZONE$" + idTel);
-                                } else {
-                                    Log.d("OUTT", "boby IS IN");
-                                    comm.sendMessage("STOPHORSZONE$" + idTel);
-                                }
-                            }
                             dataKeeper.addPosition(idTel,intent);
                         }
                         else
                         {
-                            if(MapFragment_.builder != null) {
-                                boolean isInsideBoundary = MapFragment_.builder.build().contains(latLong); // true as the test point is inside the boundary
-                                if(!isInsideBoundary) {
-                                    comm.sendMessage("HORSZONE$" + idTel);
-                                    Log.d("OUTT", "boby est sortie");
-                                } else {
-                                    comm.sendMessage("STOPHORSZONE$" + idTel);
-                                    Log.d("OUTT", "boby IS IN");
-                                }
-                            }
                             sendBroadcast(intent);
                         }
 

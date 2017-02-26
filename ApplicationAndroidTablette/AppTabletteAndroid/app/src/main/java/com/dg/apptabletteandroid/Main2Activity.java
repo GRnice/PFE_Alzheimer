@@ -462,7 +462,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 // Un appel HORSZONE indique qu'il y a hors zone, un deuxieme dit le contraire
                 String idTelHorsZone = arg1.getStringExtra("IDTEL");
                 Profil profilHorsZone = profilsManager.getAllProfilsOnPromenade().get(idTelHorsZone);
-                profilHorsZone.setHorsZone(arg1.getBooleanExtra("HORSZONE", false));
+                profilHorsZone.setHorsZone(! profilHorsZone.isHorsZone());
 
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
