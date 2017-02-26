@@ -502,6 +502,7 @@ public class ServiceAdmin extends Service
                 alertManager.stopAudio();
             }
 
+
             if (arg1.hasExtra("FOLLOW_NEW_SESSION")) {
                 String idTel = arg1.getStringExtra("IDTEL");
                 String prenom = arg1.getStringExtra("PRENOM");
@@ -515,6 +516,14 @@ public class ServiceAdmin extends Service
 
                 comm.sendMessage("FOLLOW$" + idTel + "*" + prenom + "*" + nom + "*" + duree + "*" + maxImmobile + "*" + String.valueOf(barriere));
                 alertManager.addListening(idTel); // AlertManager ecoutera les alertes provenants du serveur
+            }
+
+            if (arg1.hasExtra("FOLLOW_SESSION_OVERTAKE"))
+            {
+                String idTel = arg1.getStringExtra("IDTEL");
+                Log.e("FOLLOW_SESSION_OVERTAKE",idTel);
+                alertManager.addListening(idTel);
+                // on envoie pas de follow vu que on follow deja... pas besoin d'incrementer nbFollower du tracker associé à idTel
             }
 
             if (arg1.hasExtra("FOLLOW_SESSION"))

@@ -3,8 +3,10 @@ package com.dg.apptabletteandroid;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 
+import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.fragments.Profils.ProfilFragment;
 
 /**
@@ -36,6 +38,11 @@ public class FragmentManager
      */
     public void pushFragment(Fragment frag, Activity act)
     {
+        Intent intentStopSound = new Intent();
+        intentStopSound.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+        intentStopSound.putExtra("STOP_SOUND","");
+        act.sendBroadcast(intentStopSound);
+
         FragmentTransaction ft = act.getFragmentManager().beginTransaction();
         if (fragmentCourant != null)
         {

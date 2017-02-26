@@ -44,7 +44,10 @@ public class AlertManager
      */
     public void addListening(String idTel)
     {
-        this.listOfIdTelOnListening.add(idTel);
+        if (!listOfIdTelOnListening.contains(idTel))
+        {
+            this.listOfIdTelOnListening.add(idTel);
+        }
     }
 
     /**

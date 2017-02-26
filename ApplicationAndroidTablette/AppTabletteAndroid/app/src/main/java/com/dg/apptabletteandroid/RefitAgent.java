@@ -121,7 +121,7 @@ public class RefitAgent
             enPromenade.setEstSuiviParMoi(true);
             Intent intentFollow = new Intent();
             intentFollow.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
-            intentFollow.putExtra("FOLLOW_SESSION","");
+            intentFollow.putExtra("FOLLOW_SESSION_OVERTAKE","");
             intentFollow.putExtra("IDTEL",idTel);
             enPromenade.setMarker(profilObsolete.getMarker());
             m.sendBroadcast(intentFollow);
