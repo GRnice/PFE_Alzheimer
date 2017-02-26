@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="8dp"
     android:id="@+id/icons">
@@ -13,7 +14,6 @@
         android:layout_marginTop="2dp"
         android:layout_marginLeft="15dp"
         android:src="@drawable/wifi"
-
         android:adjustViewBounds="true"
         />
 
@@ -36,10 +36,20 @@
         android:layout_width="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         android:id="@+id/timming"
-        android:layout_weight="1"
-        android:textStyle="normal|bold"
-        android:textSize="18dp" />
+        android:textStyle="normal|bold" />
 
-
+    <ImageView
+        android:visibility="gone"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="15dp"
+        android:id="@+id/timeout"
+        android:clickable="true"
+        android:src="@drawable/timeout"
+        android:background="@null"
+        android:adjustViewBounds="true"
+        />
 </LinearLayout>
