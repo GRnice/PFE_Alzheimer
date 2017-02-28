@@ -252,15 +252,16 @@ public class MapFragment_ extends BlankFragment
                             profil = group.getAnyProfil();
                             marker = profil.getMarker();
                             Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), group.getDrawable());
+                            LatLng latlng = new LatLng(profil.getLatitude(),profil.getLongitude());
                             String messageMarker = group.stringifyForMarker();
 
-                            marker = googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title("Groupe").snippet(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            marker = googleMap.addMarker(new MarkerOptions().position(latlng).title("Groupe").snippet(messageMarker).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                             marker.showInfoWindow();
                             //profil.setMarker(googleMap.addMarker(new MarkerOptions().position(marker.getPosition()).title(profil.getPrenom() + " " + profil.getNom()).icon(BitmapDescriptorFactory.fromBitmap(bitmap))));
                             profil.setMarker(marker);
 
                             googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
+//7.0800824 , 43.6131763
                                 @Override
                                 public View getInfoWindow(Marker arg0) {
                                     return null;
