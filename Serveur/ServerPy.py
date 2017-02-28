@@ -425,8 +425,8 @@ class PatientServer(Thread):
                 #New connection
                 if sock == server_socket:
                     sockfd, addr = server_socket.accept()
-                    with lockMap:
-                        self.mapper.addTracker(sockfd)
+                    self.mapper.addTracker(sockfd)
+                    sockfd.send("CONNECTED\r\n".encode('utf-8'))
                     print("Client (%s, %s) connected" % addr)
 
                 else:
@@ -437,8 +437,12 @@ class PatientServer(Thread):
                         data = sock.recv(self.RECV_BUFFER).rstrip()
 
                         if len(data) > 0:
-                            with lockPool:
-                                poolRequest.put((sock,data.decode('utf-8')))
+                            print(data)
+                            data = data.decode('utf-8').splitlines()
+                            for instr in data:
+                                if instr != "":
+                                    with lockPool:
+                                        poolRequest.put((sock,instr))
 
                         else:
                             print("Client (%s) is offline" % sock)

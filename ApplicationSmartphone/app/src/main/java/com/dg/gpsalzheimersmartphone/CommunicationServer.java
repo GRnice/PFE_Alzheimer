@@ -27,11 +27,12 @@ import static com.dg.gpsalzheimersmartphone.ServiceSocket.maxTime;
 public class CommunicationServer extends Thread implements Runnable
 {
 
-    public static final String SOCKET_ADDR = "10.212.113.246";
+    public static final String SOCKET_ADDR = "192.168.1.13";
 
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
     public static final String STOPSUIVI = "STOPSUIVI";
+    public static final String CONNECTED = "CONNECTED";
     private Socket m_sock;
     private BufferedReader input;
     private PrintWriter output;
@@ -50,6 +51,10 @@ public class CommunicationServer extends Thread implements Runnable
         actionIntent = action;
     }
 
+    public synchronized boolean isReady()
+    {
+        return m_sock != null;
+    }
 
     public synchronized void setService(Service ser)
     {
@@ -93,7 +98,13 @@ public class CommunicationServer extends Thread implements Runnable
                 {
                     if(line.equals(STOPSUIVI)){
                         intent.putExtra(STOPSUIVI, true);
-                    } else if(line.contains(OKPROMENADE)){
+                    }
+                    else if (line.equals(CONNECTED))
+                    {
+                        intent.putExtra(CONNECTED,"");
+                    }
+                    else if(line.contains(OKPROMENADE))
+                    {
                         if(line.contains("*")){
                             String []args= line.split("\\*");
                             maxTime = Long.parseLong(args[1])*60*1000;
@@ -117,13 +128,22 @@ public class CommunicationServer extends Thread implements Runnable
 
     }
 
-    public synchronized void sendMessage(String message)
+    public synchronized boolean sendMessage(String message)
     {
+        if (this.output == null)
+        {
+            return false;
+        }
         this.output.println(message);
+        return true;
     }
 
     public synchronized void deconnect()
     {
+        if (this.m_sock == null)
+        {
+            return;
+        }
         try {
             this.m_sock.close();
         } catch (IOException e) {

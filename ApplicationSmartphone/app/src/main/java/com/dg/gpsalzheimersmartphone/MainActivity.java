@@ -144,6 +144,8 @@ public class MainActivity extends AppCompatActivity {
 
             if (mustKill)
             {
+                Intent intentServiceSocket = new Intent(MainActivity.this,ServiceSocket.class);
+                stopService(intentServiceSocket);
                 MainActivity.this.finishAffinity();
             }
             if(showAlert){

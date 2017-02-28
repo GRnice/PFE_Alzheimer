@@ -1,11 +1,8 @@
 package com.dg.gpsalzheimersmartphone;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Sensor;
@@ -20,14 +17,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
+
+import static com.dg.gpsalzheimersmartphone.CommunicationServer.CONNECTED;
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 import static com.dg.gpsalzheimersmartphone.MainActivity.android_id;
 
-public class ServiceSocket extends Service implements LocationListener, SensorEventListener
+public class ServiceSocket extends Service implements LocationListener,
+        SensorEventListener
 {
     public static final String STARTSUIVI = "STARTSUIVI";
     public static final String CONTINUE = "CONTINUE";
@@ -51,15 +48,16 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     private NetworkChangeReceiver networkChangeReceiver;
     private BatteryChangeReceiver batteryChangeReceiver;
     private boolean onPromenade;
+    private boolean connectionEtablishedWithServer;
 
-    private static final String TAG = "Nombre Pas";
-    private SensorManager mSensorManagerCountStep;
-    private Sensor mSensor;
+
+
     private float valeurCompteur = 0;
     private long lastUpdate = 0;
     private float lastValeurCompteur;
-    public static Location currentLocation;
-    public static Timer timer;
+    public Location currentLocation;
+    private ScheduleSender schedSender;
+    private ConnectionTask connTask;
 
     public ServiceSocket()
     {
@@ -68,21 +66,16 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     @Override
     public int onStartCommand(Intent intent,int flags,int startId)
     {
-
-        if (comm == null)
-        {
-            comm = new CommunicationServer();
-        }
-
-        comm.setActionIntent(ACTION_SEND_TO_ACTIVITY);
-        comm.setService(this);
-        comm.start();
-
         clientReceiver = new ClientReceiver();
         serverReceiver = new ServerReceiver();
         networkChangeReceiver = new NetworkChangeReceiver();
         batteryChangeReceiver = new BatteryChangeReceiver();
 
+
+        schedSender = new ScheduleSender();
+        currentLocation = new Location("dummyprovider");
+        currentLocation.setLatitude(43.6122565);
+        currentLocation.setLongitude(7.0793731);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MainActivity.ACTION_SEND_TO_SERVER);
@@ -99,21 +92,18 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
         IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryChangeReceiver, ifilter);
 
-        //accelerometre
-
-        mSensorManagerCountStep = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManagerCountStep.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManagerCountStep.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
         super.onStartCommand(intent,flags,startId);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        if(onPromenade){
+    public void onSensorChanged(SensorEvent sensorEvent)
+    {
+        if(onPromenade)
+        {
             Sensor mySensor = sensorEvent.sensor;
 
-            if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            {
                 float x =  Math.abs(sensorEvent.values[0]);
                 float y =  Math.abs(sensorEvent.values[1]);
                 float z =  Math.abs(sensorEvent.values[2]);
@@ -125,45 +115,66 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 }
                 if ((curTime - lastUpdate) > maxTime) {
                     if(lastValeurCompteur != 0){
-                        if((valeurCompteur - lastValeurCompteur) < 5) {
+                        if(( (valeurCompteur - lastValeurCompteur) < 5) && connectionEtablishedWithServer)
+                        {
                             //Alerte Immobile
                             comm.sendMessage(IMMOBILE);
-                        }else{
+                        }else if (connectionEtablishedWithServer)
+                        {
                             comm.sendMessage(IMMOBILESTOP);
                         }
                     }
                     lastUpdate = curTime;
                     lastValeurCompteur = valeurCompteur;
                 }
-                Log.d(TAG,Float.toString(valeurCompteur));
+                Log.d("valeurCompteur",Float.toString(valeurCompteur));
             }
         }
     }
 
+    public void endTask(CommunicationServer comm,boolean success)
+    {
+        if (success)
+        {
+            this.comm = comm;
+        }
+        else
+        {
+            if (networkChangeReceiver.connectedNetwork)
+            {
+                connTask = new ConnectionTask(this);
+                connTask.doInBackground(null);
+            }
+        }
+    }
 
     @Override
-    public void onAccuracyChanged(Sensor mSensor, int accuracy) {
+    public void onAccuracyChanged(Sensor mSensor, int accuracy)
+    {
 
     }
+
     @Override
     public void onDestroy()
     {
         Log.e("DEAD","DEAD");
-        comm.interrupt();
+        if (comm != null)
+        {
+            comm.interrupt();
+        }
+
         if (onPromenade)
         {
-            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
-            lm.removeUpdates(this);
+            LocationManager lm = (LocationManager) ServiceSocket.this.getSystemService(LOCATION_SERVICE);
+            lm.removeUpdates(ServiceSocket.this);
+            schedSender.stopRemainder(this);
         }
-        mSensorManagerCountStep.unregisterListener(this);
+        connTask.cancel(true);
         unregisterReceiver(clientReceiver);
         unregisterReceiver(serverReceiver);
         unregisterReceiver(networkChangeReceiver);
         unregisterReceiver(batteryChangeReceiver);
-        if(timer != null){
-            timer.cancel();
-        }
+
         super.onDestroy();
     }
 
@@ -176,12 +187,13 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     @Override
     public void onLocationChanged(Location location)
     {
+        Log.wtf("location","LAT:"+location.getLatitude()+" LONG:"+location.getLongitude());
         currentLocation = location;
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras)
-    {
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
     }
 
     @Override
@@ -194,6 +206,16 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     public void onProviderDisabled(String provider)
     {
 
+    }
+
+    public void sendUpdate()
+    {
+        if (connectionEtablishedWithServer)
+        {
+            comm.sendMessage(POSITION + SEPARATOR + String.valueOf(currentLocation.getLongitude()) +
+                    SEPARATOR +
+                    String.valueOf(currentLocation.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
+        }
     }
 
     /**
@@ -213,33 +235,18 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
             boolean messageContinue = arg1.getBooleanExtra(CONTINUE + SEPARATOR + android_id, false);
             boolean stopSuivi = arg1.getBooleanExtra(STOPSUIVI, false);
 
-            if(stopSuivi){
+            if(stopSuivi && connectionEtablishedWithServer)
+            {
                 ServiceSocket.this.comm.sendMessage(STOPSUIVI);
-                if(timer != null){
-                    timer.cancel();
-                }
             }
-            if(startSuivi)
+            if(startSuivi && connectionEtablishedWithServer)
             {
                 ServiceSocket.this.comm.sendMessage(STARTSUIVI + SEPARATOR + android_id);
             }
-            if (messageContinue)
+            if (messageContinue && connectionEtablishedWithServer)
             {
-                ServiceSocket.this.comm = new CommunicationServer();
-                ServiceSocket.this.comm.setActionIntent(ACTION_SEND_TO_ACTIVITY);
-                ServiceSocket.this.comm.setService(ServiceSocket.this);
-                ServiceSocket.this.comm.start();
-                try {
-                    //Wait for input and output to be initialised in comm object
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 ServiceSocket.this.comm.sendMessage(CONTINUE + SEPARATOR + android_id);
             }
-
-
-
         }
 
     }
@@ -260,53 +267,41 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
             boolean startGps = arg1.getBooleanExtra(OKPROMENADE,false);
             boolean stop = arg1.getBooleanExtra(STOPSUIVI, false);
 
-            if(stop){
+            if (arg1.hasExtra(CONNECTED)) // si on recoit CONNECTED, alors on est bien enregistré chez le serveur
+            {
+                connectionEtablishedWithServer = true;
+                if (onPromenade) // si on est en promenade alors on envoie un CONTINUE
+                {
+                    ServiceSocket.this.comm.sendMessage(CONTINUE + SEPARATOR + android_id);
+                }
+            }
+
+            else if(stop) // si stop du serveur on coupe tout
+            {
+                ServiceSocket.this.comm.interrupt();
                 onPromenade = false;
+                schedSender.stopRemainder(ServiceSocket.this);
                 Intent messageForActivity = new Intent();
                 messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
                 messageForActivity.putExtra("KILL",true);
                 sendBroadcast(messageForActivity);
-                ServiceSocket.this.stopSelf();
-                try {
-                    ServiceSocket.this.comm.getSocket().close();
-                } catch (IOException e) {
-                    Log.e("Socket", "Oops");
-                    e.printStackTrace();
-                }
             }
 
-            if (startGps)
+            else if (startGps) // OKPROMENADE
             {
                 onPromenade = true;
-                timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(currentLocation != null && onPromenade && networkChangeReceiver.connected){
-                            comm.sendMessage(POSITION + SEPARATOR + String.valueOf(currentLocation.getLongitude()) +
-                                    SEPARATOR +
-                                    String.valueOf(currentLocation.getLatitude()) + SEPARATOR + batteryChangeReceiver.level);
-                        }
-                    }
-                }, DELAY, PERIOD);
-                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                    Intent intent = new Intent();
-                    intent.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
-                    intent.putExtra("ALERTGPS", true);
-                    sendBroadcast(intent);
-                }
-                checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,1,0);
-                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0,ServiceSocket.this);
+                Log.e("LOCATIONON","§§");
+                schedSender.startRemainder(ServiceSocket.this);
+                LocationManager lm = (LocationManager) ServiceSocket.this.getSystemService(LOCATION_SERVICE);
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,ServiceSocket.this);
 
             }
             else if (!startGps)
             {
-                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Log.e("LOCATIONOFF","**");
+                schedSender.stopRemainder(ServiceSocket.this);
+                LocationManager lm = (LocationManager) ServiceSocket.this.getSystemService(LOCATION_SERVICE);
                 lm.removeUpdates(ServiceSocket.this);
-                if(timer != null){
-                    timer.cancel();
-                }
             }
         }
 
@@ -318,15 +313,18 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
     public class NetworkChangeReceiver extends BroadcastReceiver {
 
         public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
-        private boolean connected = true;
+        public boolean connectedNetwork = false;
 
         @Override
-        public void onReceive(final Context context, final Intent intent) {
+        public void onReceive(final Context context, final Intent intent)
+        {
             int status = NetworkUtil.getConnectivityStatusString(context);
             if (CONNECTIVITY_CHANGED.equals(intent.getAction()))
             {
-                if(status==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
-                    connected = false;
+                if(status==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED)
+                {
+                    connectedNetwork = false;
+                    connectionEtablishedWithServer = false;
                     ServiceSocket.this.comm.interrupt();
                     Intent intent1 = new Intent();
                     intent1.setAction(ACTION_RECEIVE_FROM_SERVER);
@@ -335,19 +333,16 @@ public class ServiceSocket extends Service implements LocationListener, SensorEv
                 }
                 else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status== NetworkUtil.NETWORK_STATUS_WIFI)
                 {
-                    if(!connected && onPromenade){
-                        Intent intent1 = new Intent();
-                        intent1.setAction(MainActivity.ACTION_SEND_TO_SERVER);
-                        intent1.putExtra("CONTINUE*" + android_id, true);
-                        sendBroadcast(intent1);
-                        connected = true;
-                    }
+                    connectedNetwork = true;
+                    connTask = new ConnectionTask(ServiceSocket.this);
+                    connTask.doInBackground(null);
                 }
             }
         }
     }
 
-    public class BatteryChangeReceiver extends BroadcastReceiver {
+    public class BatteryChangeReceiver extends BroadcastReceiver
+    {
         public int level;
         @Override
         public void onReceive(Context context, Intent intent) {
