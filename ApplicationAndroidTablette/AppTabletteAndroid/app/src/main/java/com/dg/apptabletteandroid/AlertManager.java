@@ -62,7 +62,7 @@ public class AlertManager
         }
     }
 
-    private void sendNotification(Context context,String idTel,int idicone,String typeNotif,String titre,String message)
+    private void sendNotification(Context context,String idTel,int idicone,String typeNotif,String titre,String message, boolean makeSound)
     {
         Intent intent = new Intent(context,Main2Activity.class);
         intent.putExtra("WAKE_UP",typeNotif);
@@ -101,17 +101,22 @@ public class AlertManager
 //        RingtoneManager mRing = new RingtoneManager(context);
 //        int mNumberOfRingtones = mRing.getCursor().getCount();
 //        Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
-        Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context.getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+
+        if(makeSound) {
+            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context.getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
 
 
-        try {
-            mediaPlayer.stop();
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(context, defaultRingtoneUri);
-            mediaPlayer.prepare();
-            mediaPlayer.start(); // no need to call prepare(); create() does that for you
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                mediaPlayer.stop();
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setDataSource(context, defaultRingtoneUri);
+                mediaPlayer.prepare();
+                mediaPlayer.start(); // no need to call prepare(); create() does that for you
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
 
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
@@ -132,41 +137,41 @@ public class AlertManager
     public void notifNewSession(Context context,String idTel)
     {
         sendNotification(context,idTel,R.drawable.ic_report_problem_white,"NEWSESSION","Nouvelle promenade , id dispositif : "+idTel.substring(0,6),
-                "Configurer la promenade ?");
+                "Configurer la promenade ?",false);
     }
 
 
     public void notifHorsZone(boolean broadcastAlert,Context context,String idTel)
     {
         if (!broadcastAlert && !listen(idTel)) return;
-        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEHORSZONE","ALERTE - HORS ZONE","Hors zone detecté ! cliquez pour désactiver l'alerte");
+        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEHORSZONE","ALERTE - HORS ZONE","Hors zone detecté ! cliquez pour désactiver l'alerte", true);
     }
 
     public void notifBattery(boolean broadcastAlert,Context context, String idTel) {
         if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
-        sendNotification(context,idTel,R.drawable.ic_battery_alert,"ALERTEBATTERY","ALERTE - BATTERIE","Battery de " + profil.getPrenom() + " " + profil.getNom() + " est faible!");
+        sendNotification(context,idTel,R.drawable.ic_battery_alert,"ALERTEBATTERY","ALERTE - BATTERIE","Battery de " + profil.getPrenom() + " " + profil.getNom() + " est faible!", true);
     }
     public void notifImmobile(boolean broadcastAlert,Context context, String idTel)
     {
         if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
         profil.setImmobile(true);
-        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEIMMOBILE","ALERTE - IMMOBILITE",profil.getPrenom() + " " + profil.getNom() + " est immobile!\"");
+        sendNotification(context,idTel,R.drawable.ic_report_problem_white,"ALERTEIMMOBILE","ALERTE - IMMOBILITE",profil.getPrenom() + " " + profil.getNom() + " est immobile!\"", true);
 
     }
 
     public void notifPromenadeTimeout(boolean broadcastAlert,Context baseContext, String idTel) {
         if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
-        sendNotification(baseContext,idTel,R.drawable.ic_directions_walk,"ALERTEPROMENADETIMEOUT","ALERTE - PROMENADE TERMINEE",profil.getPrenom() + " " + profil.getNom() + " a terminé la promenade");
+        sendNotification(baseContext,idTel,R.drawable.ic_directions_walk,"ALERTEPROMENADETIMEOUT","ALERTE - PROMENADE TERMINEE",profil.getPrenom() + " " + profil.getNom() + " a terminé la promenade", true);
     }
 
     public void notifTimeoutUpdate(boolean broadcastAlert,Context baseContext, String idTel)
     {
         if (!broadcastAlert && !listen(idTel)) return;
         Profil profil = Main2Activity.profilsManager.getProfilOnPromenade(idTel);
-        sendNotification(baseContext,idTel,R.drawable.ic_report_problem_white,"ALERTETIMEOUTUPDATE","ALERTE - PERTE SUIVI",profil.getPrenom() + " " + profil.getNom() + " ne répond plus depuis au moins 20 secondes !");
+        sendNotification(baseContext,idTel,R.drawable.ic_report_problem_white,"ALERTETIMEOUTUPDATE","ALERTE - PERTE SUIVI",profil.getPrenom() + " " + profil.getNom() + " ne répond plus depuis au moins 20 secondes !", true);
     }
 
     public void clear()

@@ -104,6 +104,15 @@ public class MapFragment_ extends BlankFragment
 
         //  Get back the mutable Polygon
         Polygon limitDuCentre = googleMap.addPolygon(rectOptions);
+
+        // affichage Bariere
+        /*CircleOptions c = new CircleOptions()
+                                .center(new LatLng(43.612549, 7.07977))
+                                .radius(8.219290934885054)  // In meters
+                                .strokeColor(Color.MAGENTA)
+                                .strokeWidth(1);
+        googleMap.addCircle(c); */
+
     }
 
 
