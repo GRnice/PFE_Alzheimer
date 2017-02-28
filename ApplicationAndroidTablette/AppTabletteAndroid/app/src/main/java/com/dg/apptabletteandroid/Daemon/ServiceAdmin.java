@@ -1,5 +1,6 @@
 package com.dg.apptabletteandroid.Daemon;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,6 +15,8 @@ import com.dg.apptabletteandroid.AlertManager;
 import com.dg.apptabletteandroid.Communication.CommunicationServer;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.NetworkUtil;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -455,6 +458,20 @@ public class ServiceAdmin extends Service
                         alertManager.notifNewSession(getBaseContext(), content);
                         break;
                     }
+
+                    case "STOPNEWSESSION": {
+                        NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        String[] contenu = content.split("\\*");
+                        String idTel = contenu[0];
+                        for(String alert : (ArrayList<String>)AlertManager.idTelAlertes.get(idTel).clone()){
+                            if(alert.contains("NEWSESSION")){
+                                String[] alertID = alert.split("\\$");
+                                String idNotif = alertID[1];
+                                notifManager.cancel(Integer.parseInt(idNotif));
+                                AlertManager.idTelAlertes.get(contenu[0]).remove(alert);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -567,6 +584,11 @@ public class ServiceAdmin extends Service
             if(arg1.hasExtra("CHECKALERT")) {
                 String idTel = arg1.getStringExtra("CHECKALERT");  // ancienProfil*nouveauProfil
                 comm.sendMessage("CHECKALERT$" + idTel);
+            }
+
+            if(arg1.hasExtra("NEW_SESSION")){
+                String idNotifEtTel = arg1.getStringExtra("NEW_SESSION");  // ancienProfil*nouveauProfil
+                comm.sendMessage("STOPNEWSESSION$" + idNotifEtTel);
             }
         }
     }
