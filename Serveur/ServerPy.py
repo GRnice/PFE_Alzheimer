@@ -75,12 +75,14 @@ class Tracker: ## Classe representant un tracker
         if self.etat == 2:
             self.reset()
             return True
-
         if self.etat == 1:
-            raise PermissionError("stopPromenade appelé, mais une demande de suivi a été envoyée et attend une réponse")
+            print("annulation promenade")
+            self.reset()
+            return True
 
         if self.etat == 0:
-            raise PermissionError("stopPromenade appelé, mais le tracker est anonyme")
+            return False
+            print("Annulation alors que le tracker est anonyme")
 
     def startSuiviCalled(self,idTel,lastemit):
         if self.etat == 0:
@@ -90,22 +92,12 @@ class Tracker: ## Classe representant un tracker
             return True
 
         if self.etat == 1:
-            raise PermissionError("startSuiviCalled appelé , mais le tracker a deja émit une demande de suivi et attend une réponse")
+            print("startSuiviCalled appelé , mais le tracker a deja émit une demande de suivi et attend une réponse")
+            return False
 
         if self.etat == 2:
             raise PermissionError("startSuiviCalled appelé , mais le tracker est en cours de promenade")
 
-
-    def startSuiviAborted(self):
-        if self.etat == 1:
-            self.etat = 0
-            return True
-
-        if self.etat == 0:
-            raise PermissionError("startSuiviAborted appelé , mais aucune demande de suivi n'a été formulée pour ce tracker")
-
-        if self.etat == 2:
-            raise PermissionError("startSuiviAborted appelé , mais le tracker en cours de promenade")
 
     def updatePosition(self,position,timeupdate, battery,tempsCourant):
         self.position = position
@@ -216,8 +208,9 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     index = listeSock.index(sockPatient)
                     listeSock.pop(index)
 
-            del self.mapIdSock[tracker.id]
-            self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
+            if  tracker.id in list(self.mapIdSock.keys()):
+                del self.mapIdSock[tracker.id]
+                self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
 
 
     def apply(self,commande):
@@ -237,7 +230,9 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         if (entete == "STARTSUIVI"):
             idTel = requeteArray[1]
             tracker = self.getTracker(socket)
-            tracker.startSuiviCalled(idTel,None)
+            if(not tracker.startSuiviCalled(idTel,None)):
+                return # probleme , demande deja faite ou deja en promenade
+            
             self.mapIdSock[idTel] = socket
 
             #print("Demarrage du suivi pour le tel à l'id : ",idTel)
@@ -289,9 +284,11 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
 
         elif (entete == "STOPSUIVI"):
             tracker = self.getTracker(socket)
-            self.removePatient(socket)
-            tracker.stopPromenade()
-            tracker.lastEmit = time.time()
+            if tracker.etat != 0:
+                self.removePatient(socket)
+                tracker.stopPromenade()
+                tracker.lastEmit = time.time()
+                print("YAP")
             #print("le tracker ayant l'id :",tracker.id," a terminé la promenade")
             socket.send("STOPSUIVI\r\n".encode('utf-8'))
 
@@ -341,7 +338,8 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
                     self.mapIdSock[idTel] = socket
                     self.dictSocketPatient[socket] = nwTracker
                     self.updateSocketPatient(oldSocket,socket)
-                    socket.send("OKPROMENADE\r\n".encode('utf-8'))
+                    if (nwTracker.etat == 2):
+                        socket.send("OKPROMENADE\r\n".encode('utf-8'))
                     break
                 
 

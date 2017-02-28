@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.provider.Settings;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
 
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String ACTION_SEND_TO_SERVER = "DATA_TO_SERVICE";
     private int etat = 0;
     private Button buttonSwitchConnexion;
+    private TextView textViewInfo;
     private ServiceListenerReceiver serviceListener;
 
     public static String android_id;
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         TextView androidIdView = (TextView) findViewById(R.id.textViewIdentifiantTitle);
+        textViewInfo = (TextView) findViewById(R.id.textViewInfo);
 
         androidIdView.setText("Identifiant : "+android_id.substring(0,6));
 
@@ -64,11 +68,8 @@ public class MainActivity extends AppCompatActivity {
                     intent.setAction(ACTION_SEND_TO_SERVER);
                     intent.putExtra(STARTSUIVI + "*" + android_id, true);
                     sendBroadcast(intent);
-
-                    buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
-                    etat = 1;
                 }
-                else
+                else if (etat == 1 || etat == 2)
                 {
                     etat = 0;
                     Intent intent = new Intent();
@@ -113,8 +114,23 @@ public class MainActivity extends AppCompatActivity {
         buttonSwitchConnexion = (Button) findViewById(R.id.button);
         if (etat == 1)
         {
-            buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
+            buttonSwitchConnexion.setText("ANNULER LA DEMANDE DE SUIVI");
+            textViewInfo.setText("En attente de configuration de la promenade ...");
+            textViewInfo.setTextColor(Color.argb(255,255,127,80));
         }
+        else if (etat == 2)
+        {
+            buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
+            textViewInfo.setText("PROMENADE EN COURS");
+            textViewInfo.setTextColor(Color.argb(255,50,205,50));
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        Toast.makeText(this,"Arretez le suivi pour arreter l'application",Toast.LENGTH_LONG).show();
+        return;
     }
 
     @Override
@@ -148,7 +164,22 @@ public class MainActivity extends AppCompatActivity {
                 stopService(intentServiceSocket);
                 MainActivity.this.finishAffinity();
             }
-            if(showAlert){
+            else if (intent.hasExtra("OKPROMENADE"))
+            {
+                buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
+                textViewInfo.setText("PROMENADE EN COURS");
+                textViewInfo.setTextColor(Color.argb(255,50,205,50));
+                etat = 2;
+            }
+            else if (intent.hasExtra("DEMANDESUIVISENT"))
+            {
+                textViewInfo.setText("En attente de configuration de la promenade ...");
+                textViewInfo.setTextColor(Color.argb(255,255,127,80));
+                etat = 1;
+                buttonSwitchConnexion.setText("ANNULER LA DEMANDE DE SUIVI");
+            }
+
+            else if (showAlert){
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Vous devez activer le GPS. Voulez-vous l'activer maintenant?")
                         .setCancelable(false)

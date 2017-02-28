@@ -6,7 +6,8 @@
     android:orientation="vertical"
     android:weightSum="1"
     tools:context="com.dg.gpsalzheimersmartphone.MainActivity"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:id="@+id/linlayout">
 
 
     <TextView
@@ -18,11 +19,22 @@
         android:gravity="center_vertical"
         android:textSize="30sp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0px"
+        android:id="@+id/textViewInfo"
+        android:layout_weight="0.2"
+        android:gravity="fill_vertical"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:textColorHighlight="@android:color/black" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:layout_weight="0.8"
+        android:layout_weight="0.6"
         android:text="Activer le suivi"
         android:id="@+id/button"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textSize="18sp" />
 </LinearLayout>

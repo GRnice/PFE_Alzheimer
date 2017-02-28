@@ -47,6 +47,7 @@ public class ServiceSocket extends Service implements LocationListener,
     private ServerReceiver serverReceiver;
     private NetworkChangeReceiver networkChangeReceiver;
     private BatteryChangeReceiver batteryChangeReceiver;
+    private boolean identifiedByServer;
     private boolean onPromenade;
     private boolean connectionEtablishedWithServer;
 
@@ -71,6 +72,7 @@ public class ServiceSocket extends Service implements LocationListener,
         networkChangeReceiver = new NetworkChangeReceiver();
         batteryChangeReceiver = new BatteryChangeReceiver();
 
+        identifiedByServer = false;
 
         schedSender = new ScheduleSender();
         currentLocation = new Location("dummyprovider");
@@ -238,10 +240,16 @@ public class ServiceSocket extends Service implements LocationListener,
             if(stopSuivi && connectionEtablishedWithServer)
             {
                 ServiceSocket.this.comm.sendMessage(STOPSUIVI);
+                identifiedByServer = false;
             }
             if(startSuivi && connectionEtablishedWithServer)
             {
                 ServiceSocket.this.comm.sendMessage(STARTSUIVI + SEPARATOR + android_id);
+                Intent messageForActivity = new Intent();
+                messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
+                messageForActivity.putExtra("DEMANDESUIVISENT","");
+                sendBroadcast(messageForActivity);
+                identifiedByServer = true;
             }
             if (messageContinue && connectionEtablishedWithServer)
             {
@@ -270,7 +278,7 @@ public class ServiceSocket extends Service implements LocationListener,
             if (arg1.hasExtra(CONNECTED)) // si on recoit CONNECTED, alors on est bien enregistré chez le serveur
             {
                 connectionEtablishedWithServer = true;
-                if (onPromenade) // si on est en promenade alors on envoie un CONTINUE
+                if (identifiedByServer)
                 {
                     ServiceSocket.this.comm.sendMessage(CONTINUE + SEPARATOR + android_id);
                 }
@@ -280,6 +288,7 @@ public class ServiceSocket extends Service implements LocationListener,
             {
                 ServiceSocket.this.comm.interrupt();
                 onPromenade = false;
+                identifiedByServer = false;
                 schedSender.stopRemainder(ServiceSocket.this);
                 Intent messageForActivity = new Intent();
                 messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
@@ -289,11 +298,16 @@ public class ServiceSocket extends Service implements LocationListener,
 
             else if (startGps) // OKPROMENADE
             {
+                identifiedByServer = true;
                 onPromenade = true;
                 Log.e("LOCATIONON","§§");
                 schedSender.startRemainder(ServiceSocket.this);
                 LocationManager lm = (LocationManager) ServiceSocket.this.getSystemService(LOCATION_SERVICE);
                 lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,ServiceSocket.this);
+                Intent messageForActivity = new Intent();
+                messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
+                messageForActivity.putExtra("OKPROMENADE","");
+                sendBroadcast(messageForActivity);
 
             }
             else if (!startGps)
@@ -325,13 +339,17 @@ public class ServiceSocket extends Service implements LocationListener,
                 {
                     connectedNetwork = false;
                     connectionEtablishedWithServer = false;
-                    ServiceSocket.this.comm.interrupt();
+                    if (ServiceSocket.this.comm != null)
+                    {
+                        ServiceSocket.this.comm.interrupt();
+
+                    }
                     Intent intent1 = new Intent();
                     intent1.setAction(ACTION_RECEIVE_FROM_SERVER);
                     intent1.putExtra(OKPROMENADE, false);
                     sendBroadcast(intent1);
                 }
-                else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status== NetworkUtil.NETWORK_STATUS_WIFI)
+                else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status == NetworkUtil.NETWORK_STATUS_WIFI)
                 {
                     connectedNetwork = true;
                     connTask = new ConnectionTask(ServiceSocket.this);
@@ -345,7 +363,8 @@ public class ServiceSocket extends Service implements LocationListener,
     {
         public int level;
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, Intent intent)
+        {
             level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         }
     }
