@@ -170,7 +170,7 @@ public class ServiceAdmin extends Service
                                 alertManager.notifHorsZone(broadcastAlerte,getBaseContext(),idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("HORSZONE",true);
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
@@ -185,7 +185,7 @@ public class ServiceAdmin extends Service
                             {
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("HORSZONE",false);
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
@@ -336,18 +336,20 @@ public class ServiceAdmin extends Service
 
                             case "SYNCH-CONTINUE":
                             {
-                                String[] allProfilsEnPromenade = dataParams[1].split("\\*");
-                                Arrays.deepToString(allProfilsEnPromenade);
-                                if (allProfilsEnPromenade.length > 0)
-                                {
-                                    Arrays.deepToString(allProfilsEnPromenade);
-                                }
-
-
+                                String[] allProfilsEnPromenade = null;
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                                 intent.putExtra("SYNCHCONTINUE", "");
-                                intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsEnPromenade);
+
+                                if (dataParams[1].equals("NONE"))
+                                {
+                                    intent.putExtra("SYNCH-NOPROMENADES",true);
+                                }
+                                else
+                                {
+                                    allProfilsEnPromenade = dataParams[1].split("\\*");
+                                    intent.putExtra("SYNCH-ALLPROFILSPROMENADE",allProfilsEnPromenade);
+                                }
 
                                 if (activity_is_on_background)
                                 {

@@ -332,6 +332,9 @@ class AssistanceServer(Thread):
 
                                     if message != "":
                                         sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
+                                    else:
+                                        print("continue avec 0 promenades")
+                                        sock.send("SYNCH$SYNCH-CONTINUE_NONE\r\n".encode('utf-8'))
 
                                 elif message[0] == "CHECKALERT":
                                     print("CHECKALERT")
