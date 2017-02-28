@@ -3,10 +3,13 @@ import time
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.connect(("127.0.0.1",3000))
+message = sock.recv(4096) # attente du CONNECTED
+print(message.decode('utf-8'))
 idtel = input("entrez IDTEL:")
 sock.send(("STARTSUIVI*"+str(idtel)+"\r\n").encode())
 #19
-sock.recv(4096) # attente du OKPROMENADE
+message = sock.recv(4096) # attente du OKPROMENADE
+print(message.decode('utf-8'))
 input("envoyer premiere position")
 sock.send("POSITION*7.079131*43.612139*100\r\n".encode())  ## 43.612139, 7.079131
 input("envoyer deuxieme position")
@@ -36,7 +39,9 @@ sock.send("POSITION*7.079235*43.612590*100\r\n".encode())  ## 43.612590, 7.07923
 
 input("envoyer stop suivi et fermer le socket")
 sock.send("STOPSUIVI\r\n".encode())
-sock.recv(4096) # attente du STOPSUIVI
+m = sock.recv(4096) # attente du STOPSUIVI
+print(m.decode('utf-8'))
+time.sleep(0.1)
 sock.close()
 
 
