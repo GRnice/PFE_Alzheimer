@@ -154,7 +154,8 @@ public class AdapterListingMap extends ArrayAdapter
             alerte.setVisibility(View.VISIBLE);
             rowView.setBackgroundColor(Color.YELLOW);
             alerteImmobilite.setVisibility(View.VISIBLE);
-        }else if(profil.getTempsRestant() <= 0){
+        }
+        if(profil.getTempsRestant() <= 0){
             rowView.setBackgroundColor(Color.YELLOW);
         }
         // jaune
@@ -173,7 +174,7 @@ public class AdapterListingMap extends ArrayAdapter
             alerteHorsZone.setVisibility(View.VISIBLE);
             rowView.setBackgroundColor(Color.argb(128,255,80,41));
         }
-        else if (profil.updateIsTimeout())
+        if (profil.updateIsTimeout())
         {
             alerte.setVisibility(View.VISIBLE);
             alertePerte.setVisibility(View.VISIBLE);

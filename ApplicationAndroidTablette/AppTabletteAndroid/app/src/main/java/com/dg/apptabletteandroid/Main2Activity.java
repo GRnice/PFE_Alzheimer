@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -207,7 +208,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 Intent intentServiceSocket = new Intent(Main2Activity.this,ServiceAdmin.class);
                 stopService(intentServiceSocket);
                 profilsManager.clearPromenade();
-                finish();
+                finishAffinity();
             }
         }
         // else if (id == R.id.nav_share) {} else if (id == R.id.nav_send) {}
@@ -462,7 +463,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 // Un appel HORSZONE indique qu'il y a hors zone, un deuxieme dit le contraire
                 String idTelHorsZone = arg1.getStringExtra("IDTEL");
                 Profil profilHorsZone = profilsManager.getAllProfilsOnPromenade().get(idTelHorsZone);
-                profilHorsZone.setHorsZone(! profilHorsZone.isHorsZone());
+                profilHorsZone.setHorsZone(arg1.getBooleanExtra("HORSZONE",false));
 
                 if (fragmentManager.getCurrentFragment() instanceof MapFragment_)
                 {
@@ -550,11 +551,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             }
             else if (arg1.hasExtra("SYNCHCONTINUE"))
             {
-                String[] profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
+                String[] profilsEnPromenade = null;
+                if (!arg1.hasExtra("SYNCH-NOPROMENADES"))
+                {
+                    profilsEnPromenade = arg1.getStringArrayExtra("SYNCH-ALLPROFILSPROMENADE");
+                }
+
                 RefitAgent.fix(Main2Activity.this,profilsEnPromenade);
                 Fragment fragmap = MapFragment_.newInstance();
                 fragmentManager.pushFragment(fragmap,Main2Activity.this);
-
             }
 
             // True si onReceive est appellé lors d'une procedure de synchronisation de l'activité suite à son retour en premier plan

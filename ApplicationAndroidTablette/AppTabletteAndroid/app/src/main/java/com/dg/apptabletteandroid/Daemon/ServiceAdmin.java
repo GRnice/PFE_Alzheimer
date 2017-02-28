@@ -170,7 +170,7 @@ public class ServiceAdmin extends Service
                                 alertManager.notifHorsZone(broadcastAlerte,getBaseContext(),idTel);
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("HORSZONE",true);
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
@@ -185,7 +185,7 @@ public class ServiceAdmin extends Service
                             {
                                 Intent intent = new Intent();
                                 intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
-                                intent.putExtra("HORSZONE","");
+                                intent.putExtra("HORSZONE",false);
                                 intent.putExtra("IDTEL", idTel);
                                 if (activity_is_on_background)
                                 {
