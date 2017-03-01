@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,15 +91,24 @@ public class ConfigPromenade extends BlankFragment {
             public void onClick(View view)
             {
                 EditText duration = (EditText) v.findViewById(R.id.entry_temps_promenade);
-
+                EditText tempsImobilite = (EditText) v.findViewById(R.id.entry_temps_immobilite);
+                if (duration.getText().toString().equals("") || tempsImobilite.getText().toString().equals(""))
+                {
+                    Toast.makeText(getActivity(),"Tous les champs doivent etre remplis",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 try{
                     Integer.parseInt(duration.getText().toString());
+                    Integer.parseInt(tempsImobilite.getText().toString());
                 }
                 catch(NumberFormatException err)
                 {
-                    Toast.makeText(getActivity(),"Durée de la promenade incorrecte",Toast.LENGTH_LONG).show();
+                    Toast msg = Toast.makeText(getActivity(),"Valeur incorrecte dans au moins un des champs",Toast.LENGTH_LONG);
+                    msg.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                    msg.show();
                     return;
                 }
+
                 EditText max =(EditText) v.findViewById(R.id.entry_temps_immobilite);
                 Intent intent = new Intent();
                 intent.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);

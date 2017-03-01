@@ -491,14 +491,14 @@ public class ServiceAdmin extends Service
 
                     case "STOPNEWSESSION": {
                         NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        String[] contenu = content.split("\\*");
-                        String idTel = contenu[0];
+
+                        String idTel = content;
                         for(String alert : (ArrayList<String>)AlertManager.idTelAlertes.get(idTel).clone()){
                             if(alert.contains("NEWSESSION")){
                                 String[] alertID = alert.split("\\$");
                                 String idNotif = alertID[1];
                                 notifManager.cancel(Integer.parseInt(idNotif));
-                                AlertManager.idTelAlertes.get(contenu[0]).remove(alert);
+                                AlertManager.idTelAlertes.get(idTel).remove(alert);
                             }
                         }
                     }
@@ -614,11 +614,6 @@ public class ServiceAdmin extends Service
             if(arg1.hasExtra("CHECKALERT")) {
                 String idTel = arg1.getStringExtra("CHECKALERT");  // ancienProfil*nouveauProfil
                 comm.sendMessage("CHECKALERT$" + idTel);
-            }
-
-            if(arg1.hasExtra("NEW_SESSION")){
-                String idNotifEtTel = arg1.getStringExtra("NEW_SESSION");  // ancienProfil*nouveauProfil
-                comm.sendMessage("STOPNEWSESSION$" + idNotifEtTel);
             }
         }
     }

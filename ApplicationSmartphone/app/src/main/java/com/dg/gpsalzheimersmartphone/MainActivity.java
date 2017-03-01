@@ -13,12 +13,14 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.dg.gpsalzheimersmartphone.CommunicationServer.STOPSUIVI;
+import static java.lang.Thread.MAX_PRIORITY;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String ACTION_SEND_TO_SERVER = "DATA_TO_SERVICE";
     private int etat = 0;
     private Button buttonSwitchConnexion;
+    private boolean connected;
     private TextView textViewInfo;
     private ServiceListenerReceiver serviceListener;
 
@@ -62,8 +65,17 @@ public class MainActivity extends AppCompatActivity {
         buttonSwitchConnexion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!connected)
+                {
+                    Toast msg = Toast.makeText(MainActivity.this,"Necessite une connexion réseau",Toast.LENGTH_LONG);
+                    msg.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                    msg.show();
+                    return;
+                }
+
                 if(etat == 0)
                 {
+
                     Intent intent = new Intent();
                     intent.setAction(ACTION_SEND_TO_SERVER);
                     intent.putExtra(STARTSUIVI + "*" + android_id, true);
@@ -171,6 +183,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intentServiceSocket = new Intent(MainActivity.this,ServiceSocket.class);
                 stopService(intentServiceSocket);
                 MainActivity.this.finishAffinity();
+            }
+            else if (intent.hasExtra("SERVICECONNECTION"))
+            {
+                connected = intent.getBooleanExtra("SERVICECONNECTION",false);
             }
             else if (intent.hasExtra("OKPROMENADE"))
             {

@@ -40,6 +40,7 @@ class AssistanceServer(Thread):
     # emet un message à tous les assistants
     def broadcast(self,messageString):
         allAssistants = self.mapper.getSocketsAssistant()
+        print("allassistant size",len(list(allAssistants)))
         for assistant in allAssistants:
             try:
                 assistant.send(messageString.encode("utf-8"))
@@ -200,6 +201,7 @@ class AssistanceServer(Thread):
             tracker = self.mapper.getTrackerById(idTel)
 
             if (tracker.etat == 1): # le premier qui défini le profil du device
+                self.broadcastFilter("STOPNEWSESSION$" + idTel + "\r\n", sockAssistant)
                 tracker.startPromenade(nom,prenom,duree,risqueBarriere)
                 print("OKPROMENADE POUR ",tracker.id)
                 sockPatient.send(("OKPROMENADE*" + tempsImmobile + "\r\n").encode("utf-8"))
@@ -342,9 +344,7 @@ class AssistanceServer(Thread):
                                     tracker = self.mapper.getTrackerById(message[1])
                                     if tracker != None and tracker.etat == 2:
                                         self.mapper.getTrackerById(message[1]).lastAlert = None
-                                elif message[0] == "STOPNEWSESSION":
-                                    print("STOPNEWSESSION")
-                                    self.broadcastFilter("STOPNEWSESSION$" + message[1] + "\r\n", sock)
+
                             else:
                                 print("Assistant (%s) is offline" % sock)
                                 sock.close()

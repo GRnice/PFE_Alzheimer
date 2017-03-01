@@ -135,6 +135,11 @@ public class ServiceSocket extends Service implements LocationListener,
         if (success)
         {
             this.comm = commnw;
+            Intent messageForActivity = new Intent();
+            messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
+            messageForActivity.putExtra("SERVICECONNECTION",true);
+            sendBroadcast(messageForActivity);
+
         }
         else
         {
@@ -334,6 +339,11 @@ public class ServiceSocket extends Service implements LocationListener,
             {
                 if(status==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED)
                 {
+                    Intent messageForActivity = new Intent();
+                    messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
+                    messageForActivity.putExtra("SERVICECONNECTION",false);
+                    sendBroadcast(messageForActivity);
+
                     connectedNetwork = false;
                     connectionEtablishedWithServer = false;
                     if (ServiceSocket.this.comm != null)
