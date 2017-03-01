@@ -5,12 +5,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.drm.DrmStore;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 
 import com.dg.apptabletteandroid.Profils.Profil;
@@ -103,15 +105,22 @@ public class AlertManager
 //        Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
 
         if(makeSound) {
-            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context.getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+
+            if (defaultRingtoneUri == null)
+            {
+                defaultRingtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            }
 
 
-            try {
+            try
+            {
                 mediaPlayer.stop();
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(context, defaultRingtoneUri);
                 mediaPlayer.prepare();
-                mediaPlayer.start(); // no need to call prepare(); create() does that for you
+                mediaPlayer.setLooping(false);
+                mediaPlayer.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
