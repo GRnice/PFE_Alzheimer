@@ -102,6 +102,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             String idTel = intent.getStringExtra("IDTEL");
             Fragment profilFragment = ProfilFragment.newInstance(profilsManager,true,idTel);
             fragmentManager.pushFragment(profilFragment,this);
+            Intent intentToService = new Intent();
+            intentToService.setAction(ServiceAdmin.ACTION_FROM_ACTIVITY);
+            intentToService.putExtra("NEW_SESSION", idTel);
+            sendBroadcast(intentToService);
         }
 
         Intent intentAlerteGeree = new Intent();

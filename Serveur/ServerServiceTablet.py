@@ -342,6 +342,9 @@ class AssistanceServer(Thread):
                                     tracker = self.mapper.getTrackerById(message[1])
                                     if tracker != None and tracker.etat == 2:
                                         self.mapper.getTrackerById(message[1]).lastAlert = None
+                                elif message[0] == "STOPNEWSESSION":
+                                    print("STOPNEWSESSION")
+                                    self.broadcastFilter("STOPNEWSESSION$" + message[1] + "\r\n", sock)
                             else:
                                 print("Assistant (%s) is offline" % sock)
                                 sock.close()
