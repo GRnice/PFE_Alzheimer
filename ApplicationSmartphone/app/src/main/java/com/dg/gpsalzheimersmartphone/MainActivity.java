@@ -143,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
     {
         if (etat == 0)
         {
-            Intent intentServiceSocket = new Intent(this,ServiceSocket.class);
-            stopService(intentServiceSocket);
             this.finishAffinity();
         }
         else
@@ -156,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy()
     {
+		Intent intentServiceSocket = new Intent(this,ServiceSocket.class);
+        stopService(intentServiceSocket);
         unregisterReceiver(serviceListener);
         super.onDestroy();
     }

@@ -46,6 +46,8 @@ class AssistanceServer(Thread):
                 assistant.send(messageString.encode("utf-8"))
             except ConnectionResetError as err:
                 self.removeAssistant(assistant)
+            except BrokenPipeError as err:
+                print("brokenpipeerror")
 
     # emet un message à tous les assistants sauf à l'assistant socketAssistant
 
@@ -58,6 +60,8 @@ class AssistanceServer(Thread):
                     assistant.send(messageString.encode("utf-8"))
                 except ConnectionResetError as err:
                     self.removeAssistant(assistant)
+                except BrokenPipeError as err:
+                    print("brokenpipeerror")
                 
 
 
