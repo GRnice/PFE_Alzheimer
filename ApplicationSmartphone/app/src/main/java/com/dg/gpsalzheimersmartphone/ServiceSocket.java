@@ -37,10 +37,7 @@ public class ServiceSocket extends Service implements LocationListener,
     final public static String ACTION_SEND_TO_ACTIVITY = "DATA_TO_ACTIVITY";
     final public static String ACTION_RECEIVE_FROM_SERVER = "RECEIVE_FROM_SERVER";
     final public static String MESSAGE_FROM_SERVICE = "DATA_FROM_SERVICE";
-    //Delay du premier envoie de location
-    public static final int DELAY = 2000;
-    //Période de temps entre envoie de deux updates
-    public static final int PERIOD = 5000;
+
     public static long maxTime;
     private CommunicationServer comm;
     private ClientReceiver clientReceiver;
@@ -58,7 +55,6 @@ public class ServiceSocket extends Service implements LocationListener,
     private float lastValeurCompteur;
     public Location currentLocation;
     private ScheduleSender schedSender;
-    private ConnectionTask connTask;
 
     public ServiceSocket()
     {
@@ -134,18 +130,20 @@ public class ServiceSocket extends Service implements LocationListener,
         }
     }
 
-    public void endTask(CommunicationServer comm,boolean success)
+    public void endTask(CommunicationServer commnw,boolean success)
     {
         if (success)
         {
-            this.comm = comm;
+            this.comm = commnw;
         }
         else
         {
             if (networkChangeReceiver.connectedNetwork)
             {
-                connTask = new ConnectionTask(this);
-                connTask.doInBackground(null);
+                CommunicationServer comm = new CommunicationServer(10000);
+                comm.setActionIntent(ServiceSocket.ACTION_SEND_TO_ACTIVITY);
+                comm.setService(this);
+                comm.start();
             }
         }
     }
@@ -171,7 +169,7 @@ public class ServiceSocket extends Service implements LocationListener,
             lm.removeUpdates(ServiceSocket.this);
             schedSender.stopRemainder(this);
         }
-        connTask.cancel(true);
+
         unregisterReceiver(clientReceiver);
         unregisterReceiver(serverReceiver);
         unregisterReceiver(networkChangeReceiver);
@@ -249,7 +247,6 @@ public class ServiceSocket extends Service implements LocationListener,
                 messageForActivity.setAction(ServiceSocket.MESSAGE_FROM_SERVICE);
                 messageForActivity.putExtra("DEMANDESUIVISENT","");
                 sendBroadcast(messageForActivity);
-                identifiedByServer = true;
             }
             if (messageContinue && connectionEtablishedWithServer)
             {
@@ -342,6 +339,7 @@ public class ServiceSocket extends Service implements LocationListener,
                     if (ServiceSocket.this.comm != null)
                     {
                         ServiceSocket.this.comm.interrupt();
+                        comm = null;
 
                     }
                     Intent intent1 = new Intent();
@@ -352,8 +350,10 @@ public class ServiceSocket extends Service implements LocationListener,
                 else if(status==NetworkUtil.NETWORK_STATUS_MOBILE || status == NetworkUtil.NETWORK_STATUS_WIFI)
                 {
                     connectedNetwork = true;
-                    connTask = new ConnectionTask(ServiceSocket.this);
-                    connTask.doInBackground(null);
+                    CommunicationServer comm = new CommunicationServer();
+                    comm.setActionIntent(ServiceSocket.ACTION_SEND_TO_ACTIVITY);
+                    comm.setService(ServiceSocket.this);
+                    comm.start();
                 }
             }
         }

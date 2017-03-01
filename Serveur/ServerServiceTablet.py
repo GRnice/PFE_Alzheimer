@@ -260,12 +260,13 @@ class AssistanceServer(Thread):
                         # a "Connection reset by peer" exception will be thrown
                         data = sock.recv(self.RECV_BUFFER)
                         tabdata = data.decode('utf-8').rstrip().split("\r\n")
-                        print(tabdata)
+                        print("-->",tabdata)
                         for data in tabdata:
 
                             if len(data) > 0:
 
                                 message = data.rstrip().split("$")
+                                
                                 # Si c'est un follow
                                 if message[0] == "FOLLOW":
                                     print('follow received')
@@ -329,7 +330,7 @@ class AssistanceServer(Thread):
                                             tracker = self.mapper.getTracker(socketPatient)
                                             message += tracker.toString()
                                             message += "*"
-
+                
                                     if message != "":
                                         sock.send(("SYNCH$SYNCH-CONTINUE_"+message[0:-1]+"\r\n").encode('utf-8'))
                                     else:

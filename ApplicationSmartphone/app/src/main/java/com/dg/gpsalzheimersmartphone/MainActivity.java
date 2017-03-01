@@ -129,8 +129,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        Toast.makeText(this,"Arretez le suivi pour arreter l'application",Toast.LENGTH_LONG).show();
-        return;
+        if (etat == 0)
+        {
+            Intent intentServiceSocket = new Intent(this,ServiceSocket.class);
+            stopService(intentServiceSocket);
+            this.finishAffinity();
+        }
+        else
+        {
+            Toast.makeText(this,"Arretez le suivi pour arreter l'application",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
