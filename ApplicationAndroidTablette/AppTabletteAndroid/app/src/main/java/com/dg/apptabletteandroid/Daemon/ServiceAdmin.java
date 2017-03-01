@@ -27,6 +27,8 @@ public class ServiceAdmin extends Service
     NetworkChangeReceiver networkReceiver; // ce receiver recevra l'etat de la connection de la tablette
     AlertManager alertManager; // le manager des alertes
     DataKeeper dataKeeper; // stocke tous les messages recus en attendant que l'activite revienne en premier plan
+    public boolean premiereConnexion = true;
+    public boolean establishedConnexionWithServer = false;
 
     boolean activity_is_on_background; // true -> application en background ; false -> application au premier plan
 
@@ -63,6 +65,24 @@ public class ServiceAdmin extends Service
         return START_NOT_STICKY;
     }
 
+    public void endTask(CommunicationServer nwcomm,boolean success)
+    {
+        if (success)
+        {
+            establishedConnexionWithServer = true;
+            this.comm = nwcomm;
+
+        }
+        else if (networkReceiver.connected)
+        {
+            Log.e("retry after 5s","!");
+            nwcomm = new CommunicationServer(10000);
+            nwcomm.setActionIntent(ServiceAdmin.ACTION_FROM_SERVER);
+            nwcomm.setService(ServiceAdmin.this);
+            nwcomm.start();
+        }
+    }
+
     @Override
     public void onDestroy()
     {
@@ -77,7 +97,8 @@ public class ServiceAdmin extends Service
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -115,8 +136,17 @@ public class ServiceAdmin extends Service
                 Log.e("ALL", message);
 
                 switch (header) {
+
                     case "PROFILES": {
                         Log.e("ALL_PROFILES", content);
+                        establishedConnexionWithServer = true;
+                        if (!premiereConnexion)
+                        {
+                            Log.e("SENDCONTINUE","j");
+                            ServiceAdmin.this.comm.sendMessage("CONTINUE$");
+                        }
+                        premiereConnexion = false;
+
                         Intent intent = new Intent();
                         intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
                         intent.putExtra("ALL_PROFILES", content);
@@ -579,7 +609,7 @@ public class ServiceAdmin extends Service
 
         public static final String CONNECTIVITY_CHANGED = "android.net.conn.CONNECTIVITY_CHANGE";
         public boolean connected = false;
-        private boolean premiereConnexion = true;
+
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -587,12 +617,12 @@ public class ServiceAdmin extends Service
             if (CONNECTIVITY_CHANGED.equals(intent.getAction())) {
                 if (status == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
                     Log.e("ABAB", "not connected");
-
+                    establishedConnexionWithServer = false;
                     if (connected && comm != null)
                     {
                         // couper le socket
                         comm.interrupt();
-
+                        comm = null;
                         // notify activity
                         Intent intentForActivity = new Intent();
                         intentForActivity.setAction(Main2Activity.ACTION_FROM_SERVICE);
@@ -604,8 +634,6 @@ public class ServiceAdmin extends Service
                         } else {
                             sendBroadcast(intentForActivity);  // A TEST
                         }
-                        //   Toast ts = Toast.makeText(context, "DéConnecté", Toast.LENGTH_SHORT);
-                        //    ts.show();
 
                     }
                     connected = false;
@@ -615,31 +643,17 @@ public class ServiceAdmin extends Service
 
                     if (!connected)
                     {
-                        if(premiereConnexion){
-                            comm = new CommunicationServer();
-                            premiereConnexion = false;
-                            comm.setActionIntent(ACTION_FROM_SERVER);
-                            comm.setService(ServiceAdmin.this);
-                            comm.start();
-                            connected = true;
-                        }else{
-                            comm = new CommunicationServer();
-                            comm.setActionIntent(ACTION_FROM_SERVER);
-                            comm.setService(ServiceAdmin.this);
-                            comm.start();
-
-                            try
-                            {
-                                Thread.sleep(5000);
-                                alertManager.clear(); // clear car lors d'un continu on se resynchronisera totalement
-                                connected = comm.sendMessage("CONTINUE$");
-                            }
-                            catch (InterruptedException e)
-                            {
-                                Log.e("Socket", "Impossible d'établir une reconnexion.");
-                                return;
-                            }
+                        if (!premiereConnexion)
+                        {
+                            alertManager.clear();// clear car lors d'un continu on se resynchronisera totalement
                         }
+                        CommunicationServer comm = new CommunicationServer();
+                        comm.setActionIntent(ServiceAdmin.ACTION_FROM_SERVER);
+                        comm.setService(ServiceAdmin.this);
+                        comm.start();
+
+                        connected = true;
+
                     }
                 }
             }

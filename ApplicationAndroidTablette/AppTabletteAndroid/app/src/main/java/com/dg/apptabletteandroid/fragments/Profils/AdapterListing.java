@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +18,6 @@ import android.widget.Toast;
 
 import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
 import com.dg.apptabletteandroid.Main2Activity;
-import com.dg.apptabletteandroid.NetworkUtil;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
 
@@ -34,9 +32,11 @@ import java.util.ArrayList;
  */
 public class AdapterListing extends ArrayAdapter<Profil> {
     private boolean selectionProfilPourPromenade;
+    private Main2Activity act;
 
-    public AdapterListing(Context context, int resource, ArrayList<Profil> objects,boolean selectionProfilPourPromenade) {
+    public AdapterListing(Main2Activity context, int resource, ArrayList<Profil> objects,boolean selectionProfilPourPromenade) {
         super(context, resource, objects);
+        act = context;
         this.selectionProfilPourPromenade = selectionProfilPourPromenade;
     }
 
@@ -68,9 +68,10 @@ public class AdapterListing extends ArrayAdapter<Profil> {
             @Override
             public void onClick(View v) {
 
-                if (NetworkUtil.getConnectivityStatus(getContext()) == 0)
+                if (!act.isConnected())
                 {
                     Toast.makeText(getContext(),"Connectez vous au réseau pour modifier le profil",Toast.LENGTH_LONG).show();
+                    return;
                 }
 
                 Fragment fragEditProfil = AddProfilFragment.newInstance(profil);
@@ -82,7 +83,7 @@ public class AdapterListing extends ArrayAdapter<Profil> {
             @Override
             public void onClick(View v)
             {
-                if (NetworkUtil.getConnectivityStatus(getContext()) == 0)
+                if (!act.isConnected())
                 {
                     Toast.makeText(getContext(),"Connectez vous au réseau",Toast.LENGTH_LONG).show();
                     return;

@@ -45,6 +45,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     private FragmentManager fragmentManager;
     public static ProfilsManager profilsManager;
     private ServiceReceiver serviceReceiver;
+    private boolean connected = false;
 
     public final static String ACTION_FROM_SERVICE = "action.from.service";
 
@@ -243,6 +244,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         unregisterReceiver(serviceReceiver);
     }
 
+    public boolean isConnected()
+    {
+        return connected;
+    }
+
     public void followProfil(Profil p)
     {
         String idTel = profilsManager.findIdTelByProfil(p);
@@ -320,11 +326,13 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         public void onReceive(Context arg0,Intent arg1)
         {
 
-            // recuperations de tous les profils
+            // recuperations de tous les profils, systematique à chaque connexion
             if (arg1.hasExtra("ALL_PROFILES"))
             {
                 String allProfiles = arg1.getStringExtra("ALL_PROFILES");
                 Log.e("ALL_PROFILES",allProfiles);
+                connected = true;
+                Toast.makeText(Main2Activity.this,"Vous etes connecté au serveur",Toast.LENGTH_LONG).show();
                 profilsManager.saveAllProfils(getPreferences(Context.MODE_PRIVATE),allProfiles);
             }
 
@@ -408,6 +416,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             // notif recu du service si la tablette est pas connecté a Internet
             else if(arg1.hasExtra("TABNOTCO")) {
                 Log.e("ABAB", "Activity received signal");
+                connected = false;
+                Toast.makeText(Main2Activity.this,"Connexion au serveur perdue",Toast.LENGTH_LONG).show();
                 displayDialogAlert();
             }
 

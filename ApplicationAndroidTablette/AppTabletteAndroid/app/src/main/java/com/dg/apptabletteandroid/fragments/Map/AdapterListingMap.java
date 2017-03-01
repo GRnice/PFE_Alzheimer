@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.R;
@@ -195,20 +197,27 @@ public class AdapterListingMap extends ArrayAdapter
         {
             imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.pas_suivre)); // alors afficher l'icone plus suivre
         }
+
         imageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if(profil.estSuiviParMoi()) // si je le suis
+                if (!act.isConnected()) // si on est pas connecté on ignore le clic
                 {
+                    Toast.makeText(act,"Connexion au réseau nécessaire",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if(profil.estSuiviParMoi() && act.isConnected()) // si je le suis
+                {
+
                     act.unfollowProfil(profil); // alors j'afficherai suivre puisque à cet instant je ne suis pas
 //                    imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone suivre
                 }
-                else{
+                else if (act.isConnected())
+                {
                     act.followProfil(profil); // et inversement
                     imageView.setImageDrawable(act.getResources().getDrawable(R.drawable.suivre)); // alors afficher l'icone plus suivre
-
                 }
             }
         });

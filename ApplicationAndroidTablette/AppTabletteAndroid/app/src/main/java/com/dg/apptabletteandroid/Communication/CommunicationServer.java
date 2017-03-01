@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.util.Log;
 
 
+import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,19 +28,26 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "10.212.113.246";
+    public static final String SOCKET_ADDR = "192.168.1.13"; // "31.220.57.38"; // VM
 
     public static final int PORT = 3100;
     private Socket m_sock;
     private BufferedReader input;
     private PrintWriter output;
     private String actionIntent;
-    private Service service;
+    private ServiceAdmin service;
+    int delayBeforeConnection;
     boolean run;
 
     public CommunicationServer()
     {
         super();
+        delayBeforeConnection = 0;
+    }
+
+    public CommunicationServer(int delayMs)
+    {
+        delayBeforeConnection = delayMs;
     }
 
     public synchronized void setActionIntent(String action)
@@ -47,26 +56,35 @@ public class CommunicationServer extends Thread implements Runnable
     }
 
 
-    public synchronized void setService(Service ser)
+    public synchronized void setService(ServiceAdmin ser)
     {
         this.service = ser;
     }
+
+
     @Override
     public void run()
     {
         String line;
-
+        try
+        {
+            Thread.sleep(delayBeforeConnection);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
         try
         {
             m_sock = new Socket(SOCKET_ADDR, PORT);
         }
         catch (IOException e)
         {
-
+            service.endTask(this,false);
             e.printStackTrace();
             return;
         }
-
+        service.endTask(this,true);
         try
         {
             input = new BufferedReader(new InputStreamReader(m_sock.getInputStream()));
@@ -130,8 +148,14 @@ public class CommunicationServer extends Thread implements Runnable
         super.interrupt();
     }
 
-    public synchronized Socket getSocket() {
+    public synchronized Socket getSocket()
+    {
         return m_sock;
+    }
+
+    public boolean isReady()
+    {
+        return m_sock != null;
     }
 }
 

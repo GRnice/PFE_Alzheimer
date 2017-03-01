@@ -2,7 +2,6 @@ package com.dg.apptabletteandroid.fragments.Profils;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -21,8 +20,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.dg.apptabletteandroid.Daemon.ServiceAdmin;
-import com.dg.apptabletteandroid.NetworkUtil;
 import com.dg.apptabletteandroid.Profils.Profil;
 import com.dg.apptabletteandroid.Main2Activity;
 import com.dg.apptabletteandroid.Profils.ProfilsManager;
@@ -42,6 +39,7 @@ public class ProfilFragment extends BlankFragment
     private boolean selectionProfilNewSession;
     private WorkerListingProfil worker;
     private Button buttonAddProfil;
+    private Main2Activity act;
 
     public ProfilFragment()
     {
@@ -79,6 +77,7 @@ public class ProfilFragment extends BlankFragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        act = (Main2Activity) getActivity();
         super.onCreate(savedInstanceState);
     }
 
@@ -99,7 +98,8 @@ public class ProfilFragment extends BlankFragment
             @Override
             public void onClick(View view)
             {
-                if (NetworkUtil.getConnectivityStatus(getActivity()) == 0)
+
+                if (!act.isConnected())
                 {
                     Toast.makeText(getActivity(), "Connectez vous au réseau", Toast.LENGTH_LONG).show();
                     return;
@@ -117,13 +117,12 @@ public class ProfilFragment extends BlankFragment
         {
             buttonAddProfil.setVisibility(View.INVISIBLE);
             getActivity().setTitle("Selectionner un profil pour le dispositif :"+idTel.substring(0,6));
-            AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,true);
+            AdapterListing adapterListing = new AdapterListing((Main2Activity)getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,true);
             this.listView.setAdapter(adapterListing);
 
             this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
 
                     AdapterListing adapterListing = (AdapterListing) listView.getAdapter();
                     Profil profilselected = adapterListing.getItem(i);
@@ -135,7 +134,7 @@ public class ProfilFragment extends BlankFragment
         }
         else
         {
-            AdapterListing adapterListing = new AdapterListing(getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,false);
+            AdapterListing adapterListing = new AdapterListing((Main2Activity)getActivity(),R.layout.item_adapter_profil_listing,listprofilFilter,false);
             this.listView.setAdapter(adapterListing);
         }
 
@@ -238,7 +237,7 @@ public class ProfilFragment extends BlankFragment
         protected void onPostExecute(Object result)
         {
             final AdapterListing listingBoutiques = new AdapterListing(
-                    getActivity(),R.layout.item_adapter_profil_listing,listProfilSelected,selectionProfilNewSession);
+                    (Main2Activity)getActivity(),R.layout.item_adapter_profil_listing,listProfilSelected,selectionProfilNewSession);
             updateListing(listingBoutiques);
         }
     }
