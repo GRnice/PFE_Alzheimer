@@ -1,2 +1,3 @@
-# polytech
+# longCentre,latCentre,longExtrem,latExtrem
 7.079770,43.612549,7.079695,43.612497
+7.079525,43.612730,7.079506,43.612716
