@@ -107,11 +107,11 @@ public class MapFragment_ extends BlankFragment
 
         // affichage Bariere
         /*CircleOptions c = new CircleOptions()
-                                .center(new LatLng(43.612549, 7.07977))
-                                .radius(8.219290934885054)  // In meters
+                                .center(new LatLng(43.61273, 7.079525))
+                                .radius(2.1255215857234537)  // In meters
                                 .strokeColor(Color.MAGENTA)
                                 .strokeWidth(1);
-        googleMap.addCircle(c); */
+        googleMap.addCircle(c);*/
 
     }
 

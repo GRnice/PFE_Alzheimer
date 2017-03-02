@@ -16,7 +16,7 @@ class WatchMan:
         #load all circles of death, si un patient entre dans l'un de ces
         # cercles ont déclenche une alerte.
         self.limitCentre = []
-        self.cercleBarriere = None
+        self.listCircles = [] ## liste de cercle ou le premier c'est la barriere -- le portail
         self.loadCircles()
         self.loadCentreLimits()
 
@@ -37,15 +37,23 @@ class WatchMan:
                 if (line[0] == "#"):
                     continue
                 line = line.rstrip().split(",")
-                circleBarriere = Circle(float(line[0]),float(line[1]),float(line[2]),float(line[3]))
-                self.cercleBarriere = circleBarriere
+                print("---- Bariere")
+                circle = Circle(float(line[0]),float(line[1]),float(line[2]),float(line[3]))
+                self.listCircles.append(circle)
             
             
     def positionIsGood(self,tracker,longP,latP):
+        self.limitCentre = []
+        self.circles = []
+        self.loadCircles()
+        self.loadCentreLimits()
+        
         p = path.Path(self.limitCentre)
         if(not p.contains_points([(latP, longP)])):
             return False
-        if tracker.risqueFranchissementBarriere and self.cercleBarriere.isInside(longP,latP):
+        if tracker.risqueFranchissementBarriere and self.listCircles[0].isInside(longP,latP):
+            return False
+        if self.listCircles[1].isInside(longP, latP):
             return False
 
         return True
