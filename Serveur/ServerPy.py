@@ -113,6 +113,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         self.dictSocketPatient = dict() # <sockPatient,Tracker>
         self.watchman = WatchMan()
         self.dictAssistance = dict() # HashMap<sockAssistant,none>
+        self.mapIdAssistant = dict() # HashMap<tokenId,sockAssistant>
 
         self.serverAssistant = serverAssistant
         self.serverAssistant.setMapper(self)
@@ -127,6 +128,14 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         with lockMap:
             if socket in self.dictSocketPatient.keys():
                 del self.dictSocketPatient[socket]
+
+                
+    def removePatient(self,sockPatient):
+        with lockMap:
+            tracker = self.getTracker(sockPatient)
+            if tracker.id in list(self.mapIdSock.keys()):
+                del self.mapIdSock[tracker.id]
+                self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
 
 
     def getTracker(self,socket):
@@ -149,70 +158,44 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
         with lockMap:
             return self.dictSocketPatient.keys()
 
-    #################################################
-
+## ASSISTANT #####
 
     def getSocketsAssistant(self):
-        return self.dictAssistance.keys()
+        with lockMap:
+            return self.dictAssistance.keys()
 
+    def getTokensAssistant(self):
+        with lockMap:
+            return self.mapIdAssistant.keys()
+
+    def getSocketAssistantByToken(self,token):
+        print("list of mapIdAssistant")
+        if (token in list(self.mapIdAssistant.keys())):
+            return self.mapIdAssistant[token]
 
     def attachAssistant(self,socketPatient,socketAssistant):
-        #print(socketPatient,"attach with",socketAssistant)
-##        with lockMap:
-##            if socketAssistant in self.dictAssistance.keys():
-##                listeSocketPatient = self.dictAssistance[socketAssistant]
-##                listeSocketPatient.append(socketPatient)
-##
-##            else:
-##                self.dictAssistance[socketAssistant] = [socketPatient]
-##
-        tracker = self.getTracker(socketPatient)
-        tracker.nbFollower += 1
+        with lockMap:
+            tracker = self.getTracker(socketPatient)
+            tracker.nbFollower += 1
 
     def detachAssistant(self,socketPatient,socketAssistant):
-##        with lockMap:
-##            if socketAssistant in self.dictAssistance.keys():
-##                listeSpatient = self.dictAssistance[socketAssistant]
-##                if socketPatient in listeSpatient:
-##                    index = listeSpatient.index(socketPatient)
-##                    listeSpatient.pop(index)
-        tracker = self.getTracker(socketPatient)
-        tracker.nbFollower -= 1
+        with lockMap:
+            tracker = self.getTracker(socketPatient)
+            tracker.nbFollower -= 1
 
-    def addAssistant(self,assistantSock):
+    def addAssistant(self,token,assistantSock):
         with lockMap:
             if assistantSock not in self.dictAssistance.keys():
-                self.dictAssistance[assistantSock] = []
-
+                print("add assistant ok")
+                self.dictAssistance[assistantSock] = token
+                self.mapIdAssistant[token] = assistantSock
 
     def removeAssistant(self,sockAssistant):
         with lockMap:
             if sockAssistant in self.dictAssistance.keys():
+                token = self.dictAssistance[sockAssistant]
                 del self.dictAssistance[sockAssistant]
-
-##    def updateSocketPatient(self,nwSocketPatient,oldSocketPatient):
-##        with lockMap:
-##            allAssistants = list(self.getSocketsAssistant())
-##            for assistantSock in allAssistants:
-##                listeSock = self.dictAssistance[assistantSock]
-##                if (oldSocketPatient in listeSock):
-##                    index = listeSock.index(oldSocketPatient)
-##                    listeSock[index] = nwSocketAssistant
-
-    def removePatient(self,sockPatient):
-        with lockMap:
-            tracker = self.getTracker(sockPatient)
-##            allAssistants = list(self.getSocketsAssistant())
-##            for assistantSock in allAssistants:
-##                listeSock = self.dictAssistance[assistantSock]
-##                if (sockPatient in listeSock):
-##                    index = listeSock.index(sockPatient)
-##                    listeSock.pop(index)
-
-            if tracker.id in list(self.mapIdSock.keys()):
-                del self.mapIdSock[tracker.id]
-                self.serverAssistant.broadcast("SYNCH$STOPPROMENADE_"+str(tracker.id)+"\r\n")
-
+                del self.mapIdAssistant[token]
 
     def apply(self,commande):
         ## parse la commande et applique la commande
@@ -395,7 +378,7 @@ class PatientServer(Thread):
         self.maxClientSocket = maxClientSocket
         self.CONNECTION_LIST = [] # liste des patients connectés (socket)
         self.serverOnline = True
-        self.mapper = mapper # HashMap<socket,Profil>
+        self.mapper = mapper
 
     def getMapper(self):
         return self.mapper
@@ -454,14 +437,15 @@ class PatientServer(Thread):
 
                         else:
                             print("Client (%s) is offline" % sock)
-                            sock.close()
-                            with lockMap:
-                                tracker = self.mapper.getTracker(sock)
-                                if tracker == None:
-                                    pass
+                            if sock != None:
+                                sock.close()
+                                
+                            tracker = self.mapper.getTracker(sock)
+                            if tracker == None:
+                                pass
 
-                                if (tracker != None and tracker.etat != 2):
-                                    self.mapper.delTracker(sock)
+                            if (tracker != None and tracker.etat != 2):
+                                self.mapper.delTracker(sock)
 
 
 
@@ -472,15 +456,16 @@ class PatientServer(Thread):
                         print(err)
                         #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                         print("(fail) Client (%s) is offline" % sock)
-                        sock.close()
-                        with lockMap:
-                            tracker = self.mapper.getTracker(sock)
-                            if tracker == None: # si none le socket existe plus dans mapper
-                                pass
+                        if sock != None:
+                            sock.close()
+                            
+                        tracker = self.mapper.getTracker(sock)
+                        if tracker == None: # si none le socket existe plus dans mapper
+                            pass
 
-                            if (tracker != None and tracker.etat != 2): #si == 2 on attendra un continue
-                                print("Except suppression d'un socket, il n'est pas à l'etat 2")
-                                self.mapper.delTracker(sock)
+                        if (tracker != None and tracker.etat != 2): #si == 2 on attendra un continue
+                            print("Except suppression d'un socket, il n'est pas à l'etat 2")
+                            self.mapper.delTracker(sock)
 
         server_socket.close()
         print("=============SERVEUR OFFLINE=============")

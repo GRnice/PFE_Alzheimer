@@ -5,6 +5,7 @@ import Profils
 import LookupAssistantPatient
 from Pinger import Pinger
 import time
+import re
 
 lockPool = RLock()
 
@@ -29,6 +30,7 @@ class AssistanceServer(Thread):
 
         self.managerProfils = Profils.ManagerProfile("./profils.txt")
         self.managerProfils.read()
+        self.token = 1024
 
 
     def setMapper(self,mapper):
@@ -159,8 +161,8 @@ class AssistanceServer(Thread):
             self.broadcast(messageAlerte)
 
     # ajout d'un assistant
-    def addAssistant(self,sockAssistant):
-        self.mapper.addAssistant(sockAssistant)
+    def addAssistant(self,token,sockAssistant):
+        self.mapper.addAssistant(token,sockAssistant)
         # lui transmettre tous les promenés.
         listOfSocketPatient = list(self.mapper.getSocketPatient())
 
@@ -253,9 +255,14 @@ class AssistanceServer(Thread):
                 #New connection
                 if sock == server_socket:
                     sockfd, addr = server_socket.accept()
+                    message = "TOKEN$"+str(self.token)+"\r\n"
+                    sockfd.send(message.encode("utf-8"))
                     message = "PROFILES$"+str(self.managerProfils)+"\r\n"
                     sockfd.send(message.encode('utf-8'))
-                    self.addAssistant(sockfd)
+                    
+                    self.addAssistant(self.token,sockfd)
+                    self.token += 1
+                    self.token %= 4096
                     print("Assistant (%s, %s) connected" % addr)
                     print("NB ASSISTANT",len(self.mapper.getSocketsAssistant()))
 
@@ -265,7 +272,7 @@ class AssistanceServer(Thread):
                         #In Windows, sometimes when a TCP program closes abruptly,
                         # a "Connection reset by peer" exception will be thrown
                         data = sock.recv(self.RECV_BUFFER)
-                        tabdata = data.decode('utf-8').rstrip().split("\r\n")
+                        tabdata = re.split(r'[\n\r]+',data.decode('utf-8').rstrip())
                         print("-->",tabdata)
                         for data in tabdata:
 
@@ -326,8 +333,13 @@ class AssistanceServer(Thread):
                                     #L'ancien socket meurt automatiquement dans le except Exception quand on essaye d'envoyer un update dans l'ancien socket
                                     #L'ancien socket est aussi supprimé dans le except
                                     #On ajoute le nouveau socket à la liste d'assistants
-                                    self.addAssistant(sock)
-
+                                    oldToken = message[1]
+                                    print("ancien token",oldToken)
+                                    oldSocket = self.mapper.getSocketAssistantByToken(int(oldToken))
+                                    if (oldSocket != None):
+                                        oldSocket.close()
+                                        self.mapper.removeAssistant(oldSocket)
+                                        
                                     message = ""
                                     allPatients = list(self.mapper.getSocketPatient())
                                     for socketPatient in allPatients:

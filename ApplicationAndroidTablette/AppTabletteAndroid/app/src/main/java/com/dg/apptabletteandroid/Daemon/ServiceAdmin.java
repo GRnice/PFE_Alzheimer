@@ -30,7 +30,8 @@ public class ServiceAdmin extends Service
     NetworkChangeReceiver networkReceiver; // ce receiver recevra l'etat de la connection de la tablette
     AlertManager alertManager; // le manager des alertes
     DataKeeper dataKeeper; // stocke tous les messages recus en attendant que l'activite revienne en premier plan
-    public boolean premiereConnexion = true;
+    private String token;
+
     public boolean establishedConnexionWithServer = false;
 
     boolean activity_is_on_background; // true -> application en background ; false -> application au premier plan
@@ -63,6 +64,8 @@ public class ServiceAdmin extends Service
         intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkReceiver, intentFilter);
+
+        token = null;
 
         Log.e("CHECK SERVICE", "RUN");
         return START_NOT_STICKY;
@@ -140,15 +143,20 @@ public class ServiceAdmin extends Service
 
                 switch (header) {
 
-                    case "PROFILES": {
-                        Log.e("ALL_PROFILES", content);
-                        establishedConnexionWithServer = true;
-                        if (!premiereConnexion)
+                    case "TOKEN":
+                    {
+                        Log.e("TOKEN-RCV",content);
+                        if (token != null)
                         {
                             Log.e("SENDCONTINUE","j");
-                            ServiceAdmin.this.comm.sendMessage("CONTINUE$");
+                            ServiceAdmin.this.comm.sendMessage("CONTINUE$"+token);
                         }
-                        premiereConnexion = false;
+                        establishedConnexionWithServer = true;
+                        token = content;
+                        break;
+                    }
+                    case "PROFILES": {
+                        Log.e("ALL_PROFILES", content);
 
                         Intent intent = new Intent();
                         intent.setAction(Main2Activity.ACTION_FROM_SERVICE);
@@ -660,7 +668,7 @@ public class ServiceAdmin extends Service
 
                     if (!connected)
                     {
-                        if (!premiereConnexion)
+                        if (token != null)
                         {
                             alertManager.clear();// clear car lors d'un continu on se resynchronisera totalement
                         }
@@ -669,9 +677,8 @@ public class ServiceAdmin extends Service
                         comm.setService(ServiceAdmin.this);
                         comm.start();
 
-                        connected = true;
-
                     }
+                    connected = true;
                 }
             }
         }

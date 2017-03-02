@@ -28,7 +28,7 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR = "192.168.1.13"; // "31.220.57.38"; // VM
+    public static final String SOCKET_ADDR ="10.212.118.187" ; // "31.220.57.38" // VM
 
     public static final int PORT = 3100;
     private Socket m_sock;
