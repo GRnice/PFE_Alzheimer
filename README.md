@@ -14,14 +14,14 @@
 - Puis Run pour les deux applications Android
 
 
-**Les fichiers:**
-- coordonneeCentre.txt : 
+**Les fichiers txt du dossier Serveur:**
+- *coordonneeCentre.txt* : 
 Contient la position des sommets du polygone du centre, ce polygone couvre la zone de promenade autorisée (à améliorer ce n'est pas totalement fiable !)
 
-- profils.txt : 
+- *profils.txt* : 
 Contient la liste de tous les profils des patients
 
-- cercleBarriere.txt : 
+- *cercleBarriere.txt* : 
 Contient les coordonnées des cercles sous le format suivant : 
 longitude du centre du cercle,latitude du centre du cercle,longitude du rayon,latitude du rayon
 
