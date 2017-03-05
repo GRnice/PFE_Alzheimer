@@ -230,7 +230,7 @@ class Mapper: ## HashMap permettant d'associer un socket à un utilisateur
             latitude = float(requeteArray[2])
             battery = int(requeteArray[3])
             tracker = self.getTracker(socket)
-            if (tracker == None):
+            if (tracker == None or tracker.etat != 2):
                 print("position sur un tracker null, peut arriver juste apres un stop suivi")
                 return
             
