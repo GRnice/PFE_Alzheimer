@@ -249,6 +249,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         return connected;
     }
 
+    /**
+     *
+     * @param p Profil a suivre.
+     */
     public void followProfil(Profil p)
     {
         String idTel = profilsManager.findIdTelByProfil(p);
@@ -269,6 +273,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
     }
 
+    /**
+     * Desabonnement à un profil, si le serveur répond ALLOW le desabonnement est effectif.
+     * @param p
+     */
     public void unfollowProfil(Profil p)
     {
         String idTel = profilsManager.findIdTelByProfil(p);
@@ -285,7 +293,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             throw new RuntimeException("profil: "+p.makeSignature()+" has not a idTel");
         }
     }
-    
+
+    /**
+     * Affiche le fragment sur l'écran
+     * @param frag
+     */
     public void pushFragmentFromActivity(Fragment frag)
     {
         fragmentManager.pushFragment(frag,Main2Activity.this);
@@ -400,8 +412,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                 String prenom = params[2];
                 Log.e("synch",nom+" "+prenom);
                 Profil profilSelected = profilsManager.getProfil(nom,prenom);
-                if (!(profilsManager.getAllProfilsOnPromenade().containsKey(idTel)))
-                { // si il existe deja ca n'a aucun sens, traite le CONTINUE
+                if ( ! (profilsManager.getAllProfilsOnPromenade().containsKey(idTel)))
+                { // si il existe deja ca n'a aucun sens, ca veut dire que CONTINUE a été envoyé au serveur.
                     profilSelected.setEstSuiviParMoi(false);
                     profilsManager.addProfilOnPromenade(idTel,profilSelected);
                 }

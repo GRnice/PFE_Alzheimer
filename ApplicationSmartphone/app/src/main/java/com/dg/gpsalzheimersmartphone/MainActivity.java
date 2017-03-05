@@ -26,7 +26,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String STARTSUIVI = "STARTSUIVI";
     public final static String ACTION_SEND_TO_SERVER = "DATA_TO_SERVICE";
-    private int etat = 0;
+    public final int INIT = 0;
+    public final int WAITINGRESPONSE = 1;
+    public final int ONPROMENADE = 2;
+    private int etat = INIT;
     private Button buttonSwitchConnexion;
     private boolean connected;
     private TextView textViewInfo;
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                if(etat == 0)
+                if(etat == INIT)
                 {
 
                     Intent intent = new Intent();
@@ -81,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra(STARTSUIVI + "*" + android_id, true);
                     sendBroadcast(intent);
                 }
-                else if (etat == 1 || etat == 2)
+                else if (etat == WAITINGRESPONSE || etat == ONPROMENADE)
                 {
-                    etat = 0;
+                    etat = INIT;
                     Intent intent = new Intent();
                     intent.setAction(ACTION_SEND_TO_SERVER);
                     intent.putExtra(STOPSUIVI,true);
@@ -124,13 +127,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         buttonSwitchConnexion = (Button) findViewById(R.id.button);
-        if (etat == 1)
+        if (etat == WAITINGRESPONSE)
         {
             buttonSwitchConnexion.setText("ANNULER LA DEMANDE DE SUIVI");
             textViewInfo.setText("En attente de configuration de la promenade ...");
             textViewInfo.setTextColor(Color.argb(255,255,127,80));
         }
-        else if (etat == 2)
+        else if (etat == ONPROMENADE)
         {
             buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
             textViewInfo.setText("PROMENADE EN COURS");
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        if (etat == 0)
+        if (etat == INIT)
         {
             this.finishAffinity();
         }
@@ -193,13 +196,13 @@ public class MainActivity extends AppCompatActivity {
                 buttonSwitchConnexion.setText("DESACTIVER LE SUIVI");
                 textViewInfo.setText("PROMENADE EN COURS");
                 textViewInfo.setTextColor(Color.argb(255,50,205,50));
-                etat = 2;
+                etat = ONPROMENADE;
             }
             else if (intent.hasExtra("DEMANDESUIVISENT"))
             {
                 textViewInfo.setText("En attente de configuration de la promenade ...");
                 textViewInfo.setTextColor(Color.argb(255,255,127,80));
-                etat = 1;
+                etat = WAITINGRESPONSE;
                 buttonSwitchConnexion.setText("ANNULER LA DEMANDE DE SUIVI");
             }
 

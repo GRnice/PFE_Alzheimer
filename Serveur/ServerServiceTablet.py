@@ -295,6 +295,7 @@ class AssistanceServer(Thread):
                                         sock.send(("UNFOLLOW$ALLOW_"+idTel+"\r\n").encode('utf-8'))
                                         print("OK UNFOLLOW")
                                     else:
+                                        ## CE MESSAGE N'EST PAS TRAITE PAR LE CODE TABLETTE
                                         sock.send(("UNFOLLOW$INTERDICT_"+idTel+"\r\n").encode('utf-8'))
                                         print("NO UNFOLLOW")
 

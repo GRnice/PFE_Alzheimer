@@ -28,7 +28,7 @@ import java.net.Socket;
  */
 public class CommunicationServer extends Thread implements Runnable
 {
-    public static final String SOCKET_ADDR ="10.212.118.187" ; // "31.220.57.38" // VM
+    public static final String SOCKET_ADDR = "192.168.1.13"; //"31.220.57.38" ; // "10.212.118.187" // VM
 
     public static final int PORT = 3100;
     private Socket m_sock;
@@ -80,11 +80,11 @@ public class CommunicationServer extends Thread implements Runnable
         }
         catch (IOException e)
         {
-            service.endTask(this,false);
+            service.endTask(this,false); // FAIL CONNEXION
             e.printStackTrace();
             return;
         }
-        service.endTask(this,true);
+        service.endTask(this,true); // indique au service que la tablette est connectée au serveur
         try
         {
             input = new BufferedReader(new InputStreamReader(m_sock.getInputStream()));
@@ -109,7 +109,7 @@ public class CommunicationServer extends Thread implements Runnable
                     intent.putExtra("MESSAGE",line);
                     synchronized (this.service)
                     {
-                        this.service.sendBroadcast(intent);
+                        this.service.sendBroadcast(intent); // message envoyé au service via Intent.
                     }
                     Log.e("RECEIVE THIS -> ",line);
                 }

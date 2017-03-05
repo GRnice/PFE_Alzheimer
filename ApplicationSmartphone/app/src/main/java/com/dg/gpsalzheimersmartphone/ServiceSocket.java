@@ -146,7 +146,6 @@ public class ServiceSocket extends Service implements LocationListener,
             if (networkChangeReceiver.connectedNetwork)
             {
                 CommunicationServer comm = new CommunicationServer(10000);
-                comm.setActionIntent(ServiceSocket.ACTION_SEND_TO_ACTIVITY);
                 comm.setService(this);
                 comm.start();
             }
@@ -165,17 +164,17 @@ public class ServiceSocket extends Service implements LocationListener,
         Log.e("DEAD","DEAD");
         if (comm != null)
         {
-            comm.interrupt();
+            comm.interrupt(); // arret du socket
         }
 
-        if (onPromenade)
+        if (onPromenade) // si en promenade on ne solicite plus le GPS
         {
             LocationManager lm = (LocationManager) ServiceSocket.this.getSystemService(LOCATION_SERVICE);
             lm.removeUpdates(ServiceSocket.this);
             schedSender.stopRemainder(this);
         }
 
-        unregisterReceiver(clientReceiver);
+        unregisterReceiver(clientReceiver); // arret des 4 broadcast receivers
         unregisterReceiver(serverReceiver);
         unregisterReceiver(networkChangeReceiver);
         unregisterReceiver(batteryChangeReceiver);
@@ -213,6 +212,9 @@ public class ServiceSocket extends Service implements LocationListener,
 
     }
 
+    /**
+     * Envoie la position courante et le niveau de batterie du tracker au serveur
+     */
     public void sendUpdate()
     {
         if (connectionEtablishedWithServer)
@@ -224,18 +226,19 @@ public class ServiceSocket extends Service implements LocationListener,
     }
 
     /**
-     * ClientReceiver , envoie des messages au serveur
+     * ClientReceiver , receptionne les messages provenants de MainActivity
      * STARTSUIVI
      * CONTINUE
      * STOPSUIVI
      *
      * action -> MainActivity.ACTION_SEND_TO_SERVER
      */
-    private class ClientReceiver extends BroadcastReceiver {
+    private class ClientReceiver extends BroadcastReceiver
+    {
 
         @Override
-        public void onReceive(Context arg0, Intent arg1) {
-
+        public void onReceive(Context arg0, Intent arg1)
+        {
             boolean startSuivi = arg1.getBooleanExtra(STARTSUIVI + SEPARATOR + android_id, false);
             boolean messageContinue = arg1.getBooleanExtra(CONTINUE + SEPARATOR + android_id, false);
             boolean stopSuivi = arg1.getBooleanExtra(STOPSUIVI, false);
@@ -280,7 +283,7 @@ public class ServiceSocket extends Service implements LocationListener,
             if (arg1.hasExtra(CONNECTED)) // si on recoit CONNECTED, alors on est bien enregistré chez le serveur
             {
                 connectionEtablishedWithServer = true;
-                if (identifiedByServer)
+                if (identifiedByServer) // si identifié par le serveur alors on envoie CONTINUE
                 {
                     ServiceSocket.this.comm.sendMessage(CONTINUE + SEPARATOR + android_id);
                 }
@@ -361,7 +364,6 @@ public class ServiceSocket extends Service implements LocationListener,
                 {
                     connectedNetwork = true;
                     CommunicationServer comm = new CommunicationServer();
-                    comm.setActionIntent(ServiceSocket.ACTION_SEND_TO_ACTIVITY);
                     comm.setService(ServiceSocket.this);
                     comm.start();
                 }

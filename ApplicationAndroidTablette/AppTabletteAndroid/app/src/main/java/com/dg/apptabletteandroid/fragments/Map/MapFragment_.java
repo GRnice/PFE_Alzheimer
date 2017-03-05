@@ -44,13 +44,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-
+/**
+ * MapFragment_ se charge d'afficher les usagers en promenade
+ * ET une liste où chaque item detaille le statut d'un usager (batterie, temps de promenade, alertes
+ */
 public class MapFragment_ extends BlankFragment
 {
     MapView mMapView;
     private GoogleMap googleMap;
 
-    private ListView listView;
+    private ListView listView; // la liste view qui affichera les items.
     private Button synchRefreshTitre;
     private ProfilOnPromenadeManager profilsManager;
     private ProfilGroupManager profilsGroupManager;
@@ -81,24 +84,28 @@ public class MapFragment_ extends BlankFragment
     private void limitCentre() {
         // Instantiates a new Polygon object and adds points to define a rectangle
         PolygonOptions rectOptions = new PolygonOptions()
-                .add(new LatLng(43.612736, 7.079357),
-                        new LatLng(43.612669, 7.079243),
-                        new LatLng(43.612522, 7.079179),
-                        new LatLng(43.612432, 7.079147),
-                        new LatLng(43.612366, 7.079048),
-                        new LatLng(43.612304, 7.078982),
-                        new LatLng(43.612246, 7.078964),
-                        new LatLng(43.611973, 7.079333),
-                        new LatLng(43.611956, 7.079453),
-                        new LatLng(43.612008, 7.079529),
-                        new LatLng(43.612101, 7.079949),
-                        new LatLng(43.612274, 7.080104),
-                        new LatLng(43.612373, 7.080015),
-                        new LatLng(43.612492, 7.079833),
-                        new LatLng(43.612475, 7.079789), // coint gauche avant de la bariere
-                        new LatLng(43.612555, 7.079675),  // coint droit avant de la bariere
-                        new LatLng(43.612600, 7.079692),
-                        new LatLng(43.612721, 7.079515))
+
+                .add(new LatLng(43.612736,7.079357),
+                        new LatLng(43.612669,7.079243),
+                        new LatLng(43.612522,7.079179),
+                        new LatLng(43.612432,7.079147),
+                        new LatLng(43.612366,7.079048), //
+                        new LatLng(43.612304,7.078982), //
+                        new LatLng(43.612247,7.078935), //
+                        new LatLng(43.611973,7.079333), //
+                        new LatLng(43.611956,7.079453), //
+                        new LatLng(43.612008,7.079529), //
+                        new LatLng(43.612078,7.079606), //
+                        new LatLng(43.612138,7.079728),//
+                        new LatLng(43.612140,7.079850), //
+                        new LatLng(43.612063,7.079987), //
+                        new LatLng(43.612236,7.080152), //
+                        new LatLng(43.612373,7.080015), // coint gauche avant de la bariere
+                        new LatLng(43.612509,7.079870),  // coint droit avant de la bariere
+                        new LatLng(43.612475,7.079789), //
+                        new LatLng(43.612555,7.079675),
+                        new LatLng(43.612600,7.079692),
+                        new LatLng(43.612721,7.079515))
                 .strokeColor(Color.BLUE)
                 .strokeWidth(2);
 
@@ -134,7 +141,7 @@ public class MapFragment_ extends BlankFragment
             @Override
             public void onClick(View view)
             {
-
+                // Synchro pas implementée.
             }
         });
 

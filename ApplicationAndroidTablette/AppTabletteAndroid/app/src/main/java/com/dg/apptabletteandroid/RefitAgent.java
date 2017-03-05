@@ -26,6 +26,11 @@ import java.util.HashSet;
 
 public class RefitAgent
 {
+    /**
+     * Synchronise Main2Activity suite à la réponse du serveur au CONTINUE transmis par la tablette
+     * @param m l'activité
+     * @param profilsOnPromenade liste des profils en promenades avec l'etat de chaque variable(batterie,temps promenade,alertes...)
+     */
     public static void fix(Main2Activity m,String[] profilsOnPromenade)
     {
 
@@ -35,6 +40,7 @@ public class RefitAgent
         }
         else
         {
+            // si aucune promenade on fait un simple clear.
             ProfilsManager profilsManager = m.getProfilsManager();
             profilsManager.getAllProfilsOnPromenade().clear();
         }
@@ -70,7 +76,7 @@ public class RefitAgent
                     prof.removeProfilOnPromenade(idTelProfilEnPromenadeServeur); // je supprime l'ancien objet
                 }
             }
-            else // CREATION
+            else // CREATION d'une promenade
             {
                 // cet id n'existe pas donc il faut l'ajouter, avec son profil associé.
                 String nom = unProfilEnPromenadeServ[3];
@@ -81,8 +87,8 @@ public class RefitAgent
             }
         }
 
-        allProfilsOnPromenade.keySet().retainAll(allIdTelServ); // intersection, on conserve seulement les idtels donnés par le serveur.
-
+        // intersection des idtels donnés par le serveur et ceux existants sur la tablette.
+        allProfilsOnPromenade.keySet().retainAll(allIdTelServ);
 
     }
 
@@ -102,7 +108,7 @@ public class RefitAgent
         String batteryIsLow = profilSent[13];
         String isTimeoutPromenade = profilSent[15];
         String isUpdateTimeout = profilSent[17];
-        String dureePromenade = profilSent[19];
+        String tempsRestant = profilSent[19];
         // appliquer les modifs de profilSent à enPromenade
 
         if (profilObsolete != null)
@@ -141,7 +147,7 @@ public class RefitAgent
         enPromenade.setBattery(Integer.valueOf(niveauBatterie));
         enPromenade.setHorsZone(Boolean.valueOf(isHorsZone));
         enPromenade.setBatteryLow(Boolean.valueOf(batteryIsLow));
-        enPromenade.setTempsRestant(Integer.parseInt(dureePromenade));
+        enPromenade.setTempsRestant(Integer.parseInt(tempsRestant));
         enPromenade.setUpdateOut(Boolean.valueOf(isUpdateTimeout));
         return enPromenade;
     }

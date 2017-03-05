@@ -27,7 +27,7 @@ import static com.dg.gpsalzheimersmartphone.ServiceSocket.maxTime;
 public class CommunicationServer extends Thread implements Runnable
 {
 
-    public static final String SOCKET_ADDR = "10.212.118.187"; //"31.220.57.38"; // VM
+    public static final String SOCKET_ADDR = "192.168.1.13"; // ADRESSE DU SERVEUR
 
     public static final int PORT = 3000;
     public static final String OKPROMENADE = "OKPROMENADE";
@@ -36,7 +36,6 @@ public class CommunicationServer extends Thread implements Runnable
     private Socket m_sock;
     private BufferedReader input;
     private PrintWriter output;
-    private String actionIntent;
     private ServiceSocket service;
     private int delayConnexion;
     boolean run;
@@ -52,11 +51,6 @@ public class CommunicationServer extends Thread implements Runnable
         super();
         delayConnexion = timeDelayMs;
 
-    }
-
-    public synchronized void setActionIntent(String action)
-    {
-        actionIntent = action;
     }
 
     public synchronized boolean isReady()

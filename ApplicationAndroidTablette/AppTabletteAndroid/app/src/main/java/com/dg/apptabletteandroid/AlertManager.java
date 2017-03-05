@@ -100,9 +100,6 @@ public class AlertManager
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notif);
-//        RingtoneManager mRing = new RingtoneManager(context);
-//        int mNumberOfRingtones = mRing.getCursor().getCount();
-//        Uri mRingToneUri = mRing.getRingtoneUri((int) (Math.random() * mNumberOfRingtones));
 
         if(makeSound) {
             Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
